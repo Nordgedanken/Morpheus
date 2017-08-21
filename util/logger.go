@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"sync"
+	"time"
 )
 
 var logInstance *log.Logger
@@ -17,6 +18,7 @@ func Logger() *log.Logger {
 	return logInstance
 }
 
+//StartFileLog initialises the logging function
 func StartFileLog(localLog *log.Logger) {
 	if _, err := os.Stat("./log/"); os.IsNotExist(err) {
 		os.Mkdir("./log/", 0666)
@@ -28,4 +30,5 @@ func StartFileLog(localLog *log.Logger) {
 	defer f.Close()
 
 	localLog.SetOutput(f)
+	localLog.SetPrefix(time.Now().Format("2006-01-02 15:04:05"))
 }
