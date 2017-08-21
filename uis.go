@@ -47,7 +47,7 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 		if avatarErr != nil {
 			localLog.Panicln(avatarErr)
 		}
-		localLog.Println(avatarURL)
+		localLog.Println("Avatar: " + avatarURL)
 	})
 
 	loginWidget.SetMinimumSize2(windowWidth, windowHeight)

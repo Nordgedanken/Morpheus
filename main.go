@@ -11,8 +11,10 @@ import (
 var localLog *log.Logger
 
 func main() {
+	var file *os.File
 	localLog = util.Logger()
-	localLog = util.StartFileLog(localLog)
+	localLog, file = util.StartFileLog(localLog)
+	defer file.Close()
 	localLog.Println("Starting Neo")
 
 	widgets.NewQApplication(len(os.Args), os.Args)
@@ -31,5 +33,5 @@ func main() {
 
 	//enter the main event loop
 	widgets.QApplication_Exec()
-	localLog.Println("Finished Startup Neo")
+	localLog.Println("Stopping Neo")
 }
