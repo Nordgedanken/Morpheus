@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Nordgedanken/Neo/matrix"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
@@ -20,21 +21,29 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 	file.Close()
 
 	var (
-		ui_inputUsername = widgets.NewQLineEditFromPointer(widget.FindChild("UsernameInput", core.Qt__FindChildrenRecursively).Pointer())
-		ui_inputPassword = widgets.NewQLineEditFromPointer(widget.FindChild("PasswordInput", core.Qt__FindChildrenRecursively).Pointer())
-		ui_SubmitButton  = widgets.NewQPushButtonFromPointer(widget.FindChild("loginButton", core.Qt__FindChildrenRecursively).Pointer())
+		inputUsername = widgets.NewQLineEditFromPointer(widget.FindChild("UsernameInput", core.Qt__FindChildrenRecursively).Pointer())
+		inputPassword = widgets.NewQLineEditFromPointer(widget.FindChild("PasswordInput", core.Qt__FindChildrenRecursively).Pointer())
+		SubmitButton  = widgets.NewQPushButtonFromPointer(widget.FindChild("loginButton", core.Qt__FindChildrenRecursively).Pointer())
 	)
 
-	ui_inputUsername.ConnectTextChanged(func(value string) {
+	inputUsername.ConnectTextChanged(func(value string) {
 		username = value
 	})
 
-	ui_inputPassword.ConnectTextChanged(func(value string) {
+	inputPassword.ConnectTextChanged(func(value string) {
 		password = value
 	})
 
-	ui_SubmitButton.ConnectClicked(func(checked bool) {
-		localLog.Println(username + " - " + password)
+	SubmitButton.ConnectClicked(func(checked bool) {
+		localLog.Println("Starting Login Sequenze")
+		cli, err := matrix.LoginUser(username, password)
+		if err != nil {
+			localLog.Panicln(err)
+		}
+
+		//TODO remove after testing
+		avatarURL, avatarErr := cli.GetAvatarURL()
+		localLog.Println(avatarURL)
 	})
 
 	loginWidget.SetMinimumSize2(windowWidth, windowHeight)
