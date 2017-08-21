@@ -9,10 +9,10 @@ install:
     curl -sL --retry 10 --retry-delay 10 -o %TMP%\%QT% https://download.qt.io/official_releases/qt/5.8/5.8.0/%QT%
     %TMP%\%QT% --script %GOPATH%\src\github.com\therecipe\qt\internal\ci\iscript.qs
     del %TMP%\%QT% /Q
-build_script:
-- cmd: >-
     go get -v github.com/therecipe/qt/cmd/...
     %GOPATH%\bin\qtsetup full desktop
+build_script:
+- cmd: >-
     go get -v github.com/Nordgedanken/Neo
     cd %GOPATH%\src\github.com\Nordgedanken\Neo
     %GOPATH%\bin\qtdeploy test desktop
