@@ -1,0 +1,18 @@
+version: 1.0.{build}
+clone_depth: 1
+clone_folder: C:\work\src\github.com\therecipe\qt
+install:
+- cmd: >-
+    set PATH=%PATH%;C:\Qt\Qt5.8.0\Tools\mingw530_32\bin
+    set GOPATH=C:\work
+    set QT=qt-opensource-windows-x86-android-5.8.0.exe
+    curl -sL --retry 10 --retry-delay 10 -o %TMP%\%QT% https://download.qt.io/official_releases/qt/5.8/5.8.0/%QT%
+    %TMP%\%QT% --script %GOPATH%\src\github.com\therecipe\qt\internal\ci\iscript.qs
+    del %TMP%\%QT% /Q
+build_script:
+- cmd: >-
+    go get -v github.com/therecipe/qt/cmd/...
+    %GOPATH%\bin\qtsetup full desktop
+    go get -v github.com/Nordgedanken/Neo
+    cd %GOPATH%\src\github.com\Nordgedanken\Neo
+    %GOPATH%\bin\qtdeploy test desktop
