@@ -7,7 +7,7 @@ machine:
 dependencies:
   pre:
   override:
-      - if [[ "$OS" == "linux" ]]; then /home/ubuntu/.go_project/src/github.com/Nordgedanken/Neo/.ci/linux.sh; fi
+      - if [[ "$OS" == "linux" ]]; then ./.ci/linux.sh; fi
       - go get -u -v github.com/therecipe/qt/cmd/...
       - go get -v github.com/Nordgedanken/Neo/...
   post:
