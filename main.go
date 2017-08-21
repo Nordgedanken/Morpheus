@@ -3,70 +3,68 @@ package main
 import (
 	"os"
 
+	"github.com/therecipe/qt/core"
+	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
 )
-
-//go:generate qtmoc
-// type MocLabel struct {
-// 	widgets.QLabel
-//
-// 	_ func(int) `signal:"updateLabel"`
-// }
 
 func main() {
 
 	widgets.NewQApplication(len(os.Args), os.Args)
 
-	//create a window
-	window := widgets.NewQMainWindow(nil, 0)
-	window.SetWindowTitle("Neo")
-	window.SetMinimumSize2(200, 200)
+	desktopApp := widgets.QApplication_Desktop()
+	primaryScreen := desktopApp.PrimaryScreen()
+	screen := desktopApp.Screen(primaryScreen)
+	windowWidth := (screen.Width() / 2)
+	windowHeight := (screen.Height() / 2)
 
-	//create a layout
-	layout := widgets.NewQVBoxLayout()
+	loginUI := NewLoginUI(windowWidth, windowHeight)
+	loginUI.SetMinimumSize2(windowWidth, windowHeight)
 
-	//create a widget and set the layout
-	widget := widgets.NewQWidget(nil, 0)
-	widget.SetLayout(layout)
-
-	//create a moc label
-	// label := NewMocLabel(nil, 0)
-	// label.SetAlignment(core.Qt__AlignCenter)
-
-	//wrap the setText function with a custom signal
-	// label.ConnectUpdateLabel(func(s int) {
-	//
-	// 	//we are back in the main thread
-	// 	//so it's safe to update the label now
-	// 	label.SetText(fmt.Sprintf("%v second(s)", s))
-	// })
-	//
-	// //setup a ticker to update the label in the background
-	// t := time.Now()
-	// ticker := time.NewTicker(1 * time.Second)
-	// go func() {
-	// 	for _ = range ticker.C {
-	// 		label.UpdateLabel(int(time.Since(t).Seconds()))
-	// 	}
-	// }()
-
-	//add the label to the layout
-	// layout.AddWidget(label, 0, 0)
-
-	//create a button and add it to the layout
-	// button := widgets.NewQPushButton2("reset ticker", nil)
-	// button.ConnectClicked(func(checked bool) {
-	// 	label.UpdateLabel(0)
-	// 	t = time.Now()
-	// })
-	// layout.AddWidget(button, 0, 0)
-
-	//add the widget as the central widget to the window
-	window.SetCentralWidget(widget)
-
-	//show the window
-	window.Show()
+	//Show loginUI
+	loginUI.Show()
 
 	//enter the main event loop
 	widgets.QApplication_Exec()
+}
+
+func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
+	var username string
+	var password string
+	widget := widgets.NewQWidget(nil, 0)
+
+	loader := uitools.NewQUiLoader(nil)
+	file := core.NewQFile2(":/qml/login.ui")
+
+	file.Open(core.QIODevice__ReadOnly)
+	loginWidget := loader.Load(file, widget)
+	file.Close()
+
+	var (
+		ui_inputUsername = widgets.NewQLineEditFromPointer(widget.FindChild("UsernameInput", core.Qt__FindChildrenRecursively).Pointer())
+		ui_inputPassword = widgets.NewQLineEditFromPointer(widget.FindChild("PasswordInput", core.Qt__FindChildrenRecursively).Pointer())
+		ui_SubmitButton  = widgets.NewQPushButtonFromPointer(widget.FindChild("loginButton", core.Qt__FindChildrenRecursively).Pointer())
+	)
+
+	ui_inputUsername.ConnectTextChanged(func(value string) {
+		username = value
+	})
+
+	ui_inputPassword.ConnectTextChanged(func(value string) {
+		password = value
+	})
+
+	ui_SubmitButton.ConnectClicked(func(checked bool) {
+		println(username + " - " + password)
+	})
+
+	loginWidget.SetMinimumSize2(windowWidth, windowHeight)
+
+	layout := widgets.NewQVBoxLayout()
+	layout.AddWidget(loginWidget, 0, 0)
+	widget.SetLayout(layout)
+
+	widget.SetWindowTitle("Neo - Login")
+
+	return widget
 }
