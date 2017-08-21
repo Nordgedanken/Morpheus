@@ -14,6 +14,7 @@ var localLog *log.Logger
 
 func main() {
 	localLog = util.Logger()
+	util.StartFileLog(localLog)
 
 	widgets.NewQApplication(len(os.Args), os.Args)
 

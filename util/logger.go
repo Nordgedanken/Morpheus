@@ -17,15 +17,15 @@ func Logger() *log.Logger {
 	return logInstance
 }
 
-func init() {
-	f, err := os.OpenFile("log/Main.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
+func StartFileLog(localLog *log.Logger) {
+	if _, err := os.Stat("./log/"); os.IsNotExist(err) {
+		os.Mkdir("./log/", 0666)
+	}
+	f, err := os.OpenFile("./log/Main.log", os.O_RDWR|os.O_CREATE|os.O_APPEND, 0666)
 	if err != nil {
 		log.Fatalf("error opening file: %v", err)
 	}
 	defer f.Close()
 
-	localLog := Logger()
-
 	localLog.SetOutput(f)
-	localLog.Println("This is a test log entry")
 }
