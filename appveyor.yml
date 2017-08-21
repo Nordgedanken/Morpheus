@@ -1,12 +1,13 @@
 version: 1.0.{build}
 clone_depth: 1
-clone_folder: C:\work\src\github.com\therecipe\qt
+clone_folder: C:\work\src\github.com\MTRNord\Neo
 install:
 - cmd: >-
     set PATH=%PATH%;C:\Qt\Qt5.8.0\Tools\mingw530_32\bin
 
     set GOPATH=C:\work
 
+    go get -u -v github.com/therecipe/qt/internal/...
 
     set QT=qt-opensource-windows-x86-android-5.8.0.exe
 
@@ -22,8 +23,6 @@ install:
 
 build_script:
 - cmd: >-
-    go get -v github.com/Nordgedanken/Neo
-
     cd %GOPATH%\src\github.com\Nordgedanken\Neo
-    
+
     %GOPATH%\bin\qtdeploy test desktop
