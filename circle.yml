@@ -9,6 +9,7 @@ dependencies:
   override:
       - if [[ "$OS" == "linux" ]]; then chmod +x ./.ci/linux.sh && ./.ci/linux.sh; fi
       - go get -u -v github.com/therecipe/qt/cmd/...
+      - /home/ubuntu/.go_project/bin/qtsetup full desktop
       - go get -v github.com/Nordgedanken/Neo/...
   post:
 test:

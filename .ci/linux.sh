@@ -35,6 +35,4 @@ df -h
 ls $HOME/*
 du -sh $HOME/*
 
-/home/ubuntu/.go_project/bin/qtsetup full desktop
-
 exit 0
