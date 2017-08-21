@@ -60,7 +60,7 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 	})
 
 	ui_SubmitButton.ConnectClicked(func(checked bool) {
-		localLog.Info(username + " - " + password)
+		localLog.Println(username + " - " + password)
 	})
 
 	loginWidget.SetMinimumSize2(windowWidth, windowHeight)
