@@ -43,6 +43,9 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 
 		//TODO remove after testing
 		avatarURL, avatarErr := cli.GetAvatarURL()
+		if avatarErr != nil {
+			localLog.Panicln(avatarErr)
+		}
 		localLog.Println(avatarURL)
 	})
 
