@@ -26,7 +26,7 @@ func getClient(homeserverURL, userID, accessToken string) (*gomatrix.Client, err
 func LoginUser(username, password string) (*gomatrix.Client, error) {
 	usernameSplit := strings.Split(username, ":")
 	homeserverURL := usernameSplit[1]
-	cli, cliErr := getClient(homeserverURL, "", "")
+	cli, cliErr := getClient("https://"+homeserverURL, "", "")
 	if cliErr != nil {
 		return nil, cliErr
 	}

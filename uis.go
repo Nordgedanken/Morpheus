@@ -1,23 +1,16 @@
 package main
 
 import (
-	"log"
-
 	"github.com/Nordgedanken/Neo/matrix"
-	"github.com/Nordgedanken/Neo/util"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
 )
 
-var localLog *log.Logger
-
 //NewLoginUI initializes the login Screen
 func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 	var username string
 	var password string
-	localLog = util.Logger()
-	util.StartFileLog(localLog)
 
 	widget := widgets.NewQWidget(nil, 0)
 
