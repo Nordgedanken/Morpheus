@@ -7,7 +7,7 @@ install:
 
     set GOPATH=C:\work
 
-    go get -u -v github.com/therecipe/qt/internal/...
+    git clone https://github.com/therecipe/qt.git %GOPATH%\src\github.com\therecipe\qt
 
     set QT=qt-opensource-windows-x86-android-5.8.0.exe
 
