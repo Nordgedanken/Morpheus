@@ -1,14 +1,19 @@
 package main
 
 import (
+	"log"
 	"os"
 
+	"github.com/Nordgedanken/Neo/util"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
 )
 
+var localLog *log.Logger
+
 func main() {
+	localLog = util.Logger()
 
 	widgets.NewQApplication(len(os.Args), os.Args)
 
@@ -55,7 +60,7 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 	})
 
 	ui_SubmitButton.ConnectClicked(func(checked bool) {
-		println(username + " - " + password)
+		localLog.Info(username + " - " + password)
 	})
 
 	loginWidget.SetMinimumSize2(windowWidth, windowHeight)
