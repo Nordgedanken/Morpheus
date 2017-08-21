@@ -7,7 +7,7 @@ install:
 
     set GOPATH=C:\work
 
-    git clone https://github.com/therecipe/qt.git %GOPATH%\src\github.com\therecipe\qt
+    go get -u -v github.com/therecipe/qt/cmd/...
 
     set QT=qt-opensource-windows-x86-android-5.8.0.exe
 
@@ -16,8 +16,6 @@ install:
     %TMP%\%QT% --script %GOPATH%\src\github.com\therecipe\qt\internal\ci\iscript.qs
 
     del %TMP%\%QT% /Q
-
-    go get -u -v github.com/therecipe/qt/cmd/...
 
     %GOPATH%\bin\qtsetup full desktop
 
