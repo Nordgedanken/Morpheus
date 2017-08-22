@@ -19,7 +19,7 @@ func init() {
 	defer file.Close()
 }
 
-// getUserDisplayName returns the Dispaly name to a MXID
+// getUserDisplayName returns the Dispaly name to a MXID TODO: rework cache for own User and per Room
 func getUserDisplayName(mxid string, cli *Client) (displayName string, err error) {
 	// Get cache
 	db.View(func(tx *buntdb.Tx) error {
