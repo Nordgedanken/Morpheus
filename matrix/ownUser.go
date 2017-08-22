@@ -1,53 +1,82 @@
 package matrix
 
 import (
-	"log"
-	"os"
 	"strings"
 
-	"github.com/Nordgedanken/Neo/util"
 	"github.com/therecipe/qt/gui"
 	"github.com/tidwall/buntdb"
 )
 
-var localLog *log.Logger
-
 // getUserDisplayName returns the Dispaly name to a MXID
-func getUserDisplayName(mxid string, cli *Client) (resp *RespUserDisplayName, err error) {
-
-	urlPath := cli.BuildURL("profile", mxid, "displayname")
-	_, err = cli.MakeRequest("GET", urlPath, nil, &resp)
-	err = db.Update(func(tx *buntdb.Tx) error {
-		tx.Set("user:displayName", resp.DisplayName, nil)
-		return nil
+func getUserDisplayName(mxid string, cli *Client) (displayName string, err error) {
+	// Get cache
+	db.View(func(tx *Tx) error {
+		tx.AscendKeys("user:displayName",
+			func(key, value string) bool {
+				displayName = value
+				return true
+			})
 	})
+
+	// If cache is empty query the api
+	if displayName == "" {
+		urlPath := cli.BuildURL("profile", mxid, "displayname")
+		var resp *RespUserDisplayName
+		_, err = cli.MakeRequest("GET", urlPath, nil, &resp)
+
+		// Update cache
+		err = db.Update(func(tx *buntdb.Tx) error {
+			tx.Set("user:displayName", resp.DisplayName, nil)
+			return nil
+		})
+
+		displayName = resp.DisplayName
+	}
 	return
 }
 
 // getOwnUserAvatar returns a *gui.QPixmap of an UserAvatar
 func getOwnUserAvatar(cli *Client) *gui.QPixmap {
-	var file *os.File
-	localLog = util.Logger()
-	localLog, file = util.StartFileLog(localLog)
-	defer file.Close()
-	avatarURL, avatarErr := cli.GetAvatarURL()
-	if avatarErr != nil {
-		localLog.Println(avatarErr)
-	}
-
+	// Init local vars
+	var avatarData string
 	var IMGdata string
-	if avatarURL != "" {
-		hsURL := cli.HomeserverURL.String()
-		avatarURL_splits := strings.Split(strings.Replace(avatarURL, "mxc://", "", -1), "/")
 
-		urlPath := hsURL + "/_matrix/media/r0/thumbnail/" + avatarURL_splits[0] + "/" + avatarURL_splits[1] + "?width=100&height=100"
-		println(urlPath)
+	// Get cache
+	db.View(func(tx *Tx) error {
+		tx.AscendKeys("user:avatarData100x100",
+			func(key, value string) bool {
+				avatarData = value
+				return true
+			})
+	})
 
-		data, err := cli.MakeRequest("GET", urlPath, nil, nil)
-		if err != nil {
-			localLog.Println(err)
+	//If cache is empty do a ServerQuery
+	if avatarData == "" {
+
+		// Get avatarURL
+		avatarURL, avatarErr := cli.GetAvatarURL()
+		if avatarErr != nil {
+			localLog.Println(avatarErr)
 		}
-		IMGdata = string(data[:])
+
+		// If avatarURL is not empty (aka. has a avatar set) download it at the size of 100x100. Else make the data string empty
+		if avatarURL != "" {
+			hsURL := cli.HomeserverURL.String()
+			avatarURL_splits := strings.Split(strings.Replace(avatarURL, "mxc://", "", -1), "/")
+
+			urlPath := hsURL + "/_matrix/media/r0/thumbnail/" + avatarURL_splits[0] + "/" + avatarURL_splits[1] + "?width=100&height=100"
+
+			data, err := cli.MakeRequest("GET", urlPath, nil, nil)
+			if err != nil {
+				localLog.Println(err)
+			}
+			IMGdata = string(data[:])
+		} else {
+			//TODO Generate default image (Step: AfterUI)
+			IMGdata = ""
+		}
+
+		// Update cache
 		DBerr := db.Update(func(tx *buntdb.Tx) error {
 			tx.Set("user:avatarData100x100", IMGdata, nil)
 			return nil
@@ -55,10 +84,9 @@ func getOwnUserAvatar(cli *Client) *gui.QPixmap {
 		if DBerr != nil {
 			localLog.Fatalln(err)
 		}
-	} else {
-		IMGdata = ""
 	}
 
+	// Convert avatarimage to QPixmap for usage in QT
 	avatar := gui.NewQPixmap()
 	avatar.LoadFromData(IMGdata, uint(len(IMGdata)), "", 0)
 	return avatar

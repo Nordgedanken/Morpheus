@@ -9,11 +9,11 @@ import (
 	"github.com/therecipe/qt/widgets"
 )
 
-var localLog *log.Logger
 var window *widgets.QMainWindow
 
 func main() {
 	var file *os.File
+	var localLog *log.Logger
 	localLog = util.Logger()
 	localLog, file = util.StartFileLog(localLog)
 	defer file.Close()
