@@ -9,6 +9,7 @@ import (
 )
 
 var localLog *log.Logger
+var window *widgets.QMainWindow
 
 func main() {
 	var file *os.File
@@ -25,11 +26,16 @@ func main() {
 	windowWidth := (screen.Width() / 2)
 	windowHeight := (screen.Height() / 2)
 
+	window = widgets.NewQMainWindow(nil, 0)
+	window.SetMinimumSize2(windowWidth, windowHeight)
+
 	loginUI := NewLoginUI(windowWidth, windowHeight)
+	loginUI.Resize2(windowWidth, windowHeight)
 	loginUI.SetMinimumSize2(windowWidth, windowHeight)
 
 	//Show loginUI
-	loginUI.Show()
+	window.SetCentralWidget(loginUI)
+	window.Show()
 
 	//enter the main event loop
 	widgets.QApplication_Exec()

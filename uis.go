@@ -16,47 +16,53 @@ var password string
 //NewLoginUI initializes the login Screen
 func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 	widget := widgets.NewQWidget(nil, 0)
+	layout := widgets.NewQVBoxLayout()
+	widget.SetLayout(layout)
 
-	loader := uitools.NewQUiLoader(nil)
-	file := core.NewQFile2(":/qml/login.ui")
+	// UsernameInput
+	usernameInput := widgets.NewQLineEdit(nil)
+	usernameInput.SetPlaceholderText("Insert MXID")
+	layout.AddWidget(usernameInput, 0, 0)
 
-	file.Open(core.QIODevice__ReadOnly)
-	loginWidget := loader.Load(file, widget)
-	file.Close()
+	// PasswordInput
+	passwordInput := widgets.NewQLineEdit(nil)
+	passwordInput.SetPlaceholderText("Insert password")
+	passwordInput.SetEchoMode(widgets.QLineEdit__Password)
+	layout.AddWidget(passwordInput, 0, 0)
 
-	var (
-		inputUsername = widgets.NewQLineEditFromPointer(widget.FindChild("UsernameInput", core.Qt__FindChildrenRecursively).Pointer())
-		inputPassword = widgets.NewQLineEditFromPointer(widget.FindChild("PasswordInput", core.Qt__FindChildrenRecursively).Pointer())
-		SubmitButton  = widgets.NewQPushButtonFromPointer(widget.FindChild("loginButton", core.Qt__FindChildrenRecursively).Pointer())
-	)
+	// UsernameInput-Label
+	usernameLabel := widgets.NewQLabel(nil, 0)
+	usernameLabel.SetText("Username: ")
+	usernameLabel.SetBuddy(usernameLabel)
 
-	inputUsername.ConnectTextChanged(func(value string) {
+	// PasswordInput-Label
+	passwordLabel := widgets.NewQLabel(nil, 0)
+	passwordLabel.SetText("Password: ")
+	passwordLabel.SetBuddy(passwordLabel)
+
+	// loginButton
+	loginButton := widgets.NewQPushButton2("LOGIN", nil)
+	layout.AddWidget(loginButton, 0, 0)
+
+	usernameInput.ConnectTextChanged(func(value string) {
 		username = value
 	})
 
-	inputPassword.ConnectTextChanged(func(value string) {
+	passwordInput.ConnectTextChanged(func(value string) {
 		password = value
 	})
 
-	SubmitButton.ConnectClicked(func(checked bool) {
+	loginButton.ConnectClicked(func(checked bool) {
 		localLog.Println("Starting Login Sequenze")
 		cli, err := matrix.LoginUser(username, password)
 		if err != nil {
 			localLog.Println(err)
 		}
 		MainUI := NewMainUI(windowWidth, windowHeight, cli)
-		MainUI.SetMinimumSize2(windowWidth, windowHeight)
 
 		//Show MainUI
-		widget.Close()
-		MainUI.Show()
+		window.SetCentralWidget(MainUI)
 	})
-
-	loginWidget.SetMinimumSize2(windowWidth, windowHeight)
-
-	layout := widgets.NewQVBoxLayout()
-	layout.AddWidget(loginWidget, 0, 0)
-	widget.SetLayout(layout)
 
 	widget.SetWindowTitle("Neo - Login")
 
@@ -71,13 +77,13 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWi
 	file := core.NewQFile2(":/qml/Main.ui")
 
 	file.Open(core.QIODevice__ReadOnly)
-	loginWidget := loader.Load(file, widget)
+	mainWidget := loader.Load(file, widget)
 	file.Close()
 
 	var (
 		usernameLabel = widgets.NewQLabelFromPointer(widget.FindChild("UsernameLabel", core.Qt__FindChildrenRecursively).Pointer())
 		mxidLabel     = widgets.NewQLabelFromPointer(widget.FindChild("MXIDLabel", core.Qt__FindChildrenRecursively).Pointer())
-		//avatarLogo    = widgets.NewQLabelFromPointer(widget.FindChild("AvatarLabel", core.Qt__FindChildrenRecursively).Pointer())
+		avatarLogo    = widgets.NewQLabelFromPointer(widget.FindChild("AvatarLabel", core.Qt__FindChildrenRecursively).Pointer())
 	)
 
 	// Set MXID Label
@@ -90,13 +96,13 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWi
 	}
 	usernameLabel.SetText(fmt.Sprint(DisplayNameResp.DisplayName))
 
-	loginWidget.SetMinimumSize2(windowWidth, windowHeight)
+	// Set Avatar
+	avatarLogo.SetAlignment(core.Qt__AlignBottom | core.Qt__AlignRight)
+	avatarLogo.SetPixmap(matrix.GetOwnUserAvatar(cli))
 
 	layout := widgets.NewQVBoxLayout()
-	layout.AddWidget(loginWidget, 0, 0)
+	layout.AddWidget(mainWidget, 0, 0)
 	widget.SetLayout(layout)
-
-	widget.SetWindowTitle("Neo - Login")
 
 	return widget
 }
