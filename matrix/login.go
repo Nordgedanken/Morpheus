@@ -29,7 +29,6 @@ func getClient(homeserverURL, userID, accessToken string) (*Client, error) {
 		tx.Set("user:userID", clientInstance.UserID, nil)
 		return nil
 	})
-
 	if DBerr != nil {
 		return nil, DBerr
 	}

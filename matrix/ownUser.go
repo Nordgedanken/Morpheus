@@ -7,14 +7,20 @@ import (
 
 	"github.com/Nordgedanken/Neo/util"
 	"github.com/therecipe/qt/gui"
+	"github.com/tidwall/buntdb"
 )
 
 var localLog *log.Logger
 
 // getUserDisplayName returns the Dispaly name to a MXID
 func getUserDisplayName(mxid string, cli *Client) (resp *RespUserDisplayName, err error) {
+
 	urlPath := cli.BuildURL("profile", mxid, "displayname")
 	_, err = cli.MakeRequest("GET", urlPath, nil, &resp)
+	err = db.Update(func(tx *buntdb.Tx) error {
+		tx.Set("user:displayName", resp.DisplayName, nil)
+		return nil
+	})
 	return
 }
 
@@ -42,6 +48,13 @@ func getOwnUserAvatar(cli *Client) *gui.QPixmap {
 			localLog.Println(err)
 		}
 		IMGdata = string(data[:])
+		DBerr := db.Update(func(tx *buntdb.Tx) error {
+			tx.Set("user:avatarData100x100", IMGdata, nil)
+			return nil
+		})
+		if DBerr != nil {
+			localLog.Fatalln(err)
+		}
 	} else {
 		IMGdata = ""
 	}
