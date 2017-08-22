@@ -23,7 +23,7 @@ func init() {
 func getUserDisplayName(mxid string, cli *Client) (displayName string, err error) {
 	// Get cache
 	db.View(func(tx *buntdb.Tx) error {
-		QueryErr := tx.AscendKeys("user:displayName",
+		QueryErr := tx.AscendKeys("user:"+mxid+":displayName",
 			func(key, value string) bool {
 				displayName = value
 				return true
@@ -42,7 +42,7 @@ func getUserDisplayName(mxid string, cli *Client) (displayName string, err error
 
 		// Update cache
 		err = db.Update(func(tx *buntdb.Tx) error {
-			tx.Set("user:displayName", resp.DisplayName, nil)
+			tx.Set("user:"+mxid+":displayName", resp.DisplayName, nil)
 			return nil
 		})
 
@@ -59,7 +59,7 @@ func getOwnUserAvatar(cli *Client) *gui.QPixmap {
 
 	// Get cache
 	db.View(func(tx *buntdb.Tx) error {
-		QueryErr := tx.AscendKeys("user:avatarData100x100",
+		QueryErr := tx.AscendKeys("user:"+cli.UserID+":avatarData100x100",
 			func(key, value string) bool {
 				avatarData = value
 				return true
@@ -92,12 +92,12 @@ func getOwnUserAvatar(cli *Client) *gui.QPixmap {
 			IMGdata = string(data[:])
 		} else {
 			//TODO Generate default image (Step: AfterUI)
-			IMGdata = ""
+			IMGdata = "0"
 		}
 
 		// Update cache
 		DBerr := db.Update(func(tx *buntdb.Tx) error {
-			tx.Set("user:avatarData100x100", IMGdata, nil)
+			tx.Set("user:"+cli.UserID+":avatarData100x100", IMGdata, nil)
 			return nil
 		})
 		if DBerr != nil {
