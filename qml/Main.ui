@@ -100,16 +100,6 @@
     <string>Titel</string>
    </property>
   </widget>
-  <widget class="QGraphicsView" name="AvatarImage">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>71</width>
-     <height>61</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="QLabel" name="UsernameLabel">
    <property name="geometry">
     <rect>
@@ -147,6 +137,26 @@
    </property>
    <property name="text">
     <string>@User:matrix.org</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="AvatarLabel">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>71</width>
+     <height>51</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Arial</family>
+     <pointsize>31</pointsize>
+     <underline>false</underline>
+    </font>
+   </property>
+   <property name="text">
+    <string>MR</string>
    </property>
   </widget>
  </widget>

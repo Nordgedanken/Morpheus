@@ -26,7 +26,7 @@ func StartFileLog(localLog *log.Logger) (*log.Logger, *os.File) {
 	}
 	f, err := os.OpenFile("./log/Main.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
 	if err != nil {
-		localLog.Fatalf("error opening file: %v", err)
+		localLog.Printf("error opening file: %v", err)
 	}
 
 	mw := io.MultiWriter(os.Stdout, f)

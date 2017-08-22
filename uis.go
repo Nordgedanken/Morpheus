@@ -42,7 +42,7 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 		localLog.Println("Starting Login Sequenze")
 		cli, err := matrix.LoginUser(username, password)
 		if err != nil {
-			localLog.Fatalln(err)
+			localLog.Println(err)
 		}
 		MainUI := NewMainUI(windowWidth, windowHeight, cli)
 		MainUI.SetMinimumSize2(windowWidth, windowHeight)
@@ -77,7 +77,7 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWi
 	var (
 		usernameLabel = widgets.NewQLabelFromPointer(widget.FindChild("UsernameLabel", core.Qt__FindChildrenRecursively).Pointer())
 		mxidLabel     = widgets.NewQLabelFromPointer(widget.FindChild("MXIDLabel", core.Qt__FindChildrenRecursively).Pointer())
-		//avatarLogo    = widgets.NewQGraphicsViewFromPointer(widget.FindChild("loginButton", core.Qt__FindChildrenRecursively).Pointer())
+		//avatarLogo    = widgets.NewQLabelFromPointer(widget.FindChild("AvatarLabel", core.Qt__FindChildrenRecursively).Pointer())
 	)
 
 	// Set MXID Label
@@ -89,13 +89,6 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWi
 		localLog.Println(DisplayNameErr)
 	}
 	usernameLabel.SetText(fmt.Sprint(DisplayNameResp.DisplayName))
-
-	//TODO remove after testing
-	avatarURL, avatarErr := cli.GetAvatarURL()
-	if avatarErr != nil {
-		localLog.Println(avatarErr)
-	}
-	localLog.Println("Avatar: " + avatarURL)
 
 	loginWidget.SetMinimumSize2(windowWidth, windowHeight)
 
