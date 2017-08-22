@@ -6,26 +6,25 @@ import (
 	"strings"
 
 	"github.com/Nordgedanken/Neo/util"
-	"github.com/matrix-org/gomatrix"
 	"github.com/therecipe/qt/gui"
 )
 
 var localLog *log.Logger
 
-// RespUserDisplayName is the Response type of GetUserDisplayName()
+// RespUserDisplayName is the Response type of getUserDisplayName()
 type RespUserDisplayName struct {
 	DisplayName string `json:"displayname"`
 }
 
-// GetUserDisplayName returns the Dispaly name to a MXID
-func GetUserDisplayName(mxid string, cli *gomatrix.Client) (resp *RespUserDisplayName, err error) {
+// getUserDisplayName returns the Dispaly name to a MXID
+func getUserDisplayName(mxid string, cli *Client) (resp *RespUserDisplayName, err error) {
 	urlPath := cli.BuildURL("profile", mxid, "displayname")
 	_, err = cli.MakeRequest("GET", urlPath, nil, &resp)
 	return
 }
 
-// GetOwnUserAvatar returns a *gui.QPixmap of an UserAvatar
-func GetOwnUserAvatar(cli *gomatrix.Client) *gui.QPixmap {
+// getOwnUserAvatar returns a *gui.QPixmap of an UserAvatar
+func getOwnUserAvatar(cli *Client) *gui.QPixmap {
 	var file *os.File
 	localLog = util.Logger()
 	localLog, file = util.StartFileLog(localLog)

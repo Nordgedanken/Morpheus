@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/Nordgedanken/Neo/matrix"
-	"github.com/matrix-org/gomatrix"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
@@ -72,7 +71,7 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 }
 
 //NewMainUI initializes the login Screen
-func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWidget {
+func NewMainUI(windowWidth, windowHeight int, cli *matrix.Client) *widgets.QWidget {
 	widget := widgets.NewQWidget(nil, 0)
 
 	loader := uitools.NewQUiLoader(nil)
@@ -92,7 +91,7 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWi
 	mxidLabel.SetText(fmt.Sprint(username))
 
 	// Set Dispalyname Label
-	DisplayNameResp, DisplayNameErr := matrix.GetUserDisplayName(username, cli)
+	DisplayNameResp, DisplayNameErr := cli.GetUserDisplayName(username)
 	if DisplayNameErr != nil {
 		localLog.Println(DisplayNameErr)
 	}
@@ -100,7 +99,7 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWi
 
 	// Set Avatar
 	avatarLogo.SetAlignment(core.Qt__AlignBottom | core.Qt__AlignRight)
-	avatarLogo.SetPixmap(matrix.GetOwnUserAvatar(cli))
+	avatarLogo.SetPixmap(cli.GetOwnUserAvatar())
 
 	layout := widgets.NewQVBoxLayout()
 	layout.AddWidget(mainWidget, 0, 0)
