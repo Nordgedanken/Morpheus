@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/matrix-org/gomatrix"
+	"github.com/tidwall/buntdb"
 )
 
 var clientInstance *gomatrix.Client
@@ -19,6 +20,18 @@ func getClient(homeserverURL, userID, accessToken string) (*gomatrix.Client, err
 	if err != nil {
 		return nil, err
 	}
+
+	DBerr := db.Update(func(tx *buntdb.Tx) error {
+		tx.Set("user:accessToken", clientInstance.AccessToken, nil)
+		tx.Set("user:homeserverURL", clientInstance.HomeserverURL.String(), nil)
+		tx.Set("user:userID", clientInstance.UserID, nil)
+		return nil
+	})
+
+	if DBerr != nil {
+		return nil, DBerr
+	}
+
 	return clientInstance, nil
 }
 

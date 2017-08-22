@@ -33,12 +33,14 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 	// UsernameInput-Label
 	usernameLabel := widgets.NewQLabel(nil, 0)
 	usernameLabel.SetText("Username: ")
-	usernameLabel.SetBuddy(usernameLabel)
+	usernameLabel.SetBuddy(usernameInput)
+	layout.AddWidget(usernameLabel, 0, 0)
 
 	// PasswordInput-Label
 	passwordLabel := widgets.NewQLabel(nil, 0)
 	passwordLabel.SetText("Password: ")
-	passwordLabel.SetBuddy(passwordLabel)
+	passwordLabel.SetBuddy(passwordInput)
+	layout.AddWidget(passwordLabel, 0, 0)
 
 	// loginButton
 	loginButton := widgets.NewQPushButton2("LOGIN", nil)

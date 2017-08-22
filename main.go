@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 
+	"github.com/Nordgedanken/Neo/matrix"
 	"github.com/Nordgedanken/Neo/util"
 	"github.com/therecipe/qt/widgets"
 )
@@ -16,6 +17,10 @@ func main() {
 	localLog = util.Logger()
 	localLog, file = util.StartFileLog(localLog)
 	defer file.Close()
+
+	db := matrix.OpenDB()
+	defer db.Close()
+
 	localLog.Println("Starting Neo")
 
 	widgets.NewQApplication(len(os.Args), os.Args)
