@@ -11,11 +11,6 @@ import (
 
 var localLog *log.Logger
 
-// RespUserDisplayName is the Response type of getUserDisplayName()
-type RespUserDisplayName struct {
-	DisplayName string `json:"displayname"`
-}
-
 // getUserDisplayName returns the Dispaly name to a MXID
 func getUserDisplayName(mxid string, cli *Client) (resp *RespUserDisplayName, err error) {
 	urlPath := cli.BuildURL("profile", mxid, "displayname")

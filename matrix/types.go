@@ -9,6 +9,11 @@ type Client struct {
 	*gomatrix.Client
 }
 
+// RespUserDisplayName is the Response type of getUserDisplayName()
+type RespUserDisplayName struct {
+	DisplayName string `json:"displayname"`
+}
+
 // GetUserDisplayName returns the Dispaly name to a MXID
 func (cli *Client) GetUserDisplayName(mxid string) (resp *RespUserDisplayName, err error) {
 	resp, err = getUserDisplayName(mxid, cli)
