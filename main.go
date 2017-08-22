@@ -10,10 +10,10 @@ import (
 )
 
 var window *widgets.QMainWindow
+var localLog *log.Logger
 
 func main() {
 	var file *os.File
-	var localLog *log.Logger
 	localLog = util.Logger()
 	localLog, file = util.StartFileLog(localLog)
 	defer file.Close()

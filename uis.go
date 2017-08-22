@@ -91,11 +91,11 @@ func NewMainUI(windowWidth, windowHeight int, cli *matrix.Client) *widgets.QWidg
 	mxidLabel.SetText(fmt.Sprint(username))
 
 	// Set Dispalyname Label
-	DisplayNameResp, DisplayNameErr := cli.GetUserDisplayName(username)
-	if DisplayNameErr != nil {
-		localLog.Println(DisplayNameErr)
+	displayName, displayNameErr := cli.GetUserDisplayName(username)
+	if displayNameErr != nil {
+		localLog.Println(displayNameErr)
 	}
-	usernameLabel.SetText(fmt.Sprint(DisplayNameResp.DisplayName))
+	usernameLabel.SetText(fmt.Sprint(displayName))
 
 	// Set Avatar
 	avatarLogo.SetAlignment(core.Qt__AlignBottom | core.Qt__AlignRight)

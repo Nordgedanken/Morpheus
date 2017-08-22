@@ -15,8 +15,8 @@ type RespUserDisplayName struct {
 }
 
 // GetUserDisplayName returns the Dispaly name to a MXID
-func (cli *Client) GetUserDisplayName(mxid string) (resp *RespUserDisplayName, err error) {
-	resp, err = getUserDisplayName(mxid, cli)
+func (cli *Client) GetUserDisplayName(mxid string) (displayName string, err error) {
+	displayName, err = getUserDisplayName(mxid, cli)
 	return
 }
 

@@ -1,21 +1,37 @@
 package matrix
 
 import (
+	"log"
+	"os"
 	"strings"
 
+	"github.com/Nordgedanken/Neo/util"
 	"github.com/therecipe/qt/gui"
 	"github.com/tidwall/buntdb"
 )
 
+var localLog *log.Logger
+
+func init() {
+	var file *os.File
+	localLog = util.Logger()
+	localLog, file = util.StartFileLog(localLog)
+	defer file.Close()
+}
+
 // getUserDisplayName returns the Dispaly name to a MXID
 func getUserDisplayName(mxid string, cli *Client) (displayName string, err error) {
 	// Get cache
-	db.View(func(tx *Tx) error {
-		tx.AscendKeys("user:displayName",
+	db.View(func(tx *buntdb.Tx) error {
+		QueryErr := tx.AscendKeys("user:displayName",
 			func(key, value string) bool {
 				displayName = value
 				return true
 			})
+		if QueryErr != nil {
+			return QueryErr
+		}
+		return nil
 	})
 
 	// If cache is empty query the api
@@ -42,17 +58,20 @@ func getOwnUserAvatar(cli *Client) *gui.QPixmap {
 	var IMGdata string
 
 	// Get cache
-	db.View(func(tx *Tx) error {
-		tx.AscendKeys("user:avatarData100x100",
+	db.View(func(tx *buntdb.Tx) error {
+		QueryErr := tx.AscendKeys("user:avatarData100x100",
 			func(key, value string) bool {
 				avatarData = value
 				return true
 			})
+		if QueryErr != nil {
+			return QueryErr
+		}
+		return nil
 	})
 
 	//If cache is empty do a ServerQuery
 	if avatarData == "" {
-
 		// Get avatarURL
 		avatarURL, avatarErr := cli.GetAvatarURL()
 		if avatarErr != nil {
@@ -82,8 +101,10 @@ func getOwnUserAvatar(cli *Client) *gui.QPixmap {
 			return nil
 		})
 		if DBerr != nil {
-			localLog.Fatalln(err)
+			localLog.Fatalln(DBerr)
 		}
+	} else {
+		IMGdata = avatarData
 	}
 
 	// Convert avatarimage to QPixmap for usage in QT
