@@ -17,35 +17,70 @@ var password string
 //NewLoginUI initializes the login Screen
 func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 	widget := widgets.NewQWidget(nil, 0)
-	layout := widgets.NewQVBoxLayout()
-	widget.SetLayout(layout)
+	topLayout := widgets.NewQVBoxLayout()
+
+	formWidget := widgets.NewQWidget(nil, 0)
+	formWrapper := widgets.NewQHBoxLayout()
+	formWidget.SetMinimumSize2(350, 200)
+
+	formLayout := widgets.NewQVBoxLayout()
+	formLayout.SetSpacing(20)
+	formLayout.SetContentsMargins(0, 0, 0, 30)
+	formWidget.SetLayout(formLayout)
+
+	formWrapper.AddStretch(1)
+	formWrapper.AddWidget(formWidget, 0, 0)
+	formWrapper.AddStretch(1)
 
 	// UsernameInput
 	usernameInput := widgets.NewQLineEdit(nil)
 	usernameInput.SetPlaceholderText("Insert MXID")
-	layout.AddWidget(usernameInput, 0, 0)
+
+	usernameLayout := widgets.NewQHBoxLayout()
+	usernameLayout.AddWidget(usernameInput, 0, core.Qt__AlignVCenter)
 
 	// PasswordInput
 	passwordInput := widgets.NewQLineEdit(nil)
 	passwordInput.SetPlaceholderText("Insert password")
 	passwordInput.SetEchoMode(widgets.QLineEdit__Password)
-	layout.AddWidget(passwordInput, 0, 0)
+
+	passwordLayout := widgets.NewQHBoxLayout()
+	passwordLayout.AddWidget(passwordInput, 0, core.Qt__AlignVCenter)
+
+	formLayout.AddLayout(usernameLayout, 0)
+	formLayout.AddLayout(passwordLayout, 0)
 
 	// UsernameInput-Label
-	usernameLabel := widgets.NewQLabel(nil, 0)
-	usernameLabel.SetText("Username: ")
-	usernameLabel.SetBuddy(usernameInput)
-	layout.AddWidget(usernameLabel, 0, 0)
+	// usernameLabel := widgets.NewQLabel(nil, 0)
+	// usernameLabel.SetText("Username: ")
+	// usernameLabel.SetBuddy(usernameInput)
+	// layout.AddWidget(usernameLabel, 0, 0)
 
 	// PasswordInput-Label
-	passwordLabel := widgets.NewQLabel(nil, 0)
-	passwordLabel.SetText("Password: ")
-	passwordLabel.SetBuddy(passwordInput)
-	layout.AddWidget(passwordLabel, 0, 0)
+	// passwordLabel := widgets.NewQLabel(nil, 0)
+	// passwordLabel.SetText("Password: ")
+	// passwordLabel.SetBuddy(passwordInput)
+	// layout.AddWidget(passwordLabel, 0, 0)
 
 	// loginButton
+	buttonLayout := widgets.NewQHBoxLayout()
+	buttonLayout.SetSpacing(0)
+	buttonLayout.SetContentsMargins(0, 0, 0, 30)
+
 	loginButton := widgets.NewQPushButton2("LOGIN", nil)
-	layout.AddWidget(loginButton, 0, 0)
+	loginButton.SetMinimumSize2(350, 65)
+
+	buttonLayout.AddStretch(1)
+	buttonLayout.AddWidget(loginButton, 0, 0)
+	buttonLayout.AddStretch(1)
+
+	topLayout.AddStretch(1)
+	topLayout.AddLayout(formWrapper, 0)
+	topLayout.AddStretch(1)
+	topLayout.AddLayout(buttonLayout, 0)
+	topLayout.AddStretch(1)
+
+	widget.SetLayout(topLayout)
 
 	usernameInput.ConnectTextChanged(func(value string) {
 		username = value
