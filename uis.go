@@ -92,33 +92,37 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 
 	loginButton.ConnectClicked(func(checked bool) {
 		//TODO register enter and show loader or so
-		localLog.Println("Starting Login Sequenze in background")
-		var wg sync.WaitGroup
-		results := make(chan *matrix.Client)
+		if username != "" && password != "" {
+			localLog.Println("Starting Login Sequenze in background")
+			var wg sync.WaitGroup
+			results := make(chan *matrix.Client)
 
-		wg.Add(1)
-		go func(username, password string, localLog *log.Logger, results chan<- *matrix.Client) {
-			defer wg.Done()
-			cli, err := matrix.LoginUser(username, password)
-			if err != nil {
-				localLog.Println(err)
+			wg.Add(1)
+			go func(username, password string, localLog *log.Logger, results chan<- *matrix.Client) {
+				defer wg.Done()
+				cli, err := matrix.LoginUser(username, password)
+				if err != nil {
+					localLog.Println(err)
+				}
+
+				results <- cli
+
+			}(username, password, localLog, results)
+
+			go func() {
+				wg.Wait()      // wait for each execTask to return
+				close(results) // then close the results channel
+			}()
+
+			//Show MainUI
+			for result := range results {
+				//TODO Don't switch screen on wrong login data.
+				MainUI := NewMainUI(windowWidth, windowHeight, result)
+				window.SetCentralWidget(MainUI)
 			}
-
-			results <- cli
-
-		}(username, password, localLog, results)
-
-		go func() {
-			wg.Wait()      // wait for each execTask to return
-			close(results) // then close the results channel
-		}()
-
-		//Show MainUI
-		for result := range results {
-			MainUI := NewMainUI(windowWidth, windowHeight, result)
-			window.SetCentralWidget(MainUI)
+		} else {
+			localLog.Println("Username and/or password is empty. Do Nothing.")
 		}
-
 	})
 
 	widget.SetWindowTitle("Neo - Login")
