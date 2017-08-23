@@ -4,8 +4,11 @@ import (
 	"io"
 	"log"
 	"os"
+	"path/filepath"
 	"sync"
 	"time"
+
+	"github.com/shibukawa/configdir"
 )
 
 var logInstance *log.Logger
@@ -21,10 +24,11 @@ func Logger() *log.Logger {
 
 //StartFileLog initialises the logging function
 func StartFileLog(localLog *log.Logger) (*log.Logger, *os.File) {
-	if _, err := os.Stat("./log/"); os.IsNotExist(err) {
-		os.Mkdir("./log/", 0666)
+	configDirs := configdir.New("Nordgedanken", "Neo")
+	if _, err := os.Stat(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/log/"); os.IsNotExist(err) {
+		os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/log/", 0666)
 	}
-	f, err := os.OpenFile("./log/Main.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
+	f, err := os.OpenFile(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/log/Neo.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
 	if err != nil {
 		localLog.Printf("error opening file: %v", err)
 	}
