@@ -1,13 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"sync"
 
 	"github.com/Nordgedanken/Neo/matrix"
 	"github.com/therecipe/qt/core"
-	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
 )
 
@@ -49,18 +47,6 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 
 	formLayout.AddLayout(usernameLayout, 0)
 	formLayout.AddLayout(passwordLayout, 0)
-
-	// UsernameInput-Label
-	// usernameLabel := widgets.NewQLabel(nil, 0)
-	// usernameLabel.SetText("Username: ")
-	// usernameLabel.SetBuddy(usernameInput)
-	// layout.AddWidget(usernameLabel, 0, 0)
-
-	// PasswordInput-Label
-	// passwordLabel := widgets.NewQLabel(nil, 0)
-	// passwordLabel.SetText("Password: ")
-	// passwordLabel.SetBuddy(passwordInput)
-	// layout.AddWidget(passwordLabel, 0, 0)
 
 	// loginButton
 	buttonLayout := widgets.NewQHBoxLayout()
@@ -133,37 +119,29 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 //NewMainUI initializes the login Screen
 func NewMainUI(windowWidth, windowHeight int, cli *matrix.Client) *widgets.QWidget {
 	widget := widgets.NewQWidget(nil, 0)
+	topLayout := widgets.NewQVBoxLayout()
 
-	loader := uitools.NewQUiLoader(nil)
-	file := core.NewQFile2(":/qml/Main.ui")
+	// var (
+	// 	usernameLabel = widgets.NewQLabelFromPointer(widget.FindChild("UsernameLabel", core.Qt__FindChildrenRecursively).Pointer())
+	// 	mxidLabel     = widgets.NewQLabelFromPointer(widget.FindChild("MXIDLabel", core.Qt__FindChildrenRecursively).Pointer())
+	// 	avatarLogo    = widgets.NewQLabelFromPointer(widget.FindChild("AvatarLabel", core.Qt__FindChildrenRecursively).Pointer())
+	// )
+	//
+	// // Set MXID Label
+	// mxidLabel.SetText(fmt.Sprint(username))
+	//
+	// // Set Dispalyname Label
+	// displayName, displayNameErr := cli.GetUserDisplayName(username)
+	// if displayNameErr != nil {
+	// 	localLog.Println(displayNameErr)
+	// }
+	// usernameLabel.SetText(fmt.Sprint(displayName))
+	//
+	// // Set Avatar
+	// avatarLogo.SetAlignment(core.Qt__AlignBottom | core.Qt__AlignRight)
+	// avatarLogo.SetPixmap(cli.GetOwnUserAvatar())
 
-	file.Open(core.QIODevice__ReadOnly)
-	mainWidget := loader.Load(file, widget)
-	file.Close()
-
-	var (
-		usernameLabel = widgets.NewQLabelFromPointer(widget.FindChild("UsernameLabel", core.Qt__FindChildrenRecursively).Pointer())
-		mxidLabel     = widgets.NewQLabelFromPointer(widget.FindChild("MXIDLabel", core.Qt__FindChildrenRecursively).Pointer())
-		avatarLogo    = widgets.NewQLabelFromPointer(widget.FindChild("AvatarLabel", core.Qt__FindChildrenRecursively).Pointer())
-	)
-
-	// Set MXID Label
-	mxidLabel.SetText(fmt.Sprint(username))
-
-	// Set Dispalyname Label
-	displayName, displayNameErr := cli.GetUserDisplayName(username)
-	if displayNameErr != nil {
-		localLog.Println(displayNameErr)
-	}
-	usernameLabel.SetText(fmt.Sprint(displayName))
-
-	// Set Avatar
-	avatarLogo.SetAlignment(core.Qt__AlignBottom | core.Qt__AlignRight)
-	avatarLogo.SetPixmap(cli.GetOwnUserAvatar())
-
-	layout := widgets.NewQVBoxLayout()
-	layout.AddWidget(mainWidget, 0, 0)
-	widget.SetLayout(layout)
+	widget.SetLayout(topLayout)
 
 	return widget
 }
