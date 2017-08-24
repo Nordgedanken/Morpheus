@@ -5,66 +5,74 @@
 !_TAG_PROGRAM_URL	https://github.com/jstemmer/gotags
 !_TAG_PROGRAM_VERSION	1.4.1	/go1.8.3/
 *gomatrix.Client	matrix\types.go	9;"	e	access:public	ctype:Client	language:Go	line:9	type:*gomatrix.Client
-C	rcc_cgo_windows_windows_386.go	11;"	i	language:Go	line:11
 Client	matrix\types.go	8;"	t	access:public	language:Go	line:8	type:struct
-DisplayName	matrix\ownUser.go	16;"	w	access:public	ctype:RespUserDisplayName	language:Go	line:16	type:string
-GetOwnUserAvatar	matrix\types.go	19;"	m	access:public	ctype:Client	language:Go	line:19	signature:()	type:*gui.QPixmap
-GetUserDisplayName	matrix\types.go	13;"	m	access:public	ctype:Client	language:Go	line:13	signature:(mxid string)	type:*RespUserDisplayName, error
-Logger	util\logger.go	15;"	f	access:public	language:Go	line:15	signature:()	type:*log.Logger
-LoginUser	matrix\login.go	41;"	f	access:public	language:Go	line:41	signature:(username, password string)	type:*Client, error
-NewLoginUI	uis.go	16;"	f	access:public	language:Go	line:16	signature:(windowWidth, windowHeight int)	type:*widgets.QWidget
-NewMainUI	uis.go	74;"	f	access:public	language:Go	line:74	signature:(windowWidth, windowHeight int, cli *matrix.Client)	type:*widgets.QWidget
-OpenDB	matrix\db.go	12;"	f	access:public	language:Go	line:12	signature:()	type:*buntdb.DB
-RespUserDisplayName	matrix\ownUser.go	15;"	t	access:public	language:Go	line:15	type:struct
-StartFileLog	util\logger.go	23;"	f	access:public	language:Go	line:23	signature:(localLog *log.Logger)	type:*log.Logger, *os.File
-clientInstance	matrix\login.go	11;"	v	access:private	language:Go	line:11	type:*Client
-db	matrix\db.go	10;"	v	access:private	language:Go	line:10	type:*buntdb.DB
-fmt	uis.go	4;"	i	language:Go	line:4
-getClient	matrix\login.go	15;"	f	access:private	language:Go	line:15	signature:(homeserverURL, userID, accessToken string)	type:*Client, error
-getOwnUserAvatar	matrix\ownUser.go	27;"	f	access:private	language:Go	line:27	signature:(cli *Client)	type:*gui.QPixmap
-getUserDisplayName	matrix\ownUser.go	20;"	f	access:private	ctype:RespUserDisplayName	language:Go	line:20	signature:(mxid string, cli *Client)	type:*RespUserDisplayName, error
+DisplayName	matrix\types.go	14;"	w	access:public	ctype:RespUserDisplayName	language:Go	line:14	type:string
+DoLogin	uis.go	18;"	f	access:public	language:Go	line:18	signature:(username, password, homeserverURL, userID, accessToken string, localLog *log.Logger, results chan *matrix.Client)
+GetClient	matrix\login.go	13;"	f	access:public	language:Go	line:13	signature:(homeserverURL, userID, accessToken string)	type:*Client, error
+GetOwnUserAvatar	matrix\types.go	24;"	m	access:public	ctype:Client	language:Go	line:24	signature:()	type:*gui.QPixmap
+GetUserDisplayName	matrix\types.go	18;"	m	access:public	ctype:Client	language:Go	line:18	signature:(mxid string)	type:string, error
+Logger	util\logger.go	18;"	f	access:public	language:Go	line:18	signature:()	type:*log.Logger
+LoginUser	matrix\login.go	36;"	f	access:public	language:Go	line:36	signature:(username, password string)	type:*Client, error
+NewLoginUI	uis.go	46;"	f	access:public	language:Go	line:46	signature:(windowWidth, windowHeight int)	type:*widgets.QWidget
+NewMainUI	uis.go	141;"	f	access:public	language:Go	line:141	signature:(windowWidth, windowHeight int, cli *matrix.Client)	type:*widgets.QWidget
+OpenDB	matrix\db.go	14;"	f	access:public	language:Go	line:14	signature:()	type:*buntdb.DB
+RespUserDisplayName	matrix\types.go	13;"	t	access:public	language:Go	line:13	type:struct
+StartFileLog	util\logger.go	26;"	f	access:public	language:Go	line:26	signature:(localLog *log.Logger)	type:*log.Logger, *os.File
+clientInstance	matrix\login.go	10;"	v	access:private	language:Go	line:10	type:*Client
+db	main.go	15;"	v	access:private	language:Go	line:15	type:*buntdb.DB
+db	matrix\db.go	12;"	v	access:private	language:Go	line:12	type:*buntdb.DB
+getOwnUserAvatar	matrix\ownUser.go	55;"	f	access:private	language:Go	line:55	signature:(cli *Client)	type:*gui.QPixmap
+getUserDisplayName	matrix\ownUser.go	23;"	f	access:private	language:Go	line:23	signature:(mxid string, cli *Client)	type:string, error
 github.com/Nordgedanken/Neo/matrix	main.go	7;"	i	language:Go	line:7
-github.com/Nordgedanken/Neo/matrix	uis.go	6;"	i	language:Go	line:6
+github.com/Nordgedanken/Neo/matrix	uis.go	8;"	i	language:Go	line:8
 github.com/Nordgedanken/Neo/util	main.go	8;"	i	language:Go	line:8
 github.com/Nordgedanken/Neo/util	matrix\ownUser.go	8;"	i	language:Go	line:8
-github.com/matrix-org/gomatrix	matrix\login.go	7;"	i	language:Go	line:7
+github.com/matrix-org/gomatrix	matrix\login.go	6;"	i	language:Go	line:6
 github.com/matrix-org/gomatrix	matrix\types.go	4;"	i	language:Go	line:4
-github.com/therecipe/qt/core	uis.go	7;"	i	language:Go	line:7
+github.com/shibukawa/configdir	matrix\db.go	8;"	i	language:Go	line:8
+github.com/shibukawa/configdir	util\logger.go	11;"	i	language:Go	line:11
+github.com/therecipe/qt/core	uis.go	9;"	i	language:Go	line:9
 github.com/therecipe/qt/gui	matrix\ownUser.go	9;"	i	language:Go	line:9
 github.com/therecipe/qt/gui	matrix\types.go	5;"	i	language:Go	line:5
-github.com/therecipe/qt/uitools	uis.go	8;"	i	language:Go	line:8
 github.com/therecipe/qt/widgets	main.go	9;"	i	language:Go	line:9
-github.com/therecipe/qt/widgets	uis.go	9;"	i	language:Go	line:9
-github.com/tidwall/buntdb	matrix\db.go	7;"	i	language:Go	line:7
-github.com/tidwall/buntdb	matrix\login.go	8;"	i	language:Go	line:8
+github.com/therecipe/qt/widgets	uis.go	10;"	i	language:Go	line:10
+github.com/tidwall/buntdb	main.go	10;"	i	language:Go	line:10
+github.com/tidwall/buntdb	matrix\db.go	9;"	i	language:Go	line:9
+github.com/tidwall/buntdb	matrix\login.go	7;"	i	language:Go	line:7
+github.com/tidwall/buntdb	matrix\ownUser.go	10;"	i	language:Go	line:10
+github.com/tidwall/buntdb	uis.go	11;"	i	language:Go	line:11
+init	matrix\ownUser.go	15;"	f	access:private	language:Go	line:15	signature:()
 io	util\logger.go	4;"	i	language:Go	line:4
-localLog	main.go	12;"	v	access:private	language:Go	line:12	type:*log.Logger
-localLog	matrix\ownUser.go	12;"	v	access:private	language:Go	line:12	type:*log.Logger
+localLog	main.go	14;"	v	access:private	language:Go	line:14	type:*log.Logger
+localLog	matrix\ownUser.go	13;"	v	access:private	language:Go	line:13	type:*log.Logger
 log	main.go	4;"	i	language:Go	line:4
 log	matrix\db.go	4;"	i	language:Go	line:4
 log	matrix\ownUser.go	4;"	i	language:Go	line:4
+log	uis.go	4;"	i	language:Go	line:4
 log	util\logger.go	5;"	i	language:Go	line:5
-logInstance	util\logger.go	11;"	v	access:private	language:Go	line:11	type:*log.Logger
-main	main.go	15;"	f	access:private	language:Go	line:15	signature:()
+logInstance	util\logger.go	14;"	v	access:private	language:Go	line:14	type:*log.Logger
+main	main.go	17;"	f	access:private	language:Go	line:17	signature:()
 main	main.go	1;"	p	language:Go	line:1
-main	rcc_cgo_windows_windows_386.go	1;"	p	language:Go	line:1
 main	uis.go	1;"	p	language:Go	line:1
 matrix	matrix\db.go	1;"	p	language:Go	line:1
 matrix	matrix\login.go	1;"	p	language:Go	line:1
 matrix	matrix\ownUser.go	1;"	p	language:Go	line:1
 matrix	matrix\types.go	1;"	p	language:Go	line:1
-once	matrix\login.go	12;"	v	access:private	language:Go	line:12	type:sync.Once
-once	util\logger.go	12;"	v	access:private	language:Go	line:12	type:sync.Once
+once	util\logger.go	15;"	v	access:private	language:Go	line:15	type:sync.Once
 os	main.go	5;"	i	language:Go	line:5
 os	matrix\db.go	5;"	i	language:Go	line:5
 os	matrix\ownUser.go	5;"	i	language:Go	line:5
 os	util\logger.go	6;"	i	language:Go	line:6
-password	uis.go	13;"	v	access:private	language:Go	line:13	type:string
+password	uis.go	15;"	v	access:private	language:Go	line:15	type:string
+path/filepath	matrix\db.go	6;"	i	language:Go	line:6
+path/filepath	util\logger.go	7;"	i	language:Go	line:7
 strings	matrix\login.go	4;"	i	language:Go	line:4
 strings	matrix\ownUser.go	6;"	i	language:Go	line:6
-sync	matrix\login.go	5;"	i	language:Go	line:5
-sync	util\logger.go	7;"	i	language:Go	line:7
-time	util\logger.go	8;"	i	language:Go	line:8
-username	uis.go	12;"	v	access:private	language:Go	line:12	type:string
+strings	uis.go	5;"	i	language:Go	line:5
+sync	uis.go	6;"	i	language:Go	line:6
+sync	util\logger.go	8;"	i	language:Go	line:8
+time	util\logger.go	9;"	i	language:Go	line:9
+username	uis.go	14;"	v	access:private	language:Go	line:14	type:string
 util	util\logger.go	1;"	p	language:Go	line:1
+wg	uis.go	16;"	v	access:private	language:Go	line:16	type:sync.WaitGroup
 window	main.go	13;"	v	access:private	language:Go	line:13	type:*widgets.QMainWindow

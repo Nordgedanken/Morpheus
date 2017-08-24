@@ -7,10 +7,12 @@ import (
 	"github.com/Nordgedanken/Neo/matrix"
 	"github.com/Nordgedanken/Neo/util"
 	"github.com/therecipe/qt/widgets"
+	"github.com/tidwall/buntdb"
 )
 
 var window *widgets.QMainWindow
 var localLog *log.Logger
+var db *buntdb.DB
 
 func main() {
 	var file *os.File
@@ -18,7 +20,7 @@ func main() {
 	localLog, file = util.StartFileLog(localLog)
 	defer file.Close()
 
-	db := matrix.OpenDB()
+	db = matrix.OpenDB()
 	defer db.Close()
 
 	localLog.Println("Starting Neo")
@@ -38,8 +40,56 @@ func main() {
 	loginUI.Resize2(windowWidth, windowHeight)
 	loginUI.SetMinimumSize2(windowWidth, windowHeight)
 
-	//Show loginUI
-	window.SetCentralWidget(loginUI)
+	var accessToken string
+	var homeserverURL string
+	var userID string
+
+	// Get cache
+	db.View(func(tx *buntdb.Tx) error {
+		var QueryErr error
+		QueryErr = tx.AscendKeys("user:accessToken",
+			func(key, value string) bool {
+				accessToken = value
+				return true
+			})
+		QueryErr = tx.AscendKeys("user:homeserverURL",
+			func(key, value string) bool {
+				homeserverURL = value
+				return true
+			})
+		QueryErr = tx.AscendKeys("user:userID",
+			func(key, value string) bool {
+				userID = value
+				return true
+			})
+		if QueryErr != nil {
+			return QueryErr
+		}
+		return nil
+	})
+
+	if accessToken != "" && homeserverURL != "" && userID != "" {
+		localLog.Println("Starting Auto Login Sequenze in background")
+		results := make(chan *matrix.Client)
+
+		wg.Add(1)
+		go DoLogin("", "", homeserverURL, userID, accessToken, localLog, results)
+
+		go func() {
+			wg.Wait()      // wait for each execTask to return
+			close(results) // then close the results channel
+		}()
+
+		//Show MainUI
+		for result := range results {
+			//TODO Don't switch screen on wrong login data.
+			MainUI := NewMainUI(windowWidth, windowHeight, result)
+			window.SetCentralWidget(MainUI)
+		}
+	} else {
+		//Show loginUI
+		window.SetCentralWidget(loginUI)
+	}
 	window.Show()
 
 	//enter the main event loop

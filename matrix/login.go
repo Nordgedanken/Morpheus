@@ -2,22 +2,18 @@ package matrix
 
 import (
 	"strings"
-	"sync"
 
 	"github.com/matrix-org/gomatrix"
 	"github.com/tidwall/buntdb"
 )
 
 var clientInstance *Client
-var once sync.Once
 
-//getClient returns a Client
-func getClient(homeserverURL, userID, accessToken string) (*Client, error) {
+//GetClient returns a Client
+func GetClient(homeserverURL, userID, accessToken string) (*Client, error) {
 	var err error
 	var client *gomatrix.Client
-	once.Do(func() {
-		client, err = gomatrix.NewClient(homeserverURL, userID, accessToken)
-	})
+	client, err = gomatrix.NewClient(homeserverURL, userID, accessToken)
 	if err != nil {
 		return nil, err
 	}
@@ -40,7 +36,15 @@ func getClient(homeserverURL, userID, accessToken string) (*Client, error) {
 func LoginUser(username, password string) (*Client, error) {
 	usernameSplit := strings.Split(username, ":")
 	homeserverURL := usernameSplit[1]
-	cli, cliErr := getClient("https://"+homeserverURL, "", "")
+	var cli *Client
+	var cliErr error
+	if strings.HasPrefix(homeserverURL, "https://") {
+		cli, cliErr = GetClient(homeserverURL, "", "")
+	} else if strings.HasPrefix(homeserverURL, "http://") {
+		cli, cliErr = GetClient(homeserverURL, "", "")
+	} else {
+		cli, cliErr = GetClient("https://"+homeserverURL, "", "")
+	}
 	if cliErr != nil {
 		return nil, cliErr
 	}
@@ -54,5 +58,15 @@ func LoginUser(username, password string) (*Client, error) {
 		return nil, err
 	}
 	cli.SetCredentials(resp.UserID, resp.AccessToken)
+	DBerr := db.Update(func(tx *buntdb.Tx) error {
+		tx.Set("user:accessToken", resp.AccessToken, nil)
+		tx.Set("user:deviceID", resp.DeviceID, nil)
+		tx.Set("user:homeserverURL", resp.HomeServer, nil)
+		tx.Set("user:userID", resp.UserID, nil)
+		return nil
+	})
+	if DBerr != nil {
+		return nil, DBerr
+	}
 	return cli, nil
 }

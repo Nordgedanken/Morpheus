@@ -2,15 +2,45 @@ package main
 
 import (
 	"log"
+	"strings"
 	"sync"
 
 	"github.com/Nordgedanken/Neo/matrix"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/widgets"
+	"github.com/tidwall/buntdb"
 )
 
 var username string
 var password string
+var wg sync.WaitGroup
+
+func DoLogin(username, password, homeserverURL, userID, accessToken string, localLog *log.Logger, results chan<- *matrix.Client) {
+	defer wg.Done()
+	var cli *matrix.Client
+	if accessToken != "" && homeserverURL != "" && userID != "" {
+		var cliErr error
+		if strings.HasPrefix(homeserverURL, "https://") {
+			cli, cliErr = matrix.GetClient(homeserverURL, userID, accessToken)
+		} else if strings.HasPrefix(homeserverURL, "http://") {
+			cli, cliErr = matrix.GetClient(homeserverURL, userID, accessToken)
+		} else {
+			cli, cliErr = matrix.GetClient("https://"+homeserverURL, userID, accessToken)
+		}
+		if cliErr != nil {
+			localLog.Println(cliErr)
+		}
+		cli.SetCredentials(userID, accessToken)
+	} else {
+		var err error
+		cli, err = matrix.LoginUser(username, password)
+		if err != nil {
+			localLog.Println(err)
+		}
+	}
+
+	results <- cli
+}
 
 //NewLoginUI initializes the login Screen
 func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
@@ -78,22 +108,13 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 
 	loginButton.ConnectClicked(func(checked bool) {
 		//TODO register enter and show loader or so
+
 		if username != "" && password != "" {
 			localLog.Println("Starting Login Sequenze in background")
-			var wg sync.WaitGroup
 			results := make(chan *matrix.Client)
 
 			wg.Add(1)
-			go func(username, password string, localLog *log.Logger, results chan<- *matrix.Client) {
-				defer wg.Done()
-				cli, err := matrix.LoginUser(username, password)
-				if err != nil {
-					localLog.Println(err)
-				}
-
-				results <- cli
-
-			}(username, password, localLog, results)
+			go DoLogin(username, password, "", "", "", localLog, results)
 
 			go func() {
 				wg.Wait()      // wait for each execTask to return
@@ -103,7 +124,7 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 			//Show MainUI
 			for result := range results {
 				//TODO Don't switch screen on wrong login data.
-				MainUI := newMainUI(windowWidth, windowHeight, result)
+				MainUI := NewMainUI(windowWidth, windowHeight, result)
 				window.SetCentralWidget(MainUI)
 			}
 		} else {
@@ -117,7 +138,7 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 }
 
 //NewMainUI initializes the login Screen
-func newMainUI(windowWidth, windowHeight int, cli *matrix.Client) *widgets.QWidget {
+func NewMainUI(windowWidth, windowHeight int, cli *matrix.Client) *widgets.QWidget {
 	widget := widgets.NewQWidget(nil, 0)
 	topLayout := widgets.NewQVBoxLayout2(widget)
 
@@ -208,6 +229,15 @@ func newMainUI(windowWidth, windowHeight int, cli *matrix.Client) *widgets.QWidg
 				results <- false
 			} else {
 				cli.ClearCredentials()
+				//Flush complete DB
+				db.View(func(tx *buntdb.Tx) error {
+					var QueryErr error
+					QueryErr = tx.DeleteAll()
+					if QueryErr != nil {
+						return QueryErr
+					}
+					return nil
+				})
 				results <- true
 			}
 		}(cli, localLog, results)
