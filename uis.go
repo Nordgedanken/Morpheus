@@ -179,6 +179,53 @@ func newMainUI(windowWidth, windowHeight int, cli *matrix.Client) *widgets.QWidg
 
 	wrapperLayout.AddWidget(messageScroll, 0, 1, 0)
 
+	// logoutButton //TODO move it to correct place
+	buttonWidget := widgets.NewQWidget(nil, 0)
+	buttonLayout := widgets.NewQVBoxLayout()
+
+	logoutButton := widgets.NewQPushButton2("LOGOUT", nil)
+	logoutButton.SetMinimumSize2(350, 65)
+
+	buttonLayout.AddStretch(1)
+	buttonLayout.AddWidget(logoutButton, 0, 0)
+	buttonLayout.AddStretch(1)
+
+	buttonWidget.SetLayout(buttonLayout)
+	wrapperLayout.AddWidget(buttonWidget, 1, 0, core.Qt__AlignBottom)
+
+	logoutButton.ConnectClicked(func(checked bool) {
+		//TODO register enter and show loader or so
+		localLog.Println("Starting Logout Sequenze in background")
+		var wg sync.WaitGroup
+		results := make(chan bool)
+
+		wg.Add(1)
+		go func(cli *matrix.Client, localLog *log.Logger, results chan<- bool) {
+			defer wg.Done()
+			_, err := cli.Logout()
+			if err != nil {
+				localLog.Println(err)
+				results <- false
+			} else {
+				cli.ClearCredentials()
+				results <- true
+			}
+		}(cli, localLog, results)
+
+		go func() {
+			wg.Wait()      // wait for each execTask to return
+			close(results) // then close the results channel
+		}()
+
+		//Show MainUI
+		for result := range results {
+			if result {
+				LoginUI := NewLoginUI(windowWidth, windowHeight)
+				window.SetCentralWidget(LoginUI)
+			}
+		}
+	})
+
 	wrapperLayout.SetColumnMinimumWidth(0, windowWidth/3)
 	wrapperLayout.SetColumnMinimumWidth(1, (windowWidth/3)*2)
 	wrapperLayout.SetRowMinimumHeight(0, windowHeight)
