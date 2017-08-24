@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"strings"
 	"sync"
@@ -15,9 +16,8 @@ import (
 
 var username string
 var password string
-var wg sync.WaitGroup
 
-func DoLogin(username, password, homeserverURL, userID, accessToken string, localLog *log.Logger, results chan<- *matrix.Client) {
+func DoLogin(username, password, homeserverURL, userID, accessToken string, localLog *log.Logger, results chan<- *matrix.Client, wg *sync.WaitGroup) {
 	defer wg.Done()
 	var cli *matrix.Client
 	if accessToken != "" && homeserverURL != "" && userID != "" {
@@ -32,7 +32,7 @@ func DoLogin(username, password, homeserverURL, userID, accessToken string, loca
 		if cliErr != nil {
 			localLog.Println(cliErr)
 		}
-		cli.SetCredentials(userID, accessToken)
+		cli.Client.SetCredentials(userID, accessToken)
 	} else {
 		var err error
 		cli, err = matrix.LoginUser(username, password)
@@ -111,12 +111,14 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 	loginButton.ConnectClicked(func(checked bool) {
 		//TODO register enter and show loader or so
 
+		var wg sync.WaitGroup
+
 		if username != "" && password != "" {
 			localLog.Println("Starting Login Sequenze in background")
 			results := make(chan *matrix.Client)
 
 			wg.Add(1)
-			go DoLogin(username, password, "", "", "", localLog, results)
+			go DoLogin(username, password, "", "", "", localLog, results, &wg)
 
 			go func() {
 				wg.Wait()      // wait for each execTask to return
@@ -194,11 +196,11 @@ func NewMainUI(windowWidth, windowHeight int, cli *matrix.Client) *widgets.QWidg
 	messageScroll.SetWidgetResizable(true)
 
 	// Messages
-	syncer := cli.Syncer.(*gomatrix.DefaultSyncer)
-	cli.Store = gomatrix.NewInMemoryStore()
-	syncer.Store = gomatrix.NewInMemoryStore()
+	syncer := cli.Client.Syncer.(*gomatrix.DefaultSyncer)
+	customStore := gomatrix.NewInMemoryStore()
+	cli.Client.Store = customStore
+	syncer.Store = customStore
 	syncer.OnEventType("m.room.message", func(ev *gomatrix.Event) {
-		localLog.Println(ev)
 		// TODO Later needs to match current Room
 		if ev.RoomID == "!zTIXGmDjyRcAqbrWab:matrix.ffslfl.net" {
 			messageBody, messageOk := ev.Body()
@@ -216,14 +218,17 @@ func NewMainUI(windowWidth, windowHeight int, cli *matrix.Client) *widgets.QWidg
 
 	// Start Non-blocking sync
 	localLog.Println("Syncing now")
-	go func(localLog *log.Logger, cli *matrix.Client) {
-		if err := cli.Sync(); err != nil {
-			localLog.Println("Sync() returned ", err)
+	go func() {
+		for {
+			fmt.Println("sync")
+			if e := cli.Client.Sync(); e != nil {
+				fmt.Println("Fatal Sync() error")
+				time.Sleep(10 * time.Second)
+			}
 			time.Sleep(10 * time.Second)
-		} else {
-			localLog.Println("Stopping Sync()")
 		}
-	}(localLog, cli)
+	}()
+
 	localLog.Println("Started Syncing")
 
 	wrapperLayout.AddWidget(messageScroll, 0, 1, 0)
@@ -251,12 +256,12 @@ func NewMainUI(windowWidth, windowHeight int, cli *matrix.Client) *widgets.QWidg
 		wg.Add(1)
 		go func(cli *matrix.Client, localLog *log.Logger, results chan<- bool) {
 			defer wg.Done()
-			_, err := cli.Logout()
+			_, err := cli.Client.Logout()
 			if err != nil {
 				localLog.Println(err)
 				results <- false
 			} else {
-				cli.ClearCredentials()
+				cli.Client.ClearCredentials()
 				//Flush complete DB
 				db.View(func(tx *buntdb.Tx) error {
 					var QueryErr error

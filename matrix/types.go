@@ -7,7 +7,7 @@ import (
 
 // Client is the Client type extender toadd new methods to it which gomatrix lacks currently
 type Client struct {
-	*gomatrix.Client
+	Client *gomatrix.Client
 }
 
 // RespUserDisplayName is the Response type of getUserDisplayName()

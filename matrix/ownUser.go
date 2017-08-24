@@ -36,9 +36,9 @@ func getUserDisplayName(mxid string, cli *Client) (displayName string, err error
 
 	// If cache is empty query the api
 	if displayName == "" {
-		urlPath := cli.BuildURL("profile", mxid, "displayname")
+		urlPath := cli.Client.BuildURL("profile", mxid, "displayname")
 		var resp *RespUserDisplayName
-		_, err = cli.MakeRequest("GET", urlPath, nil, &resp)
+		_, err = cli.Client.MakeRequest("GET", urlPath, nil, &resp)
 
 		// Update cache
 		err = db.Update(func(tx *buntdb.Tx) error {
@@ -59,7 +59,7 @@ func getOwnUserAvatar(cli *Client) *gui.QPixmap {
 
 	// Get cache
 	db.View(func(tx *buntdb.Tx) error {
-		QueryErr := tx.AscendKeys("user:"+cli.UserID+":avatarData100x100",
+		QueryErr := tx.AscendKeys("user:"+cli.Client.UserID+":avatarData100x100",
 			func(key, value string) bool {
 				avatarData = value
 				return true
@@ -73,19 +73,19 @@ func getOwnUserAvatar(cli *Client) *gui.QPixmap {
 	//If cache is empty do a ServerQuery
 	if avatarData == "" {
 		// Get avatarURL
-		avatarURL, avatarErr := cli.GetAvatarURL()
+		avatarURL, avatarErr := cli.Client.GetAvatarURL()
 		if avatarErr != nil {
 			localLog.Println(avatarErr)
 		}
 
 		// If avatarURL is not empty (aka. has a avatar set) download it at the size of 100x100. Else make the data string empty
 		if avatarURL != "" {
-			hsURL := cli.HomeserverURL.String()
+			hsURL := cli.Client.HomeserverURL.String()
 			avatarURL_splits := strings.Split(strings.Replace(avatarURL, "mxc://", "", -1), "/")
 
 			urlPath := hsURL + "/_matrix/media/r0/thumbnail/" + avatarURL_splits[0] + "/" + avatarURL_splits[1] + "?width=100&height=100"
 
-			data, err := cli.MakeRequest("GET", urlPath, nil, nil)
+			data, err := cli.Client.MakeRequest("GET", urlPath, nil, nil)
 			if err != nil {
 				localLog.Println(err)
 			}
@@ -97,7 +97,7 @@ func getOwnUserAvatar(cli *Client) *gui.QPixmap {
 
 		// Update cache
 		DBerr := db.Update(func(tx *buntdb.Tx) error {
-			tx.Set("user:"+cli.UserID+":avatarData100x100", IMGdata, nil)
+			tx.Set("user:"+cli.Client.UserID+":avatarData100x100", IMGdata, nil)
 			return nil
 		})
 		if DBerr != nil {

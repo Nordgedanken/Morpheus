@@ -18,9 +18,9 @@ func GetClient(homeserverURL, userID, accessToken string) (clientInstance *Clien
 	clientInstance = &Client{client}
 
 	err = db.Update(func(tx *buntdb.Tx) error {
-		tx.Set("user:accessToken", clientInstance.AccessToken, nil)
-		tx.Set("user:homeserverURL", clientInstance.HomeserverURL.String(), nil)
-		tx.Set("user:userID", clientInstance.UserID, nil)
+		tx.Set("user:accessToken", clientInstance.Client.AccessToken, nil)
+		tx.Set("user:homeserverURL", clientInstance.Client.HomeserverURL.String(), nil)
+		tx.Set("user:userID", clientInstance.Client.UserID, nil)
 		return nil
 	})
 	if err != nil {
@@ -48,7 +48,7 @@ func LoginUser(username, password string) (*Client, error) {
 		return nil, cliErr
 	}
 
-	resp, err := cli.Login(&gomatrix.ReqLogin{
+	resp, err := cli.Client.Login(&gomatrix.ReqLogin{
 		Type:     "m.login.password",
 		User:     username,
 		Password: password,
@@ -56,7 +56,7 @@ func LoginUser(username, password string) (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	cli.SetCredentials(resp.UserID, resp.AccessToken)
+	cli.Client.SetCredentials(resp.UserID, resp.AccessToken)
 	DBerr := db.Update(func(tx *buntdb.Tx) error {
 		tx.Set("user:accessToken", resp.AccessToken, nil)
 		tx.Set("user:deviceID", resp.DeviceID, nil)

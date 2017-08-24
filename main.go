@@ -8,6 +8,7 @@ import (
 	"github.com/Nordgedanken/Neo/util"
 	"github.com/therecipe/qt/widgets"
 	"github.com/tidwall/buntdb"
+	"sync"
 )
 
 var window *widgets.QMainWindow
@@ -65,11 +66,12 @@ func main() {
 	})
 
 	if accessToken != "" && homeserverURL != "" && userID != "" {
+		var wg sync.WaitGroup
 		localLog.Println("Starting Auto Login Sequenze in background")
 		results := make(chan *matrix.Client)
 
 		wg.Add(1)
-		go DoLogin("", "", homeserverURL, userID, accessToken, localLog, results)
+		go DoLogin("", "", homeserverURL, userID, accessToken, localLog, results, &wg)
 
 		go func() {
 			wg.Wait()      // wait for each execTask to return
