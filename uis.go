@@ -149,7 +149,7 @@ func newMainUI(windowWidth, windowHeight int, cli *matrix.Client) *widgets.QWidg
 	roomListView := widgets.NewQWidget(nil, 0)
 	roomListView.SetMinimumHeight(windowHeight)
 	roomListScroll := widgets.NewQScrollArea(nil)
-	roomListViewLayout := widgets.NewQVBoxLayout2(roomListView)
+	roomListViewLayout := widgets.NewQGridLayout(roomListView)
 	roomListScroll.SetWidget(roomListView)
 	roomListScroll.SetWidgetResizable(true)
 
@@ -158,7 +158,7 @@ func newMainUI(windowWidth, windowHeight int, cli *matrix.Client) *widgets.QWidg
 	roomLayout := widgets.NewQVBoxLayout2(RoomWidget)
 	room := widgets.NewQLabel2("test", nil, 0)
 	roomLayout.AddWidget(room, 0, core.Qt__AlignTop)
-	roomListViewLayout.AddWidget(room, 0, core.Qt__AlignHCenter)
+	roomListViewLayout.AddWidget(room, 0, 0, core.Qt__AlignTop)
 
 	wrapperLayout.AddWidget(roomListScroll, 0, 0, 0)
 
@@ -166,7 +166,7 @@ func newMainUI(windowWidth, windowHeight int, cli *matrix.Client) *widgets.QWidg
 	messageView := widgets.NewQWidget(nil, 0)
 	messageView.SetMinimumHeight(windowHeight)
 	messageScroll := widgets.NewQScrollArea(nil)
-	messageViewLayout := widgets.NewQVBoxLayout2(messageView)
+	messageViewLayout := widgets.NewQGridLayout(messageView)
 	messageScroll.SetWidget(messageView)
 	messageScroll.SetWidgetResizable(true)
 
@@ -175,7 +175,7 @@ func newMainUI(windowWidth, windowHeight int, cli *matrix.Client) *widgets.QWidg
 	messageLayout := widgets.NewQVBoxLayout2(mesageWidget)
 	message := widgets.NewQLabel2("test", nil, 0)
 	messageLayout.AddWidget(message, 0, core.Qt__AlignTop)
-	messageViewLayout.AddWidget(message, 0, core.Qt__AlignHCenter)
+	messageViewLayout.AddWidget(message, 0, 0, core.Qt__AlignTop)
 
 	wrapperLayout.AddWidget(messageScroll, 0, 1, 0)
 
