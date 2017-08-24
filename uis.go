@@ -103,7 +103,7 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 			//Show MainUI
 			for result := range results {
 				//TODO Don't switch screen on wrong login data.
-				MainUI := NewMainUI(windowWidth, windowHeight, result)
+				MainUI := newMainUI(windowWidth, windowHeight, result)
 				window.SetCentralWidget(MainUI)
 			}
 		} else {
@@ -117,9 +117,9 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 }
 
 //NewMainUI initializes the login Screen
-func NewMainUI(windowWidth, windowHeight int, cli *matrix.Client) *widgets.QWidget {
+func newMainUI(windowWidth, windowHeight int, cli *matrix.Client) *widgets.QWidget {
 	widget := widgets.NewQWidget(nil, 0)
-	topLayout := widgets.NewQVBoxLayout()
+	topLayout := widgets.NewQVBoxLayout2(widget)
 
 	// var (
 	// 	usernameLabel = widgets.NewQLabelFromPointer(widget.FindChild("UsernameLabel", core.Qt__FindChildrenRecursively).Pointer())
@@ -141,6 +141,49 @@ func NewMainUI(windowWidth, windowHeight int, cli *matrix.Client) *widgets.QWidg
 	// avatarLogo.SetAlignment(core.Qt__AlignBottom | core.Qt__AlignRight)
 	// avatarLogo.SetPixmap(cli.GetOwnUserAvatar())
 
+	// Wrapper
+	wrapperWidget := widgets.NewQGroupBox2("", nil)
+	wrapperLayout := widgets.NewQGridLayout2()
+
+	// Roomlist
+	roomListView := widgets.NewQWidget(nil, 0)
+	roomListView.SetMinimumHeight(windowHeight)
+	roomListScroll := widgets.NewQScrollArea(nil)
+	roomListViewLayout := widgets.NewQVBoxLayout2(roomListView)
+	roomListScroll.SetWidget(roomListView)
+	roomListScroll.SetWidgetResizable(true)
+
+	// Fake Room
+	RoomWidget := widgets.NewQWidget(nil, 0)
+	roomLayout := widgets.NewQVBoxLayout2(RoomWidget)
+	room := widgets.NewQLabel2("test", nil, 0)
+	roomLayout.AddWidget(room, 0, core.Qt__AlignTop)
+	roomListViewLayout.AddWidget(room, 0, core.Qt__AlignHCenter)
+
+	wrapperLayout.AddWidget(roomListScroll, 0, 0, 0)
+
+	// Message View
+	messageView := widgets.NewQWidget(nil, 0)
+	messageView.SetMinimumHeight(windowHeight)
+	messageScroll := widgets.NewQScrollArea(nil)
+	messageViewLayout := widgets.NewQVBoxLayout2(messageView)
+	messageScroll.SetWidget(messageView)
+	messageScroll.SetWidgetResizable(true)
+
+	// Fake Message
+	mesageWidget := widgets.NewQWidget(nil, 0)
+	messageLayout := widgets.NewQVBoxLayout2(mesageWidget)
+	message := widgets.NewQLabel2("test", nil, 0)
+	messageLayout.AddWidget(message, 0, core.Qt__AlignTop)
+	messageViewLayout.AddWidget(message, 0, core.Qt__AlignHCenter)
+
+	wrapperLayout.AddWidget(messageScroll, 0, 1, 0)
+
+	wrapperLayout.SetColumnMinimumWidth(0, windowWidth/3)
+	wrapperLayout.SetColumnMinimumWidth(1, (windowWidth/3)*2)
+	wrapperLayout.SetRowMinimumHeight(0, windowHeight)
+	wrapperWidget.SetLayout(wrapperLayout)
+	topLayout.AddWidget(wrapperWidget, 1, core.Qt__AlignVCenter)
 	widget.SetLayout(topLayout)
 
 	return widget
