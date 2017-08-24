@@ -7,29 +7,28 @@ import (
 	"github.com/tidwall/buntdb"
 )
 
-var clientInstance *Client
-
 //GetClient returns a Client
-func GetClient(homeserverURL, userID, accessToken string) (*Client, error) {
-	var err error
+func GetClient(homeserverURL, userID, accessToken string) (clientInstance *Client, err error) {
 	var client *gomatrix.Client
 	client, err = gomatrix.NewClient(homeserverURL, userID, accessToken)
 	if err != nil {
-		return nil, err
+		clientInstance = nil
+		return
 	}
 	clientInstance = &Client{client}
 
-	DBerr := db.Update(func(tx *buntdb.Tx) error {
+	err = db.Update(func(tx *buntdb.Tx) error {
 		tx.Set("user:accessToken", clientInstance.AccessToken, nil)
 		tx.Set("user:homeserverURL", clientInstance.HomeserverURL.String(), nil)
 		tx.Set("user:userID", clientInstance.UserID, nil)
 		return nil
 	})
-	if DBerr != nil {
-		return nil, DBerr
+	if err != nil {
+		clientInstance = nil
+		return
 	}
 
-	return clientInstance, nil
+	return
 }
 
 //LoginUser Creates a Session for the User

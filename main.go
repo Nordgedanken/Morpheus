@@ -36,10 +36,6 @@ func main() {
 	window = widgets.NewQMainWindow(nil, 0)
 	window.SetMinimumSize2(windowWidth, windowHeight)
 
-	loginUI := NewLoginUI(windowWidth, windowHeight)
-	loginUI.Resize2(windowWidth, windowHeight)
-	loginUI.SetMinimumSize2(windowWidth, windowHeight)
-
 	var accessToken string
 	var homeserverURL string
 	var userID string
@@ -88,6 +84,9 @@ func main() {
 		}
 	} else {
 		//Show loginUI
+		loginUI := NewLoginUI(windowWidth, windowHeight)
+		loginUI.Resize2(windowWidth, windowHeight)
+		loginUI.SetMinimumSize2(windowWidth, windowHeight)
 		window.SetCentralWidget(loginUI)
 	}
 	window.Show()

@@ -4,8 +4,10 @@ import (
 	"log"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/Nordgedanken/Neo/matrix"
+	"github.com/matrix-org/gomatrix"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/widgets"
 	"github.com/tidwall/buntdb"
@@ -191,12 +193,38 @@ func NewMainUI(windowWidth, windowHeight int, cli *matrix.Client) *widgets.QWidg
 	messageScroll.SetWidget(messageView)
 	messageScroll.SetWidgetResizable(true)
 
-	// Fake Message
-	mesageWidget := widgets.NewQWidget(nil, 0)
-	messageLayout := widgets.NewQVBoxLayout2(mesageWidget)
-	message := widgets.NewQLabel2("test", nil, 0)
-	messageLayout.AddWidget(message, 0, core.Qt__AlignTop)
-	messageViewLayout.AddWidget(message, 0, 0, core.Qt__AlignTop)
+	// Messages
+	syncer := cli.Syncer.(*gomatrix.DefaultSyncer)
+	cli.Store = gomatrix.NewInMemoryStore()
+	syncer.Store = gomatrix.NewInMemoryStore()
+	syncer.OnEventType("m.room.message", func(ev *gomatrix.Event) {
+		localLog.Println(ev)
+		// TODO Later needs to match current Room
+		if ev.RoomID == "!zTIXGmDjyRcAqbrWab:matrix.ffslfl.net" {
+			messageBody, messageOk := ev.Body()
+			if messageOk == true {
+				mesageWidget := widgets.NewQWidget(nil, 0)
+				messageLayout := widgets.NewQVBoxLayout2(mesageWidget)
+				message := widgets.NewQLabel2(messageBody, nil, 0)
+				messageLayout.AddWidget(message, 0, core.Qt__AlignTop)
+				messageViewLayout.AddWidget(message, 0, 0, core.Qt__AlignTop)
+			} else {
+				localLog.Println("Message not ok: ", messageOk)
+			}
+		}
+	})
+
+	// Start Non-blocking sync
+	localLog.Println("Syncing now")
+	go func(localLog *log.Logger, cli *matrix.Client) {
+		if err := cli.Sync(); err != nil {
+			localLog.Println("Sync() returned ", err)
+			time.Sleep(10 * time.Second)
+		} else {
+			localLog.Println("Stopping Sync()")
+		}
+	}(localLog, cli)
+	localLog.Println("Started Syncing")
 
 	wrapperLayout.AddWidget(messageScroll, 0, 1, 0)
 
