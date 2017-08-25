@@ -2,24 +2,23 @@ package main
 
 import (
 	"fmt"
+	"github.com/Nordgedanken/Morpheus/matrix"
+	"github.com/matrix-org/gomatrix"
+	"github.com/therecipe/qt/core"
+	"github.com/therecipe/qt/gui"
+	"github.com/therecipe/qt/uitools"
+	"github.com/therecipe/qt/widgets"
 	"log"
 	"strings"
 	"sync"
-	"time"
-
-	"github.com/Nordgedanken/Neo/matrix"
-	"github.com/matrix-org/gomatrix"
-	"github.com/therecipe/qt/core"
-	"github.com/therecipe/qt/widgets"
-	"github.com/tidwall/buntdb"
 )
 
 var username string
 var password string
 
-func DoLogin(username, password, homeserverURL, userID, accessToken string, localLog *log.Logger, results chan<- *matrix.Client, wg *sync.WaitGroup) {
+func DoLogin(username, password, homeserverURL, userID, accessToken string, localLog *log.Logger, results chan<- *gomatrix.Client, wg *sync.WaitGroup) {
 	defer wg.Done()
-	var cli *matrix.Client
+	var cli *gomatrix.Client
 	if accessToken != "" && homeserverURL != "" && userID != "" {
 		var cliErr error
 		if strings.HasPrefix(homeserverURL, "https://") {
@@ -32,7 +31,7 @@ func DoLogin(username, password, homeserverURL, userID, accessToken string, loca
 		if cliErr != nil {
 			localLog.Println(cliErr)
 		}
-		cli.Client.SetCredentials(userID, accessToken)
+		cli.SetCredentials(userID, accessToken)
 	} else {
 		var err error
 		cli, err = matrix.LoginUser(username, password)
@@ -47,6 +46,8 @@ func DoLogin(username, password, homeserverURL, userID, accessToken string, loca
 //NewLoginUI initializes the login Screen
 func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 	widget := widgets.NewQWidget(nil, 0)
+	widget.SetObjectName("LoginWrapper")
+	widget.SetStyleSheet("QWidget#LoginWrapper { border: 0px; };")
 	topLayout := widgets.NewQVBoxLayout()
 
 	formWidget := widgets.NewQWidget(nil, 0)
@@ -115,7 +116,7 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 
 		if username != "" && password != "" {
 			localLog.Println("Starting Login Sequenze in background")
-			results := make(chan *matrix.Client)
+			results := make(chan *gomatrix.Client)
 
 			wg.Add(1)
 			go DoLogin(username, password, "", "", "", localLog, results, &wg)
@@ -127,174 +128,62 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 
 			//Show MainUI
 			for result := range results {
+				fmt.Println(result)
 				//TODO Don't switch screen on wrong login data.
-				MainUI := NewMainUI(windowWidth, windowHeight, result)
-				window.SetCentralWidget(MainUI)
+				//MainUI := NewMainUI(windowWidth, windowHeight, result)
+				mainUI := NewMainUI(windowWidth, windowHeight)
+				window.SetCentralWidget(mainUI)
 			}
 		} else {
 			localLog.Println("Username and/or password is empty. Do Nothing.")
 		}
 	})
 
-	widget.SetWindowTitle("Neo - Login")
+	widget.SetWindowTitle("Morpheus - Login")
 
 	return widget
 }
 
 //NewMainUI initializes the login Screen
-func NewMainUI(windowWidth, windowHeight int, cli *matrix.Client) *widgets.QWidget {
-	widget := widgets.NewQWidget(nil, 0)
-	topLayout := widgets.NewQVBoxLayout2(widget)
+//func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWidget {
+func NewMainUI(windowWidth, windowHeight int) *widgets.QWidget {
+	var widget = widgets.NewQWidget(nil, 0)
 
-	// var (
-	// 	usernameLabel = widgets.NewQLabelFromPointer(widget.FindChild("UsernameLabel", core.Qt__FindChildrenRecursively).Pointer())
-	// 	mxidLabel     = widgets.NewQLabelFromPointer(widget.FindChild("MXIDLabel", core.Qt__FindChildrenRecursively).Pointer())
-	// 	avatarLogo    = widgets.NewQLabelFromPointer(widget.FindChild("AvatarLabel", core.Qt__FindChildrenRecursively).Pointer())
-	// )
-	//
-	// // Set MXID Label
-	// mxidLabel.SetText(fmt.Sprint(username))
-	//
-	// // Set Dispalyname Label
-	// displayName, displayNameErr := cli.GetUserDisplayName(username)
-	// if displayNameErr != nil {
-	// 	localLog.Println(displayNameErr)
-	// }
-	// usernameLabel.SetText(fmt.Sprint(displayName))
-	//
-	// // Set Avatar
-	// avatarLogo.SetAlignment(core.Qt__AlignBottom | core.Qt__AlignRight)
-	// avatarLogo.SetPixmap(cli.GetOwnUserAvatar())
+	var loader = uitools.NewQUiLoader(nil)
+	var file = core.NewQFile2(":/qml/ui/chat.ui")
 
-	// Wrapper
-	wrapperWidget := widgets.NewQGroupBox2("", nil)
-	wrapperLayout := widgets.NewQGridLayout2()
+	file.Open(core.QIODevice__ReadOnly)
+	var mainWidget = loader.Load(file, widget)
+	file.Close()
 
-	// Roomlist
-	roomListView := widgets.NewQWidget(nil, 0)
-	roomListView.SetMinimumHeight(windowHeight)
-	roomListScroll := widgets.NewQScrollArea(nil)
-	roomListViewLayout := widgets.NewQGridLayout(roomListView)
-	roomListScroll.SetWidget(roomListView)
-	roomListScroll.SetWidgetResizable(true)
+	mainWidget.SetMinimumSize2(windowWidth, windowHeight)
+	mainWidget.Resize2(windowWidth, windowHeight)
+	mainWidget.SetGeometry2(0, 0, windowWidth, windowHeight)
 
-	// Fake Room
-	RoomWidget := widgets.NewQWidget(nil, 0)
-	roomLayout := widgets.NewQVBoxLayout2(RoomWidget)
-	room := widgets.NewQLabel2("test", nil, 0)
-	roomLayout.AddWidget(room, 0, core.Qt__AlignTop)
-	roomListViewLayout.AddWidget(room, 0, 0, core.Qt__AlignTop)
+	widget.SetMinimumSize2(windowWidth, windowHeight)
+	widget.SetGeometry2(0, 0, windowWidth, windowHeight)
 
-	wrapperLayout.AddWidget(roomListScroll, 0, 0, 0)
+	chatWidget := widgets.NewQWidgetFromPointer(widget.FindChild("ChatWidget", core.Qt__FindChildrenRecursively).Pointer())
+	chatWidget.SetMinimumSize2(windowWidth, windowHeight)
+	chatWidget.SetGeometry2(0, 0, windowWidth, windowHeight)
 
-	// Message View
-	messageView := widgets.NewQWidget(nil, 0)
-	messageView.SetMinimumHeight(windowHeight)
-	messageScroll := widgets.NewQScrollArea(nil)
-	messageViewLayout := widgets.NewQGridLayout(messageView)
-	messageScroll.SetWidget(messageView)
-	messageScroll.SetWidgetResizable(true)
+	mainWidget.SetWindowTitle("Morpheus - MatrixHQ")
+	var layout = widgets.NewQHBoxLayout()
+	layout.AddWidget(mainWidget, 1, core.Qt__AlignTop|core.Qt__AlignLeft)
+	widget.SetLayout(layout)
+	layout.SetSpacing(0)
+	layout.SetContentsMargins(0, 0, 0, 0)
 
-	// Messages
-	syncer := cli.Client.Syncer.(*gomatrix.DefaultSyncer)
-	customStore := gomatrix.NewInMemoryStore()
-	cli.Client.Store = customStore
-	syncer.Store = customStore
-	syncer.OnEventType("m.room.message", func(ev *gomatrix.Event) {
-		// TODO Later needs to match current Room
-		if ev.RoomID == "!zTIXGmDjyRcAqbrWab:matrix.ffslfl.net" {
-			messageBody, messageOk := ev.Body()
-			if messageOk == true {
-				mesageWidget := widgets.NewQWidget(nil, 0)
-				messageLayout := widgets.NewQVBoxLayout2(mesageWidget)
-				message := widgets.NewQLabel2(messageBody, nil, 0)
-				messageLayout.AddWidget(message, 0, core.Qt__AlignTop)
-				messageViewLayout.AddWidget(message, 0, 0, core.Qt__AlignTop)
-			} else {
-				localLog.Println("Message not ok: ", messageOk)
-			}
-		}
+	window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+
+		widget.SetGeometry2(0, 0, event.Size().Width(), event.Size().Height())
+		mainWidget.SetGeometry2(0, 0, event.Size().Width(), event.Size().Height())
+		chatWidget.SetGeometry2(0, 0, event.Size().Width(), event.Size().Height())
+
+		widget.Resize(event.Size())
+		mainWidget.Resize(event.Size())
+		chatWidget.Resize(event.Size())
 	})
-
-	// Start Non-blocking sync
-	localLog.Println("Syncing now")
-	go func() {
-		for {
-			fmt.Println("sync")
-			if e := cli.Client.Sync(); e != nil {
-				fmt.Println("Fatal Sync() error")
-				time.Sleep(10 * time.Second)
-			}
-			time.Sleep(10 * time.Second)
-		}
-	}()
-
-	localLog.Println("Started Syncing")
-
-	wrapperLayout.AddWidget(messageScroll, 0, 1, 0)
-
-	// logoutButton //TODO move it to correct place
-	buttonWidget := widgets.NewQWidget(nil, 0)
-	buttonLayout := widgets.NewQVBoxLayout()
-
-	logoutButton := widgets.NewQPushButton2("LOGOUT", nil)
-	logoutButton.SetMinimumSize2(350, 65)
-
-	buttonLayout.AddStretch(1)
-	buttonLayout.AddWidget(logoutButton, 0, 0)
-	buttonLayout.AddStretch(1)
-
-	buttonWidget.SetLayout(buttonLayout)
-	wrapperLayout.AddWidget(buttonWidget, 1, 0, core.Qt__AlignBottom)
-
-	logoutButton.ConnectClicked(func(checked bool) {
-		//TODO register enter and show loader or so
-		localLog.Println("Starting Logout Sequenze in background")
-		var wg sync.WaitGroup
-		results := make(chan bool)
-
-		wg.Add(1)
-		go func(cli *matrix.Client, localLog *log.Logger, results chan<- bool) {
-			defer wg.Done()
-			_, err := cli.Client.Logout()
-			if err != nil {
-				localLog.Println(err)
-				results <- false
-			} else {
-				cli.Client.ClearCredentials()
-				//Flush complete DB
-				db.View(func(tx *buntdb.Tx) error {
-					var QueryErr error
-					QueryErr = tx.DeleteAll()
-					if QueryErr != nil {
-						return QueryErr
-					}
-					return nil
-				})
-				results <- true
-			}
-		}(cli, localLog, results)
-
-		go func() {
-			wg.Wait()      // wait for each execTask to return
-			close(results) // then close the results channel
-		}()
-
-		//Show MainUI
-		for result := range results {
-			if result {
-				LoginUI := NewLoginUI(windowWidth, windowHeight)
-				window.SetCentralWidget(LoginUI)
-			}
-		}
-	})
-
-	wrapperLayout.SetColumnMinimumWidth(0, windowWidth/3)
-	wrapperLayout.SetColumnMinimumWidth(1, (windowWidth/3)*2)
-	wrapperLayout.SetRowMinimumHeight(0, windowHeight)
-	wrapperWidget.SetLayout(wrapperLayout)
-	topLayout.AddWidget(wrapperWidget, 1, core.Qt__AlignVCenter)
-	widget.SetLayout(topLayout)
 
 	return widget
 }

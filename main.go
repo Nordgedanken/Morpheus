@@ -4,8 +4,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/Nordgedanken/Neo/matrix"
-	"github.com/Nordgedanken/Neo/util"
+	"fmt"
+	"github.com/Nordgedanken/Morpheus/matrix"
+	"github.com/Nordgedanken/Morpheus/util"
+	"github.com/matrix-org/gomatrix"
 	"github.com/therecipe/qt/widgets"
 	"github.com/tidwall/buntdb"
 	"sync"
@@ -24,18 +26,18 @@ func main() {
 	db = matrix.OpenDB()
 	defer db.Close()
 
-	localLog.Println("Starting Neo")
+	localLog.Println("Starting Morpheus")
 
 	widgets.NewQApplication(len(os.Args), os.Args)
 
 	desktopApp := widgets.QApplication_Desktop()
 	primaryScreen := desktopApp.PrimaryScreen()
 	screen := desktopApp.Screen(primaryScreen)
-	windowWidth := (screen.Width() / 2)
-	windowHeight := (screen.Height() / 2)
+	windowWidth := screen.Width() / 2
+	windowHeight := screen.Height() / 2
 
 	window = widgets.NewQMainWindow(nil, 0)
-	window.SetMinimumSize2(windowWidth, windowHeight)
+	//window.SetMinimumSize2(windowWidth, windowHeight)
 
 	var accessToken string
 	var homeserverURL string
@@ -68,7 +70,7 @@ func main() {
 	if accessToken != "" && homeserverURL != "" && userID != "" {
 		var wg sync.WaitGroup
 		localLog.Println("Starting Auto Login Sequenze in background")
-		results := make(chan *matrix.Client)
+		results := make(chan *gomatrix.Client)
 
 		wg.Add(1)
 		go DoLogin("", "", homeserverURL, userID, accessToken, localLog, results, &wg)
@@ -80,14 +82,16 @@ func main() {
 
 		//Show MainUI
 		for result := range results {
+			fmt.Println(result)
 			//TODO Don't switch screen on wrong login data.
-			MainUI := NewMainUI(windowWidth, windowHeight, result)
-			window.SetCentralWidget(MainUI)
+			//mainUI := NewMainUI(windowWidth, windowHeight, result)
+			mainUI := NewMainUI(windowWidth, windowHeight)
+			mainUI.SetMinimumSize2(windowWidth, windowHeight)
+			window.SetCentralWidget(mainUI)
 		}
 	} else {
 		//Show loginUI
 		loginUI := NewLoginUI(windowWidth, windowHeight)
-		loginUI.Resize2(windowWidth, windowHeight)
 		loginUI.SetMinimumSize2(windowWidth, windowHeight)
 		window.SetCentralWidget(loginUI)
 	}
@@ -95,5 +99,5 @@ func main() {
 
 	//enter the main event loop
 	widgets.QApplication_Exec()
-	localLog.Println("Stopping Neo")
+	localLog.Println("Stopping Morpheus")
 }

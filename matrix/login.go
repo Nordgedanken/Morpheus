@@ -8,23 +8,21 @@ import (
 )
 
 //GetClient returns a Client
-func GetClient(homeserverURL, userID, accessToken string) (clientInstance *Client, err error) {
-	var client *gomatrix.Client
+func GetClient(homeserverURL, userID, accessToken string) (client *gomatrix.Client, err error) {
 	client, err = gomatrix.NewClient(homeserverURL, userID, accessToken)
 	if err != nil {
-		clientInstance = nil
+		client = nil
 		return
 	}
-	clientInstance = &Client{client}
 
 	err = db.Update(func(tx *buntdb.Tx) error {
-		tx.Set("user:accessToken", clientInstance.Client.AccessToken, nil)
-		tx.Set("user:homeserverURL", clientInstance.Client.HomeserverURL.String(), nil)
-		tx.Set("user:userID", clientInstance.Client.UserID, nil)
+		tx.Set("user:accessToken", client.AccessToken, nil)
+		tx.Set("user:homeserverURL", client.HomeserverURL.String(), nil)
+		tx.Set("user:userID", client.UserID, nil)
 		return nil
 	})
 	if err != nil {
-		clientInstance = nil
+		client = nil
 		return
 	}
 
@@ -32,10 +30,10 @@ func GetClient(homeserverURL, userID, accessToken string) (clientInstance *Clien
 }
 
 //LoginUser Creates a Session for the User
-func LoginUser(username, password string) (*Client, error) {
+func LoginUser(username, password string) (*gomatrix.Client, error) {
 	usernameSplit := strings.Split(username, ":")
 	homeserverURL := usernameSplit[1]
-	var cli *Client
+	var cli *gomatrix.Client
 	var cliErr error
 	if strings.HasPrefix(homeserverURL, "https://") {
 		cli, cliErr = GetClient(homeserverURL, "", "")
@@ -48,7 +46,7 @@ func LoginUser(username, password string) (*Client, error) {
 		return nil, cliErr
 	}
 
-	resp, err := cli.Client.Login(&gomatrix.ReqLogin{
+	resp, err := cli.Login(&gomatrix.ReqLogin{
 		Type:     "m.login.password",
 		User:     username,
 		Password: password,
@@ -56,7 +54,7 @@ func LoginUser(username, password string) (*Client, error) {
 	if err != nil {
 		return nil, err
 	}
-	cli.Client.SetCredentials(resp.UserID, resp.AccessToken)
+	cli.SetCredentials(resp.UserID, resp.AccessToken)
 	DBerr := db.Update(func(tx *buntdb.Tx) error {
 		tx.Set("user:accessToken", resp.AccessToken, nil)
 		tx.Set("user:deviceID", resp.DeviceID, nil)
