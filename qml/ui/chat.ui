@@ -137,13 +137,13 @@
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
             <property name="spacing">
-             <number>65</number>
+             <number>0</number>
             </property>
             <property name="leftMargin">
              <number>7</number>
             </property>
             <property name="topMargin">
-             <number>9</number>
+             <number>82</number>
             </property>
             <property name="rightMargin">
              <number>9</number>
@@ -151,6 +151,18 @@
             <item>
              <widget class="QWidget" name="to1ChatButtonLayout" native="true">
               <layout class="QHBoxLayout" name="horizontalLayout_3">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>9</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
                <item>
                 <widget class="QPushButton" name="to1ChatButton">
                  <property name="sizePolicy">
@@ -176,7 +188,7 @@
                  </property>
                  <property name="icon">
                   <iconset>
-                   <normaloff>:/qml/icons/user.svg</normaloff>:/qml/icons/user.svg</iconset>
+                   <normaloff>:/qml/icons/ic_person_black_48px.svg</normaloff>:/qml/icons/ic_person_black_48px.svg</iconset>
                  </property>
                  <property name="iconSize">
                   <size>
@@ -192,6 +204,21 @@
             <item>
              <widget class="QWidget" name="newRoomButtonLayout" native="true">
               <layout class="QHBoxLayout" name="horizontalLayout_4">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="leftMargin">
+                <number>9</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>9</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
                <item>
                 <widget class="QPushButton" name="newRoomButton">
                  <property name="sizePolicy">
@@ -217,12 +244,12 @@
                  </property>
                  <property name="icon">
                   <iconset>
-                   <normaloff>:/qml/icons/plus.svg</normaloff>:/qml/icons/plus.svg</iconset>
+                   <normaloff>:/qml/icons/ic_add_black_48px.svg</normaloff>:/qml/icons/ic_add_black_48px.svg</iconset>
                  </property>
                  <property name="iconSize">
                   <size>
-                   <width>25</width>
-                   <height>25</height>
+                   <width>30</width>
+                   <height>30</height>
                   </size>
                  </property>
                 </widget>
@@ -233,6 +260,21 @@
             <item>
              <widget class="QWidget" name="directoryButtonLayout" native="true">
               <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="leftMargin">
+                <number>9</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>9</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
                <item>
                 <widget class="QPushButton" name="directoryButton">
                  <property name="sizePolicy">
@@ -258,12 +300,12 @@
                  </property>
                  <property name="icon">
                   <iconset>
-                   <normaloff>:/qml/icons/th-menu.svg</normaloff>:/qml/icons/th-menu.svg</iconset>
+                   <normaloff>:/qml/icons/ic_menu_black_48px.svg</normaloff>:/qml/icons/ic_menu_black_48px.svg</iconset>
                  </property>
                  <property name="iconSize">
                   <size>
-                   <width>22</width>
-                   <height>22</height>
+                   <width>25</width>
+                   <height>25</height>
                   </size>
                  </property>
                 </widget>
@@ -274,6 +316,21 @@
             <item>
              <widget class="QWidget" name="settingsButtonLayout" native="true">
               <layout class="QHBoxLayout" name="horizontalLayout">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="leftMargin">
+                <number>9</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>9</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
                <item>
                 <widget class="QPushButton" name="settingsMenuButton">
                  <property name="sizePolicy">
@@ -299,7 +356,7 @@
                  </property>
                  <property name="icon">
                   <iconset>
-                   <normaloff>:/qml/icons/cog.svg</normaloff>:/qml/icons/cog.svg</iconset>
+                   <normaloff>:/qml/icons/ic_settings_black_48px.svg</normaloff>:/qml/icons/ic_settings_black_48px.svg</iconset>
                  </property>
                  <property name="iconSize">
                   <size>
@@ -598,7 +655,7 @@ border-radius: 5px;</string>
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>:/qml/icons/phone.svg</normaloff>:/qml/icons/phone.svg</iconset>
+             <normaloff>:/qml/icons/ic_phone_black_48px.svg</normaloff>:/qml/icons/ic_phone_black_48px.svg</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -630,7 +687,7 @@ border-radius: 5px;</string>
            </property>
            <property name="icon">
             <iconset>
-             <normaloff>:/qml/icons/video.svg</normaloff>:/qml/icons/video.svg</iconset>
+             <normaloff>:/qml/icons/ic_video_call_black_48px.svg</normaloff>:/qml/icons/ic_video_call_black_48px.svg</iconset>
            </property>
            <property name="iconSize">
             <size>
