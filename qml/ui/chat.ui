@@ -632,6 +632,10 @@ border-radius: 5px;</string>
           <height>91</height>
          </size>
         </property>
+        <property name="styleSheet">
+         <string notr="true">background-color:rgb(246, 246, 246);
+border-radius: 2px;</string>
+        </property>
         <layout class="QGridLayout" name="gridLayout_7">
          <item row="0" column="0">
           <widget class="QLabel" name="RoomImage">
