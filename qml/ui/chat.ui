@@ -852,7 +852,22 @@ border-radius: 2px;</string>
             <height>50</height>
            </size>
           </property>
-          <layout class="QGridLayout" name="gridLayout_5">
+          <layout class="QGridLayout" name="gridLayout_3">
+           <property name="leftMargin">
+            <number>9</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>9</number>
+           </property>
+           <property name="bottomMargin">
+            <number>0</number>
+           </property>
+           <property name="spacing">
+            <number>0</number>
+           </property>
            <item row="0" column="0">
             <widget class="QLineEdit" name="MessageInput">
              <property name="sizePolicy">
@@ -878,6 +893,9 @@ padding: 3px</string>
              </property>
              <property name="text">
               <string/>
+             </property>
+             <property name="frame">
+              <bool>true</bool>
              </property>
              <property name="placeholderText">
               <string>Send a Message (unecrypted)...</string>
