@@ -1,13 +1,13 @@
 package main
 
 import (
-	"fmt"
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/matrix-org/gomatrix"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
+	"github.com/tidwall/buntdb"
 	"log"
 	"strings"
 	"sync"
@@ -128,10 +128,9 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 
 			//Show MainUI
 			for result := range results {
-				fmt.Println(result)
 				//TODO Don't switch screen on wrong login data.
-				//MainUI := NewMainUI(windowWidth, windowHeight, result)
-				mainUI := NewMainUI(windowWidth, windowHeight)
+				mainUI := NewMainUI(windowWidth, windowHeight, result)
+				mainUI.SetMinimumSize2(windowWidth, windowHeight)
 				window.SetCentralWidget(mainUI)
 			}
 		} else {
@@ -146,7 +145,7 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 
 //NewMainUI initializes the login Screen
 //func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWidget {
-func NewMainUI(windowWidth, windowHeight int) *widgets.QWidget {
+func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWidget {
 	var widget = widgets.NewQWidget(nil, 0)
 
 	var loader = uitools.NewQUiLoader(nil)
@@ -183,6 +182,55 @@ func NewMainUI(windowWidth, windowHeight int) *widgets.QWidget {
 		widget.Resize(event.Size())
 		mainWidget.Resize(event.Size())
 		chatWidget.Resize(event.Size())
+	})
+
+	//Set Avatar
+	avatarLogo := widgets.NewQLabelFromPointer(widget.FindChild("UserAvatar", core.Qt__FindChildrenRecursively).Pointer())
+	avatarLogo.SetPixmap(matrix.GetOwnUserAvatar(cli))
+
+	//Handle LogoutButton
+	logoutButton := widgets.NewQPushButtonFromPointer(widget.FindChild("LogoutButton", core.Qt__FindChildrenRecursively).Pointer())
+	logoutButton.ConnectClicked(func(checked bool) {
+		//TODO register enter and show loader or so
+		localLog.Println("Starting Logout Sequenze in background")
+		var wg sync.WaitGroup
+		results := make(chan bool)
+
+		wg.Add(1)
+		go func(cli *gomatrix.Client, localLog *log.Logger, results chan<- bool) {
+			defer wg.Done()
+			_, err := cli.Logout()
+			if err != nil {
+				localLog.Println(err)
+				results <- false
+			} else {
+				cli.ClearCredentials()
+				//Flush complete DB
+				db.View(func(tx *buntdb.Tx) error {
+					var QueryErr error
+					QueryErr = tx.DeleteAll()
+					if QueryErr != nil {
+						return QueryErr
+					}
+					return nil
+				})
+				results <- true
+			}
+		}(cli, localLog, results)
+
+		go func() {
+			wg.Wait()      // wait for each execTask to return
+			close(results) // then close the results channel
+		}()
+
+		//Show LoginUI
+		for result := range results {
+			if result {
+				loginUI := NewLoginUI(windowWidth, windowHeight)
+				loginUI.SetMinimumSize2(windowWidth, windowHeight)
+				window.SetCentralWidget(loginUI)
+			}
+		}
 	})
 
 	return widget

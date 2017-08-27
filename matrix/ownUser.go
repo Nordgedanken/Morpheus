@@ -21,7 +21,7 @@ func init() {
 }
 
 // getOwnUserAvatar returns a *gui.QPixmap of an UserAvatar
-func getOwnUserAvatar(cli *gomatrix.Client) *gui.QPixmap {
+func GetOwnUserAvatar(cli *gomatrix.Client) *gui.QPixmap {
 	// Init local vars
 	var avatarData string
 	var IMGdata string

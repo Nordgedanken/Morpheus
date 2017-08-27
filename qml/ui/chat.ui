@@ -50,7 +50,8 @@
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(70, 79, 96);</string>
+      <string notr="true">background-color: rgb(91, 103, 125);
+/* rgb(70, 79, 96);*/</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_6">
       <property name="leftMargin">
@@ -85,20 +86,17 @@
            <height>61</height>
           </rect>
          </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-           <horstretch>0</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
+         <property name="mouseTracking">
+          <bool>true</bool>
          </property>
          <property name="text">
           <string/>
          </property>
-         <property name="pixmap">
-          <pixmap>../../../../../../../Downloads/avatar512.png</pixmap>
-         </property>
          <property name="scaledContents">
           <bool>true</bool>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
          </property>
         </widget>
        </widget>
@@ -143,7 +141,7 @@
              <number>7</number>
             </property>
             <property name="topMargin">
-             <number>82</number>
+             <number>45</number>
             </property>
             <property name="rightMargin">
              <number>9</number>
@@ -177,24 +175,30 @@
                    <height>41</height>
                   </size>
                  </property>
+                 <property name="toolTip">
+                  <string>New 1-1 Chat</string>
+                 </property>
                  <property name="layoutDirection">
                   <enum>Qt::LeftToRight</enum>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">border: 0;</string>
+                  <string notr="true"/>
                  </property>
                  <property name="text">
                   <string/>
                  </property>
                  <property name="icon">
                   <iconset>
-                   <normaloff>:/qml/icons/ic_person_black_48px.svg</normaloff>:/qml/icons/ic_person_black_48px.svg</iconset>
+                   <normaloff>:/qml/icons/ic_person_white_48px.svg</normaloff>:/qml/icons/ic_person_white_48px.svg</iconset>
                  </property>
                  <property name="iconSize">
                   <size>
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="flat">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -233,24 +237,30 @@
                    <height>41</height>
                   </size>
                  </property>
+                 <property name="toolTip">
+                  <string>New Room</string>
+                 </property>
                  <property name="layoutDirection">
                   <enum>Qt::LeftToRight</enum>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">border: 0;</string>
+                  <string notr="true"/>
                  </property>
                  <property name="text">
                   <string/>
                  </property>
                  <property name="icon">
                   <iconset>
-                   <normaloff>:/qml/icons/ic_add_black_48px.svg</normaloff>:/qml/icons/ic_add_black_48px.svg</iconset>
+                   <normaloff>:/qml/icons/ic_add_white_48px.svg</normaloff>:/qml/icons/ic_add_white_48px.svg</iconset>
                  </property>
                  <property name="iconSize">
                   <size>
                    <width>30</width>
                    <height>30</height>
                   </size>
+                 </property>
+                 <property name="flat">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -289,24 +299,30 @@
                    <height>41</height>
                   </size>
                  </property>
+                 <property name="toolTip">
+                  <string>Directory</string>
+                 </property>
                  <property name="layoutDirection">
                   <enum>Qt::LeftToRight</enum>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">border: 0;</string>
+                  <string notr="true"/>
                  </property>
                  <property name="text">
                   <string/>
                  </property>
                  <property name="icon">
                   <iconset>
-                   <normaloff>:/qml/icons/ic_menu_black_48px.svg</normaloff>:/qml/icons/ic_menu_black_48px.svg</iconset>
+                   <normaloff>:/qml/icons/ic_menu_white_48px.svg</normaloff>:/qml/icons/ic_menu_white_48px.svg</iconset>
                  </property>
                  <property name="iconSize">
                   <size>
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="flat">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -345,24 +361,92 @@
                    <height>41</height>
                   </size>
                  </property>
+                 <property name="mouseTracking">
+                  <bool>false</bool>
+                 </property>
+                 <property name="toolTip">
+                  <string>Settings</string>
+                 </property>
                  <property name="layoutDirection">
                   <enum>Qt::LeftToRight</enum>
                  </property>
                  <property name="styleSheet">
-                  <string notr="true">border: 0;</string>
+                  <string notr="true"/>
                  </property>
                  <property name="text">
                   <string/>
                  </property>
                  <property name="icon">
                   <iconset>
-                   <normaloff>:/qml/icons/ic_settings_black_48px.svg</normaloff>:/qml/icons/ic_settings_black_48px.svg</iconset>
+                   <normaloff>:/qml/icons/ic_settings_white_48px.svg</normaloff>:/qml/icons/ic_settings_white_48px.svg</iconset>
                  </property>
                  <property name="iconSize">
                   <size>
                    <width>25</width>
                    <height>25</height>
                   </size>
+                 </property>
+                 <property name="flat">
+                  <bool>true</bool>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </widget>
+            </item>
+            <item>
+             <widget class="QWidget" name="LogoutButtonLayout" native="true">
+              <layout class="QHBoxLayout" name="horizontalLayout_5">
+               <property name="spacing">
+                <number>0</number>
+               </property>
+               <property name="topMargin">
+                <number>0</number>
+               </property>
+               <property name="rightMargin">
+                <number>9</number>
+               </property>
+               <property name="bottomMargin">
+                <number>0</number>
+               </property>
+               <item>
+                <widget class="QPushButton" name="LogoutButton">
+                 <property name="sizePolicy">
+                  <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                   <horstretch>0</horstretch>
+                   <verstretch>0</verstretch>
+                  </sizepolicy>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>41</width>
+                   <height>41</height>
+                  </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>Logout</string>
+                 </property>
+                 <property name="layoutDirection">
+                  <enum>Qt::LeftToRight</enum>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true"/>
+                 </property>
+                 <property name="text">
+                  <string/>
+                 </property>
+                 <property name="icon">
+                  <iconset>
+                   <normaloff>:/qml/icons/ic_power_settings_new_white_48px.svg</normaloff>:/qml/icons/ic_power_settings_new_white_48px.svg</iconset>
+                 </property>
+                 <property name="iconSize">
+                  <size>
+                   <width>25</width>
+                   <height>25</height>
+                  </size>
+                 </property>
+                 <property name="flat">
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -374,6 +458,7 @@
            <zorder>directoryButtonLayout</zorder>
            <zorder>to1ChatButtonLayout</zorder>
            <zorder>newRoomButtonLayout</zorder>
+           <zorder>LogoutButtonLayout</zorder>
           </widget>
          </item>
         </layout>
@@ -644,11 +729,14 @@ border-radius: 5px;</string>
              <height>41</height>
             </size>
            </property>
+           <property name="toolTip">
+            <string>Start Voice Chat</string>
+           </property>
            <property name="autoFillBackground">
             <bool>false</bool>
            </property>
            <property name="styleSheet">
-            <string notr="true">border: 0;</string>
+            <string notr="true"/>
            </property>
            <property name="text">
             <string/>
@@ -662,6 +750,9 @@ border-radius: 5px;</string>
              <width>25</width>
              <height>25</height>
             </size>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -679,8 +770,11 @@ border-radius: 5px;</string>
              <height>41</height>
             </size>
            </property>
+           <property name="toolTip">
+            <string>Start Video Chat</string>
+           </property>
            <property name="styleSheet">
-            <string notr="true">border: 0;</string>
+            <string notr="true">;</string>
            </property>
            <property name="text">
             <string/>
@@ -694,6 +788,9 @@ border-radius: 5px;</string>
              <width>25</width>
              <height>25</height>
             </size>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
            </property>
           </widget>
          </item>
@@ -724,7 +821,7 @@ border-radius: 5px;</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>1217</width>
+             <width>1216</width>
              <height>581</height>
             </rect>
            </property>

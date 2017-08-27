@@ -4,7 +4,6 @@ import (
 	"log"
 	"os"
 
-	"fmt"
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/util"
 	"github.com/matrix-org/gomatrix"
@@ -82,10 +81,8 @@ func main() {
 
 		//Show MainUI
 		for result := range results {
-			fmt.Println(result)
 			//TODO Don't switch screen on wrong login data.
-			//mainUI := NewMainUI(windowWidth, windowHeight, result)
-			mainUI := NewMainUI(windowWidth, windowHeight)
+			mainUI := NewMainUI(windowWidth, windowHeight, result)
 			mainUI.SetMinimumSize2(windowWidth, windowHeight)
 			window.SetCentralWidget(mainUI)
 		}
