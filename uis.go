@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/Nordgedanken/Morpheus/matrix"
+	"github.com/golang-commonmark/markdown"
 	"github.com/matrix-org/gomatrix"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
@@ -11,6 +12,7 @@ import (
 	"log"
 	"strings"
 	"sync"
+	"time"
 )
 
 var username string
@@ -232,6 +234,50 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWi
 			}
 		}
 	})
+
+	//Start Syncer!
+	syncer := cli.Syncer.(*gomatrix.DefaultSyncer)
+	customStore := gomatrix.NewInMemoryStore()
+	cli.Store = customStore
+	syncer.Store = customStore
+	syncer.OnEventType("m.room.message", func(ev *gomatrix.Event) {
+		localLog.Println("message:", ev.Content)
+	})
+
+	// Start Non-blocking sync
+	localLog.Println("Syncing now")
+	go func() {
+		for {
+			localLog.Println("sync")
+			if e := cli.Sync(); e != nil {
+				localLog.Println("Fatal Sync() error")
+				time.Sleep(10 * time.Second)
+			}
+			time.Sleep(10 * time.Second)
+		}
+	}()
+
+	messageInput := widgets.NewQLineEditFromPointer(widget.FindChild("MessageInput", core.Qt__FindChildrenRecursively).Pointer())
+	var message string
+	window.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
+		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
+			md := markdown.New(markdown.XHTMLOutput(true), markdown.Nofollow(true))
+			mardownMessage := md.RenderToString([]byte(message))
+			if mardownMessage == message {
+				cli.SendText("!zTIXGmDjyRcAqbrWab:matrix.ffslfl.net", message)
+			} else {
+				cli.SendMessageEvent("!zTIXGmDjyRcAqbrWab:matrix.ffslfl.net", "m.room.message", matrix.HTMLMessage{"m.text", message, mardownMessage, "org.matrix.custom.html"})
+			}
+			messageInput.Clear()
+		} else {
+			messageInput.KeyPressEventDefault(ev)
+		}
+	})
+	messageInput.ConnectTextChanged(func(value string) {
+		message = value
+	})
+
+	localLog.Println("Started Syncing")
 
 	return widget
 }

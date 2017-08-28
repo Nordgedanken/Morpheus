@@ -188,7 +188,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset>
+                  <iconset resource="../../rcc.qrc">
                    <normaloff>:/qml/icons/ic_person_white_48px.svg</normaloff>:/qml/icons/ic_person_white_48px.svg</iconset>
                  </property>
                  <property name="iconSize">
@@ -250,7 +250,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset>
+                  <iconset resource="../../rcc.qrc">
                    <normaloff>:/qml/icons/ic_add_white_48px.svg</normaloff>:/qml/icons/ic_add_white_48px.svg</iconset>
                  </property>
                  <property name="iconSize">
@@ -312,7 +312,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset>
+                  <iconset resource="../../rcc.qrc">
                    <normaloff>:/qml/icons/ic_menu_white_48px.svg</normaloff>:/qml/icons/ic_menu_white_48px.svg</iconset>
                  </property>
                  <property name="iconSize">
@@ -377,7 +377,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset>
+                  <iconset resource="../../rcc.qrc">
                    <normaloff>:/qml/icons/ic_settings_white_48px.svg</normaloff>:/qml/icons/ic_settings_white_48px.svg</iconset>
                  </property>
                  <property name="iconSize">
@@ -436,7 +436,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset>
+                  <iconset resource="../../rcc.qrc">
                    <normaloff>:/qml/icons/ic_power_settings_new_white_48px.svg</normaloff>:/qml/icons/ic_power_settings_new_white_48px.svg</iconset>
                  </property>
                  <property name="iconSize">
@@ -746,7 +746,7 @@ border-radius: 2px;</string>
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../../rcc.qrc">
              <normaloff>:/qml/icons/ic_phone_black_48px.svg</normaloff>:/qml/icons/ic_phone_black_48px.svg</iconset>
            </property>
            <property name="iconSize">
@@ -784,7 +784,7 @@ border-radius: 2px;</string>
             <string/>
            </property>
            <property name="icon">
-            <iconset>
+            <iconset resource="../../rcc.qrc">
              <normaloff>:/qml/icons/ic_video_call_black_48px.svg</normaloff>:/qml/icons/ic_video_call_black_48px.svg</iconset>
            </property>
            <property name="iconSize">
@@ -820,7 +820,7 @@ border-radius: 2px;</string>
           <property name="widgetResizable">
            <bool>true</bool>
           </property>
-          <widget class="QWidget" name="scrollAreaWidgetContents">
+          <widget class="QWidget" name="messagesScrollAreaContent">
            <property name="geometry">
             <rect>
              <x>0</x>
@@ -897,8 +897,14 @@ padding: 3px</string>
              <property name="frame">
               <bool>true</bool>
              </property>
+             <property name="readOnly">
+              <bool>false</bool>
+             </property>
              <property name="placeholderText">
               <string>Send a Message (unecrypted)...</string>
+             </property>
+             <property name="clearButtonEnabled">
+              <bool>false</bool>
              </property>
             </widget>
            </item>
@@ -915,6 +921,8 @@ padding: 3px</string>
   <zorder>sidebarWidget</zorder>
   <zorder>RoomWidget</zorder>
  </widget>
- <resources/>
+ <resources>
+  <include location="../../rcc.qrc"/>
+ </resources>
  <connections/>
 </ui>
