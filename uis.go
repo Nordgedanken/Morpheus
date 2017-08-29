@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/Nordgedanken/Morpheus/matrix"
-	"github.com/golang-commonmark/markdown"
 	"github.com/matrix-org/gomatrix"
+	"github.com/rhinoman/go-commonmark"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/uitools"
@@ -261,8 +261,7 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWi
 	var message string
 	window.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
 		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
-			md := markdown.New(markdown.XHTMLOutput(true), markdown.Nofollow(true))
-			mardownMessage := md.RenderToString([]byte(message))
+			mardownMessage := commonmark.Md2Html(message, 0)
 			if mardownMessage == message {
 				cli.SendText("!zTIXGmDjyRcAqbrWab:matrix.ffslfl.net", message)
 			} else {
@@ -276,8 +275,6 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWi
 	messageInput.ConnectTextChanged(func(value string) {
 		message = value
 	})
-
-	localLog.Println("Started Syncing")
 
 	return widget
 }

@@ -5,10 +5,16 @@ import (
 	"os"
 	"strings"
 
+	"bytes"
+	"fmt"
 	"github.com/Nordgedanken/Morpheus/util"
 	"github.com/matrix-org/gomatrix"
 	"github.com/therecipe/qt/gui"
 	"github.com/tidwall/buntdb"
+	"image"
+	"image/color"
+	"image/draw"
+	"image/png"
 )
 
 var localLog *log.Logger
@@ -18,6 +24,27 @@ func init() {
 	localLog = util.Logger()
 	localLog, file = util.StartFileLog(localLog)
 	defer file.Close()
+}
+
+type circle struct {
+	p image.Point
+	r int
+}
+
+func (c *circle) ColorModel() color.Model {
+	return color.AlphaModel
+}
+
+func (c *circle) Bounds() image.Rectangle {
+	return image.Rect(c.p.X-c.r, c.p.Y-c.r, c.p.X+c.r, c.p.Y+c.r)
+}
+
+func (c *circle) At(x, y int) color.Color {
+	xx, yy, rr := float64(x-c.p.X)+0.5, float64(y-c.p.Y)+0.5, float64(c.r)
+	if xx*xx+yy*yy < rr*rr {
+		return color.Alpha{255}
+	}
+	return color.Alpha{0}
 }
 
 // getOwnUserAvatar returns a *gui.QPixmap of an UserAvatar
@@ -76,8 +103,25 @@ func GetOwnUserAvatar(cli *gomatrix.Client) *gui.QPixmap {
 		IMGdata = avatarData
 	}
 
+	r := bytes.NewReader([]byte(IMGdata))
+	srcIMG, _, err := image.Decode(r)
+	if err != nil {
+		localLog.Println(err)
+	}
+
 	// Convert avatarimage to QPixmap for usage in QT
+	canvas := image.NewRGBA(srcIMG.Bounds())
+	cx := srcIMG.Bounds().Min.X + srcIMG.Bounds().Dx()/2
+	cy := srcIMG.Bounds().Min.Y + srcIMG.Bounds().Dy()/2
+	draw.DrawMask(canvas, canvas.Bounds(), srcIMG, image.ZP, &circle{image.Point{cx, cy}, 110}, image.ZP, draw.Over)
 	avatar := gui.NewQPixmap()
-	avatar.LoadFromData(IMGdata, uint(len(IMGdata)), "", 0)
+	buf := new(bytes.Buffer)
+	Converr := png.Encode(buf, canvas)
+	if Converr != nil {
+		localLog.Println(Converr)
+	}
+
+	str := fmt.Sprintf("%s", buf)
+	avatar.LoadFromData(str, uint(len(str)), "", 0)
 	return avatar
 }

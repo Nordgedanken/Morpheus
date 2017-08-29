@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/golang-commonmark/markdown"
+	"github.com/rhinoman/go-commonmark"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/uitools"
@@ -27,8 +27,7 @@ func AddMessage(body string, avatar *gui.QPixmap) *widgets.QWidget {
 	avatarLogo := widgets.NewQLabelFromPointer(widget.FindChild("avatar", core.Qt__FindChildrenRecursively).Pointer())
 	messageContent := widgets.NewQLabelFromPointer(widget.FindChild("messageContent", core.Qt__FindChildrenRecursively).Pointer())
 
-	md := markdown.New(markdown.XHTMLOutput(true), markdown.Nofollow(true))
-	mardownMessage := md.RenderToString([]byte(body))
+	mardownMessage := commonmark.Md2Html(body, 0)
 
 	messageContent.SetText(mardownMessage)
 	avatarLogo.SetPixmap(avatar)

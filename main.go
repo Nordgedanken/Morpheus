@@ -9,6 +9,7 @@ import (
 	"github.com/matrix-org/gomatrix"
 	"github.com/therecipe/qt/widgets"
 	"github.com/tidwall/buntdb"
+	_ "image/png"
 	"sync"
 )
 
