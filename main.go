@@ -45,8 +45,7 @@ func main() {
 
 	// Get cache
 	db.View(func(tx *buntdb.Tx) error {
-		var QueryErr error
-		QueryErr = tx.AscendKeys("user:accessToken",
+		QueryErr := tx.AscendKeys("user:accessToken",
 			func(key, value string) bool {
 				accessToken = value
 				return true
@@ -61,10 +60,7 @@ func main() {
 				userID = value
 				return true
 			})
-		if QueryErr != nil {
-			return QueryErr
-		}
-		return nil
+		return QueryErr
 	})
 
 	if accessToken != "" && homeserverURL != "" && userID != "" {

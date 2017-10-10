@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/Nordgedanken/Morpheus/elements"
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/matrix-org/gomatrix"
 	"github.com/rhinoman/go-commonmark"
@@ -157,6 +158,7 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWi
 	var mainWidget = loader.Load(file, widget)
 	file.Close()
 
+	matrix.InitData(cli, db)
 	mainWidget.SetMinimumSize2(windowWidth, windowHeight)
 	mainWidget.Resize2(windowWidth, windowHeight)
 	mainWidget.SetGeometry2(0, 0, windowWidth, windowHeight)
@@ -209,12 +211,8 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWi
 				cli.ClearCredentials()
 				//Flush complete DB
 				db.View(func(tx *buntdb.Tx) error {
-					var QueryErr error
-					QueryErr = tx.DeleteAll()
-					if QueryErr != nil {
-						return QueryErr
-					}
-					return nil
+					QueryErr := tx.DeleteAll()
+					return QueryErr
 				})
 				results <- true
 			}
@@ -240,8 +238,23 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWi
 	customStore := gomatrix.NewInMemoryStore()
 	cli.Store = customStore
 	syncer.Store = customStore
+
+	// Init Message View
+	_, messageListLayout := elements.NewMessageList()
+
+	messageListLayout.ConnectTriggerMessage(func(messageBody string) {
+		localLog.Println("messageTriggered:", messageBody)
+		messageListLayout.NewMessage(messageBody)
+	})
+
+	messageScrollArea := widgets.NewQScrollAreaFromPointer(widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
+
+	messageScrollArea.SetLayout(messageListLayout)
+
 	syncer.OnEventType("m.room.message", func(ev *gomatrix.Event) {
-		localLog.Println("message:", ev.Content)
+		msg, _ := ev.Body()
+		localLog.Println("message:", msg)
+		messageListLayout.TriggerMessage(msg)
 	})
 
 	// Start Non-blocking sync
@@ -253,6 +266,7 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWi
 				localLog.Println("Fatal Sync() error")
 				time.Sleep(10 * time.Second)
 			}
+			localLog.Println("sync done")
 			time.Sleep(10 * time.Second)
 		}
 	}()
