@@ -44,7 +44,8 @@ func InitData(cli *gomatrix.Client, db *buntdb.DB) {
 		for index, alias := range roomAliases.Content.Aliases {
 			// Update cache
 			DBerr := db.Update(func(tx *buntdb.Tx) error {
-				tx.Set("room:"+room+":aliases"+string(index), alias, nil)
+				localLog.Println(room)
+				tx.Set("room:"+room+":aliases:"+string(index), alias, nil)
 				return nil
 			})
 			if DBerr != nil {
@@ -52,5 +53,20 @@ func InitData(cli *gomatrix.Client, db *buntdb.DB) {
 			}
 		}
 
+	}
+}
+
+func CacheMessageEvents(id, sender, roomID, message string, timestamp int64, db *buntdb.DB) {
+	// Update cache
+	DBerr := db.Update(func(tx *buntdb.Tx) error {
+		localLog.Println(roomID)
+		tx.Set("room:"+roomID+":messages:"+id+":id", id, nil)
+		tx.Set("room:"+roomID+":messages:"+id+":sender", sender, nil)
+		tx.Set("room:"+roomID+":messages:"+id+":message", message, nil)
+		tx.Set("room:"+roomID+":messages:"+id+":timestamp", string(timestamp), nil)
+		return nil
+	})
+	if DBerr != nil {
+		localLog.Fatalln(DBerr)
 	}
 }

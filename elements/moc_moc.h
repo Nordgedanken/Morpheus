@@ -19,29 +19,29 @@
 QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
-struct qt_meta_stringdata_QGridLayoutWithTriggerSlot_t {
+struct qt_meta_stringdata_QVBoxLayoutWithTriggerSlot_t {
     QByteArrayData data[4];
     char stringdata0[55];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
-    qptrdiff(offsetof(qt_meta_stringdata_QGridLayoutWithTriggerSlot_t, stringdata0) + ofs \
+    qptrdiff(offsetof(qt_meta_stringdata_QVBoxLayoutWithTriggerSlot_t, stringdata0) + ofs \
         - idx * sizeof(QByteArrayData)) \
     )
-static const qt_meta_stringdata_QGridLayoutWithTriggerSlot_t qt_meta_stringdata_QGridLayoutWithTriggerSlot = {
+static const qt_meta_stringdata_QVBoxLayoutWithTriggerSlot_t qt_meta_stringdata_QVBoxLayoutWithTriggerSlot = {
     {
-QT_MOC_LITERAL(0, 0, 26), // "QGridLayoutWithTriggerSlot"
+QT_MOC_LITERAL(0, 0, 26), // "QVBoxLayoutWithTriggerSlot"
 QT_MOC_LITERAL(1, 27, 14), // "TriggerMessage"
 QT_MOC_LITERAL(2, 42, 0), // ""
 QT_MOC_LITERAL(3, 43, 11) // "messageBody"
 
     },
-    "QGridLayoutWithTriggerSlot\0TriggerMessage\0"
+    "QVBoxLayoutWithTriggerSlot\0TriggerMessage\0"
     "\0messageBody"
 };
 #undef QT_MOC_LITERAL
 
-static const uint qt_meta_data_QGridLayoutWithTriggerSlot[] = {
+static const uint qt_meta_data_QVBoxLayoutWithTriggerSlot[] = {
 
  // content:
        7,       // revision
@@ -63,10 +63,10 @@ static const uint qt_meta_data_QGridLayoutWithTriggerSlot[] = {
        0        // eod
 };
 
-void QGridLayoutWithTriggerSlot::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+void QVBoxLayoutWithTriggerSlot::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
 {
     if (_c == QMetaObject::InvokeMetaMethod) {
-        QGridLayoutWithTriggerSlot *_t = static_cast<QGridLayoutWithTriggerSlot *>(_o);
+        QVBoxLayoutWithTriggerSlot *_t = static_cast<QVBoxLayoutWithTriggerSlot *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
         case 0: _t->TriggerMessage((*reinterpret_cast< QString(*)>(_a[1]))); break;
@@ -75,28 +75,28 @@ void QGridLayoutWithTriggerSlot::qt_static_metacall(QObject *_o, QMetaObject::Ca
     }
 }
 
-const QMetaObject QGridLayoutWithTriggerSlot::staticMetaObject = {
-    { &QGridLayout::staticMetaObject, qt_meta_stringdata_QGridLayoutWithTriggerSlot.data,
-      qt_meta_data_QGridLayoutWithTriggerSlot,  qt_static_metacall, nullptr, nullptr}
+const QMetaObject QVBoxLayoutWithTriggerSlot::staticMetaObject = {
+    { &QVBoxLayout::staticMetaObject, qt_meta_stringdata_QVBoxLayoutWithTriggerSlot.data,
+      qt_meta_data_QVBoxLayoutWithTriggerSlot,  qt_static_metacall, nullptr, nullptr}
 };
 
 
-const QMetaObject *QGridLayoutWithTriggerSlot::metaObject() const
+const QMetaObject *QVBoxLayoutWithTriggerSlot::metaObject() const
 {
     return QObject::d_ptr->metaObject ? QObject::d_ptr->dynamicMetaObject() : &staticMetaObject;
 }
 
-void *QGridLayoutWithTriggerSlot::qt_metacast(const char *_clname)
+void *QVBoxLayoutWithTriggerSlot::qt_metacast(const char *_clname)
 {
     if (!_clname) return nullptr;
-    if (!strcmp(_clname, qt_meta_stringdata_QGridLayoutWithTriggerSlot.stringdata0))
-        return static_cast<void*>(const_cast< QGridLayoutWithTriggerSlot*>(this));
-    return QGridLayout::qt_metacast(_clname);
+    if (!strcmp(_clname, qt_meta_stringdata_QVBoxLayoutWithTriggerSlot.stringdata0))
+        return static_cast<void*>(const_cast< QVBoxLayoutWithTriggerSlot*>(this));
+    return QVBoxLayout::qt_metacast(_clname);
 }
 
-int QGridLayoutWithTriggerSlot::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+int QVBoxLayoutWithTriggerSlot::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = QGridLayout::qt_metacall(_c, _id, _a);
+    _id = QVBoxLayout::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {

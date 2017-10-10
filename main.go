@@ -7,6 +7,8 @@ import (
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/util"
 	"github.com/matrix-org/gomatrix"
+	"github.com/therecipe/qt/core"
+	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
 	"github.com/tidwall/buntdb"
 	_ "image/png"
@@ -28,7 +30,13 @@ func main() {
 
 	localLog.Println("Starting Morpheus")
 
-	widgets.NewQApplication(len(os.Args), os.Args)
+	app := widgets.NewQApplication(len(os.Args), os.Args)
+
+	app.SetAttribute(core.Qt__AA_UseHighDpiPixmaps, true)
+	app.SetApplicationName("Morpheus")
+	app.SetApplicationVersion("0.0.1")
+	appIcon := gui.NewQIcon5(":/qml/resources/logos/MorpheusBig.png")
+	app.SetWindowIcon(appIcon)
 
 	desktopApp := widgets.QApplication_Desktop()
 	primaryScreen := desktopApp.PrimaryScreen()
@@ -37,7 +45,6 @@ func main() {
 	windowHeight := screen.Height() / 2
 
 	window = widgets.NewQMainWindow(nil, 0)
-	//window.SetMinimumSize2(windowWidth, windowHeight)
 
 	var accessToken string
 	var homeserverURL string

@@ -2,46 +2,55 @@ package elements
 
 import (
 	"github.com/therecipe/qt/core"
+	"github.com/therecipe/qt/gui"
+	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
 )
 
-type QGridLayoutWithTriggerSlot struct {
-	widgets.QGridLayout
+type QVBoxLayoutWithTriggerSlot struct {
+	widgets.QVBoxLayout
 
 	_ func(messageBody string) `slot:"TriggerMessage"`
 }
 
-func NewMessageList() (messageView *widgets.QWidget, messageViewLayout *QGridLayoutWithTriggerSlot) {
+func NewMessageList() (messageView *widgets.QWidget, messageViewLayout *QVBoxLayoutWithTriggerSlot) {
 	messageView = widgets.NewQWidget(nil, 0)
 
-	messageScroll := widgets.NewQScrollArea(nil)
-	messageScroll.SetObjectName("messageScroll")
-	messageScroll.SetStyleSheet("QScrollArea#messageScroll { border: 0px; };")
-	messageScroll.SetStyleSheet("QScrollArea#messageScroll { border: 0px; };")
+	messageViewLayout = NewQVBoxLayoutWithTriggerSlot2(messageView)
 
-	messageViewLayout = NewQGridLayoutWithTriggerSlot(messageView)
-
-	//messageViewLayout = widgets.NewQGridLayout(messageView)
 	messageViewLayout.SetSpacing(0)
 	messageViewLayout.SetContentsMargins(0, 0, 0, 0)
-
-	messageScroll.SetWidget(messageView)
-	messageScroll.SetWidgetResizable(true)
 
 	return
 }
 
-func (messageViewLayout *QGridLayoutWithTriggerSlot) NewMessage(messageBody string) {
-	mesageWidget := widgets.NewQWidget(nil, 0)
-	mesageWidget.SetStyleSheet("QLabel { border: 0px; }; QWidget { border: 0px; };")
+func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(messageBody string, widthScrollArea *widgets.QScrollArea, chatWidget *widgets.QWidget) {
+	var widget = widgets.NewQWidget(nil, 0)
 
-	messageLayout := widgets.NewQVBoxLayout2(mesageWidget)
+	var loader = uitools.NewQUiLoader(nil)
+	var file = core.NewQFile2(":/qml/ui/message.ui")
 
-	message := widgets.NewQLabel2(messageBody, nil, 0)
+	file.Open(core.QIODevice__ReadOnly)
+	var wrapperWidget = loader.Load(file, widget)
+	file.Close()
 
-	message.SetLayout(messageLayout)
+	messageWidget := widgets.NewQWidgetFromPointer(widget.FindChild("message", core.Qt__FindChildrenRecursively).Pointer())
+	message := widgets.NewQLabelFromPointer(widget.FindChild("messageContent", core.Qt__FindChildrenRecursively).Pointer())
 
-	messageViewLayout.AddWidget(message, 0, 0, core.Qt__AlignTop)
+	chatWidget.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+		messageWidget.SetMinimumSize2(widthScrollArea.Size().Width(), wrapperWidget.Size().Height())
+		message.SetMinimumWidth(widthScrollArea.Size().Width())
+	})
+
+	message.SetText(messageBody)
+	message.SetMinimumWidth(widthScrollArea.Size().Width())
+
+	messageWidget.SetMinimumSize2(widthScrollArea.Size().Width(), wrapperWidget.Size().Height())
+	messageWidget.Resize(wrapperWidget.Size())
+
+	messageViewLayout.SetSpacing(0)
+
+	messageViewLayout.AddWidget(messageWidget, 0, core.Qt__AlignBottom)
 
 	return
 }

@@ -904,7 +904,7 @@ padding: 3px</string>
               <bool>false</bool>
              </property>
              <property name="placeholderText">
-              <string>Send a Message (unecrypted)...</string>
+              <string>Send a Message (unencrypted)...</string>
              </property>
              <property name="clearButtonEnabled">
               <bool>false</bool>
