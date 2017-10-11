@@ -253,13 +253,13 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWi
 	})
 
 	messageScrollArea.SetLayout(messageListLayout)
-	messageScrollArea.SetWidgetResizable(true)
-	messageScrollArea.SetObjectName("messageScroll")
-	//messageScrollArea.SetStyleSheet("QScrollArea#messageScroll { border: 0px; };")
 	messageScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
 	messageScrollArea.SetVerticalScrollBarPolicy(core.Qt__ScrollBarAsNeeded)
 	messageScrollArea.SetContentsMargins(0, 0, 0, 0)
+	messageView.AdjustSize()
+	messageView.SetContentsMargins(0, 0, 0, 0)
 	messageScrollArea.SetWidget(messageView)
+	messageScrollArea.SetWidgetResizable(false)
 
 	syncer.OnEventType("m.room.message", func(ev *gomatrix.Event) {
 		msg, _ := ev.Body()

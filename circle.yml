@@ -15,5 +15,5 @@ dependencies:
 test:
   pre:
   override:
-    - if [[ "$DESKTOP" == "true" ]]; then /home/ubuntu/.go_project/bin/qtsetup full desktop && /home/ubuntu/.go_project/bin/qtdeploy test desktop; fi
+    - if [[ "$DESKTOP" == "true" ]]; then /home/ubuntu/.go_project/bin/qtsetup && /home/ubuntu/.go_project/bin/qtdeploy test desktop; fi
   post:

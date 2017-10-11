@@ -50,6 +50,7 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(messageBody stri
 
 	messageViewLayout.SetSpacing(0)
 
+	messageViewLayout.AddLayout(messageWidget.Layout(), 1)
 	messageViewLayout.AddWidget(messageWidget, 0, core.Qt__AlignBottom)
 
 	return
