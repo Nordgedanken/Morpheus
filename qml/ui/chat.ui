@@ -807,10 +807,16 @@ border-radius: 2px;</string>
       <item>
        <layout class="QVBoxLayout" name="messageAreaLayout">
         <property name="spacing">
-         <number>21</number>
+         <number>9</number>
         </property>
         <item>
          <widget class="QScrollArea" name="messageScroll">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
           <property name="minimumSize">
            <size>
             <width>901</width>
@@ -822,6 +828,9 @@ border-radius: 2px;</string>
           </property>
           <property name="widgetResizable">
            <bool>true</bool>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
           </property>
           <widget class="QWidget" name="messagesScrollAreaContent">
            <property name="geometry">
@@ -860,13 +869,13 @@ border-radius: 2px;</string>
             <number>9</number>
            </property>
            <property name="topMargin">
-            <number>0</number>
+            <number>9</number>
            </property>
            <property name="rightMargin">
             <number>9</number>
            </property>
            <property name="bottomMargin">
-            <number>0</number>
+            <number>9</number>
            </property>
            <property name="spacing">
             <number>0</number>

@@ -78,20 +78,20 @@ func callbackQVBoxLayoutWithTriggerSlot_Constructor(ptr unsafe.Pointer) {
 }
 
 //export callbackQVBoxLayoutWithTriggerSlot_TriggerMessage
-func callbackQVBoxLayoutWithTriggerSlot_TriggerMessage(ptr unsafe.Pointer, messageBody C.struct_Moc_PackedString) {
+func callbackQVBoxLayoutWithTriggerSlot_TriggerMessage(ptr unsafe.Pointer, messageBody C.struct_Moc_PackedString, sender C.struct_Moc_PackedString) {
 	if signal := qt.GetSignal(ptr, "TriggerMessage"); signal != nil {
-		signal.(func(string))(cGoUnpackString(messageBody))
+		signal.(func(string, string))(cGoUnpackString(messageBody), cGoUnpackString(sender))
 	}
 
 }
 
-func (ptr *QVBoxLayoutWithTriggerSlot) ConnectTriggerMessage(f func(messageBody string)) {
+func (ptr *QVBoxLayoutWithTriggerSlot) ConnectTriggerMessage(f func(messageBody string, sender string)) {
 	if ptr.Pointer() != nil {
 
 		if signal := qt.LendSignal(ptr.Pointer(), "TriggerMessage"); signal != nil {
-			qt.ConnectSignal(ptr.Pointer(), "TriggerMessage", func(messageBody string) {
-				signal.(func(string))(messageBody)
-				f(messageBody)
+			qt.ConnectSignal(ptr.Pointer(), "TriggerMessage", func(messageBody string, sender string) {
+				signal.(func(string, string))(messageBody, sender)
+				f(messageBody, sender)
 			})
 		} else {
 			qt.ConnectSignal(ptr.Pointer(), "TriggerMessage", f)
@@ -106,14 +106,19 @@ func (ptr *QVBoxLayoutWithTriggerSlot) DisconnectTriggerMessage() {
 	}
 }
 
-func (ptr *QVBoxLayoutWithTriggerSlot) TriggerMessage(messageBody string) {
+func (ptr *QVBoxLayoutWithTriggerSlot) TriggerMessage(messageBody string, sender string) {
 	if ptr.Pointer() != nil {
 		var messageBodyC *C.char
 		if messageBody != "" {
 			messageBodyC = C.CString(messageBody)
 			defer C.free(unsafe.Pointer(messageBodyC))
 		}
-		C.QVBoxLayoutWithTriggerSlot_TriggerMessage(ptr.Pointer(), C.struct_Moc_PackedString{data: messageBodyC, len: C.longlong(len(messageBody))})
+		var senderC *C.char
+		if sender != "" {
+			senderC = C.CString(sender)
+			defer C.free(unsafe.Pointer(senderC))
+		}
+		C.QVBoxLayoutWithTriggerSlot_TriggerMessage(ptr.Pointer(), C.struct_Moc_PackedString{data: messageBodyC, len: C.longlong(len(messageBody))}, C.struct_Moc_PackedString{data: senderC, len: C.longlong(len(sender))})
 	}
 }
 

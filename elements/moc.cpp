@@ -66,7 +66,7 @@ public:
 	QWidget * widget() { return static_cast<QWidget*>(callbackQVBoxLayoutWithTriggerSlot_Widget(this)); };
 signals:
 public slots:
-	void TriggerMessage(QString messageBody) { QByteArray t59bf16 = messageBody.toUtf8(); Moc_PackedString messageBodyPacked = { const_cast<char*>(t59bf16.prepend("WHITESPACE").constData()+10), t59bf16.size()-10 };callbackQVBoxLayoutWithTriggerSlot_TriggerMessage(this, messageBodyPacked); };
+	void TriggerMessage(QString messageBody, QString sender) { QByteArray t59bf16 = messageBody.toUtf8(); Moc_PackedString messageBodyPacked = { const_cast<char*>(t59bf16.prepend("WHITESPACE").constData()+10), t59bf16.size()-10 };QByteArray tacc6a3 = sender.toUtf8(); Moc_PackedString senderPacked = { const_cast<char*>(tacc6a3.prepend("WHITESPACE").constData()+10), tacc6a3.size()-10 };callbackQVBoxLayoutWithTriggerSlot_TriggerMessage(this, messageBodyPacked, senderPacked); };
 private:
 };
 
@@ -76,9 +76,9 @@ Q_DECLARE_METATYPE(QVBoxLayoutWithTriggerSlot*)
 void QVBoxLayoutWithTriggerSlot_QVBoxLayoutWithTriggerSlot_QRegisterMetaTypes() {
 }
 
-void QVBoxLayoutWithTriggerSlot_TriggerMessage(void* ptr, struct Moc_PackedString messageBody)
+void QVBoxLayoutWithTriggerSlot_TriggerMessage(void* ptr, struct Moc_PackedString messageBody, struct Moc_PackedString sender)
 {
-	QMetaObject::invokeMethod(static_cast<QVBoxLayoutWithTriggerSlot*>(ptr), "TriggerMessage", Q_ARG(QString, QString::fromUtf8(messageBody.data, messageBody.len)));
+	QMetaObject::invokeMethod(static_cast<QVBoxLayoutWithTriggerSlot*>(ptr), "TriggerMessage", Q_ARG(QString, QString::fromUtf8(messageBody.data, messageBody.len)), Q_ARG(QString, QString::fromUtf8(sender.data, sender.len)));
 }
 
 int QVBoxLayoutWithTriggerSlot_QVBoxLayoutWithTriggerSlot_QRegisterMetaType()

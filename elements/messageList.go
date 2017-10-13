@@ -1,30 +1,46 @@
 package elements
 
 import (
+	"github.com/Nordgedanken/Morpheus/matrix"
+	"github.com/matrix-org/gomatrix"
+	"github.com/rhinoman/go-commonmark"
 	"github.com/therecipe/qt/core"
-	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
 )
 
+////////////////////////////////////////////////////
+//                                                //
+//                                                //
+//                                                //
+//                                                //
+// DON'T TOUCH I HAVE NO IDEA WHY THIS EVEN WORKS //
+//                                                //
+//                                                //
+//                                                //
+////////////////////////////////////////////////////
+
 type QVBoxLayoutWithTriggerSlot struct {
 	widgets.QVBoxLayout
 
-	_ func(messageBody string) `slot:"TriggerMessage"`
+	_ func(messageBody, sender string) `slot:"TriggerMessage"`
 }
 
-func NewMessageList() (messageView *widgets.QWidget, messageViewLayout *QVBoxLayoutWithTriggerSlot) {
-	messageView = widgets.NewQWidget(nil, 0)
-
+func NewMessageList(scrollArea *widgets.QScrollArea, messageView *widgets.QWidget) (messageViewLayout *QVBoxLayoutWithTriggerSlot) {
 	messageViewLayout = NewQVBoxLayoutWithTriggerSlot2(messageView)
 
 	messageViewLayout.SetSpacing(0)
 	messageViewLayout.SetContentsMargins(0, 0, 0, 0)
+	messageView.SetContentsMargins(0, 0, 0, 0)
+	scrollArea.SetWidget(messageView)
+	scrollArea.Widget().SetLayout(messageViewLayout)
 
 	return
 }
 
-func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(messageBody string, widthScrollArea *widgets.QScrollArea, chatWidget *widgets.QWidget) {
+func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli *gomatrix.Client, sender string, scrollArea *widgets.QScrollArea) {
+	avatar := matrix.GetUserAvatar(cli, sender)
+
 	var widget = widgets.NewQWidget(nil, 0)
 
 	var loader = uitools.NewQUiLoader(nil)
@@ -35,23 +51,29 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(messageBody stri
 	file.Close()
 
 	messageWidget := widgets.NewQWidgetFromPointer(widget.FindChild("message", core.Qt__FindChildrenRecursively).Pointer())
-	message := widgets.NewQLabelFromPointer(widget.FindChild("messageContent", core.Qt__FindChildrenRecursively).Pointer())
+	avatarLogo := widgets.NewQLabelFromPointer(widget.FindChild("avatar", core.Qt__FindChildrenRecursively).Pointer())
+	messageContent := widgets.NewQLabelFromPointer(widget.FindChild("messageContent", core.Qt__FindChildrenRecursively).Pointer())
+	senderContent := widgets.NewQLabelFromPointer(widget.FindChild("sender", core.Qt__FindChildrenRecursively).Pointer())
 
-	chatWidget.ConnectResizeEvent(func(event *gui.QResizeEvent) {
-		messageWidget.SetMinimumSize2(widthScrollArea.Size().Width(), wrapperWidget.Size().Height())
-		message.SetMinimumWidth(widthScrollArea.Size().Width())
-	})
+	markdownMessage := commonmark.Md2Html(body, 0)
 
-	message.SetText(messageBody)
-	message.SetMinimumWidth(widthScrollArea.Size().Width())
+	messageContent.SetText(markdownMessage)
 
-	messageWidget.SetMinimumSize2(widthScrollArea.Size().Width(), wrapperWidget.Size().Height())
+	senderDisplayNameResp, _ := cli.GetDisplayName(sender)
+	senderDisplayName := senderDisplayNameResp.DisplayName
+	senderContent.SetText(senderDisplayName)
+	avatarLogo.SetPixmap(avatar)
+
+	messageContent.SetMinimumWidth(messageContent.LineWidth())
+
+	messageWidget.SetMinimumWidth(messageContent.LineWidth() + 100)
 	messageWidget.Resize(wrapperWidget.Size())
 
 	messageViewLayout.SetSpacing(0)
+	messageViewLayout.SetContentsMargins(0, 0, 0, 0)
 
-	messageViewLayout.AddLayout(messageWidget.Layout(), 1)
 	messageViewLayout.AddWidget(messageWidget, 0, core.Qt__AlignBottom)
+	scrollArea.Widget().SetLayout(messageViewLayout)
 
 	return
 }

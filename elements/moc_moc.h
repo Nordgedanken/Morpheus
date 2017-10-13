@@ -20,8 +20,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_QVBoxLayoutWithTriggerSlot_t {
-    QByteArrayData data[4];
-    char stringdata0[55];
+    QByteArrayData data[5];
+    char stringdata0[62];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -33,11 +33,12 @@ static const qt_meta_stringdata_QVBoxLayoutWithTriggerSlot_t qt_meta_stringdata_
 QT_MOC_LITERAL(0, 0, 26), // "QVBoxLayoutWithTriggerSlot"
 QT_MOC_LITERAL(1, 27, 14), // "TriggerMessage"
 QT_MOC_LITERAL(2, 42, 0), // ""
-QT_MOC_LITERAL(3, 43, 11) // "messageBody"
+QT_MOC_LITERAL(3, 43, 11), // "messageBody"
+QT_MOC_LITERAL(4, 55, 6) // "sender"
 
     },
     "QVBoxLayoutWithTriggerSlot\0TriggerMessage\0"
-    "\0messageBody"
+    "\0messageBody\0sender"
 };
 #undef QT_MOC_LITERAL
 
@@ -55,10 +56,10 @@ static const uint qt_meta_data_QVBoxLayoutWithTriggerSlot[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    1,   19,    2, 0x0a /* Public */,
+       1,    2,   19,    2, 0x0a /* Public */,
 
  // slots: parameters
-    QMetaType::Void, QMetaType::QString,    3,
+    QMetaType::Void, QMetaType::QString, QMetaType::QString,    3,    4,
 
        0        // eod
 };
@@ -69,7 +70,7 @@ void QVBoxLayoutWithTriggerSlot::qt_static_metacall(QObject *_o, QMetaObject::Ca
         QVBoxLayoutWithTriggerSlot *_t = static_cast<QVBoxLayoutWithTriggerSlot *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
-        case 0: _t->TriggerMessage((*reinterpret_cast< QString(*)>(_a[1]))); break;
+        case 0: _t->TriggerMessage((*reinterpret_cast< QString(*)>(_a[1])),(*reinterpret_cast< QString(*)>(_a[2]))); break;
         default: ;
         }
     }

@@ -171,6 +171,7 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWi
 	chatWidget.SetGeometry2(0, 0, window.Size().Width(), window.Size().Height())
 
 	messageScrollArea := widgets.NewQScrollAreaFromPointer(widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
+	messagesScrollAreaContent := widgets.NewQWidgetFromPointer(widget.FindChild("messagesScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
 
 	mainWidget.SetWindowTitle("Morpheus - MatrixHQ")
 	var layout = widgets.NewQHBoxLayout()
@@ -180,9 +181,19 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWi
 	layout.SetContentsMargins(0, 0, 0, 0)
 
 	window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+		mainWidget.SetMinimumSize2(1, 1)
+		widget.SetMinimumSize2(1, 1)
+		chatWidget.SetMinimumSize2(1, 1)
+
 		widget.Resize(event.Size())
 		mainWidget.Resize(event.Size())
 		chatWidget.Resize(event.Size())
+	})
+
+	messageScrollArea.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+		messageScrollArea.SetMinimumSize2(1, 1)
+
+		messageScrollArea.Resize(event.Size())
 	})
 
 	//Set Avatar
@@ -237,29 +248,14 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWi
 	syncer.Store = customStore
 
 	// Init Message View
-	messageView, messageListLayout := elements.NewMessageList()
+	messageListLayout := elements.NewMessageList(messageScrollArea, messagesScrollAreaContent)
 
-	messageListLayout.ConnectTriggerMessage(func(messageBody string) {
-		localLog.Println("messageTriggered:", messageBody)
-		chatWidgetSize := chatWidget.Size()
-		widgetSize := widget.Size()
-		mainWidgetSize := mainWidget.Size()
-
-		messageListLayout.NewMessage(messageBody, messageScrollArea, chatWidget)
-
-		chatWidget.Resize(chatWidgetSize)
-		widget.Resize(widgetSize)
-		mainWidget.Resize(mainWidgetSize)
+	messageListLayout.ConnectTriggerMessage(func(messageBody, sender string) {
+		messageListLayout.NewMessage(messageBody, cli, sender, messageScrollArea)
 	})
-
-	messageScrollArea.SetLayout(messageListLayout)
+	messageScrollArea.SetWidgetResizable(true)
 	messageScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
-	messageScrollArea.SetVerticalScrollBarPolicy(core.Qt__ScrollBarAsNeeded)
 	messageScrollArea.SetContentsMargins(0, 0, 0, 0)
-	messageView.AdjustSize()
-	messageView.SetContentsMargins(0, 0, 0, 0)
-	messageScrollArea.SetWidget(messageView)
-	messageScrollArea.SetWidgetResizable(false)
 
 	syncer.OnEventType("m.room.message", func(ev *gomatrix.Event) {
 		msg, _ := ev.Body()
@@ -268,8 +264,7 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWi
 		id := ev.ID
 		timestamp := ev.Timestamp
 		matrix.CacheMessageEvents(id, sender, room, msg, timestamp, db)
-		localLog.Println("message:", msg)
-		messageListLayout.TriggerMessage(msg)
+		messageListLayout.TriggerMessage(msg, sender)
 	})
 
 	// Start Non-blocking sync
