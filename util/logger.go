@@ -23,10 +23,14 @@ func Logger() *log.Logger {
 }
 
 //StartFileLog initialises the logging function
-func StartFileLog(localLog *log.Logger) (*log.Logger, *os.File) {
+func StartFileLog(localLog *log.Logger) (logger *log.Logger, logFile *os.File, err error) {
 	configDirs := configdir.New("Nordgedanken", "Morpheus")
-	if _, err := os.Stat(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/log/"); os.IsNotExist(err) {
-		os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/log/", 0666)
+	if _, StatErr := os.Stat(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/log/"); os.IsNotExist(StatErr) {
+		MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/log/", 0666)
+		if MkdirErr != nil {
+			err = MkdirErr
+			return
+		}
 	}
 	f, err := os.OpenFile(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/log/Morpheus.log", os.O_CREATE|os.O_APPEND|os.O_RDWR, 0666)
 	if err != nil {
@@ -37,5 +41,7 @@ func StartFileLog(localLog *log.Logger) (*log.Logger, *os.File) {
 
 	localLog.SetOutput(mw)
 	localLog.SetPrefix(time.Now().Format("2006-01-02 15:04:05") + " - ")
-	return localLog, f
+	logger = localLog
+	logFile = f
+	return
 }

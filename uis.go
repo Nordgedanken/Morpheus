@@ -11,7 +11,6 @@ import (
 	"github.com/therecipe/qt/widgets"
 	"github.com/tidwall/buntdb"
 	"log"
-	"strings"
 	"sync"
 	"time"
 )
@@ -19,36 +18,8 @@ import (
 var username string
 var password string
 
-// DoLogin generates the needed Client
-func DoLogin(username, password, homeserverURL, userID, accessToken string, localLog *log.Logger, results chan<- *gomatrix.Client, wg *sync.WaitGroup) {
-	defer wg.Done()
-	var cli *gomatrix.Client
-	if accessToken != "" && homeserverURL != "" && userID != "" {
-		var cliErr error
-		if strings.HasPrefix(homeserverURL, "https://") {
-			cli, cliErr = matrix.GetClient(homeserverURL, userID, accessToken)
-		} else if strings.HasPrefix(homeserverURL, "http://") {
-			cli, cliErr = matrix.GetClient(homeserverURL, userID, accessToken)
-		} else {
-			cli, cliErr = matrix.GetClient("https://"+homeserverURL, userID, accessToken)
-		}
-		if cliErr != nil {
-			localLog.Println(cliErr)
-		}
-		cli.SetCredentials(userID, accessToken)
-	} else {
-		var err error
-		cli, err = matrix.LoginUser(username, password)
-		if err != nil {
-			localLog.Println(err)
-		}
-	}
-
-	results <- cli
-}
-
 //NewLoginUI initializes the login Screen
-func NewLoginUI(windowWidth, windowHeight int, window *widgets.QMainWindow) *widgets.QWidget {
+func NewLoginUI(windowWidth, windowHeight int, window *widgets.QMainWindow) (respWidget *widgets.QWidget, err error) {
 	widget := widgets.NewQWidget(nil, 0)
 	widget.SetObjectName("LoginWrapper")
 	widget.SetStyleSheet("QWidget#LoginWrapper { border: 0px; };")
@@ -112,7 +83,7 @@ func NewLoginUI(windowWidth, windowHeight int, window *widgets.QMainWindow) *wid
 		password = value
 	})
 
-	loginButton.ConnectClicked(func(checked bool) {
+	loginButton.ConnectClicked(func(_ bool) {
 		//TODO register enter and show loader or so
 
 		var wg sync.WaitGroup
@@ -122,7 +93,7 @@ func NewLoginUI(windowWidth, windowHeight int, window *widgets.QMainWindow) *wid
 			results := make(chan *gomatrix.Client)
 
 			wg.Add(1)
-			go DoLogin(username, password, "", "", "", localLog, results, &wg)
+			go matrix.DoLogin(username, password, "", "", "", localLog, results, &wg)
 
 			go func() {
 				wg.Wait()      // wait for each execTask to return
@@ -132,8 +103,13 @@ func NewLoginUI(windowWidth, windowHeight int, window *widgets.QMainWindow) *wid
 			//Show MainUI
 			for result := range results {
 				//TODO Don't switch screen on wrong login data.
-				mainUI := NewMainUI(windowWidth, windowHeight, result, window)
+				mainUI, mainUIErr := NewMainUI(windowWidth, windowHeight, result, window)
+				if mainUIErr != nil {
+					err = mainUIErr
+					return
+				}
 				window.SetCentralWidget(mainUI)
+				window.Resize(widget.Size())
 			}
 		} else {
 			localLog.Println("Username and/or password is empty. Do Nothing.")
@@ -142,12 +118,13 @@ func NewLoginUI(windowWidth, windowHeight int, window *widgets.QMainWindow) *wid
 
 	widget.SetWindowTitle("Morpheus - Login")
 
-	return widget
+	respWidget = widget
+	return
 }
 
 //NewMainUI initializes the login Screen
 //func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWidget {
-func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client, window *widgets.QMainWindow) *widgets.QWidget {
+func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client, window *widgets.QMainWindow) (respWidget *widgets.QWidget, err error) {
 	var widget = widgets.NewQWidget(nil, 0)
 
 	var loader = uitools.NewQUiLoader(nil)
@@ -157,7 +134,11 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client, window *widg
 	var mainWidget = loader.Load(file, widget)
 	file.Close()
 
-	matrix.InitData(cli, db)
+	InitDataErr := matrix.InitData(cli)
+	if InitDataErr != nil {
+		err = InitDataErr
+		return
+	}
 
 	messageScrollArea := widgets.NewQScrollAreaFromPointer(widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
 	messagesScrollAreaContent := widgets.NewQWidgetFromPointer(widget.FindChild("messagesScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
@@ -186,11 +167,16 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client, window *widg
 
 	//Set Avatar
 	avatarLogo := widgets.NewQLabelFromPointer(widget.FindChild("UserAvatar", core.Qt__FindChildrenRecursively).Pointer())
-	avatarLogo.SetPixmap(matrix.GetOwnUserAvatar(cli))
+	avatar, AvatarErr := matrix.GetOwnUserAvatar(cli)
+	if AvatarErr != nil {
+		err = AvatarErr
+		return
+	}
+	avatarLogo.SetPixmap(avatar)
 
 	//Handle LogoutButton
 	logoutButton := widgets.NewQPushButtonFromPointer(widget.FindChild("LogoutButton", core.Qt__FindChildrenRecursively).Pointer())
-	logoutButton.ConnectClicked(func(checked bool) {
+	logoutButton.ConnectClicked(func(_ bool) {
 		//TODO register enter and show loader or so
 		localLog.Println("Starting Logout Sequenze in background")
 		var wg sync.WaitGroup
@@ -199,17 +185,31 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client, window *widg
 		wg.Add(1)
 		go func(cli *gomatrix.Client, localLog *log.Logger, results chan<- bool) {
 			defer wg.Done()
-			_, err := cli.Logout()
-			if err != nil {
-				localLog.Println(err)
+			_, LogoutErr := cli.Logout()
+			if LogoutErr != nil {
+				localLog.Println(LogoutErr)
+				results <- false
+			}
+			cli.ClearCredentials()
+
+			db, DBOpenErr := matrix.OpenDB()
+			if DBOpenErr != nil {
+				localLog.Fatalln(DBOpenErr)
+			}
+			defer db.Close()
+
+			//Flush complete DB
+			DBErr := db.Update(func(tx *buntdb.Tx) error {
+				QueryErr := tx.DeleteAll()
+				if QueryErr != nil {
+					return QueryErr
+				}
+				return nil
+			})
+			if DBErr != nil {
+				localLog.Panicln(DBErr)
 				results <- false
 			} else {
-				cli.ClearCredentials()
-				//Flush complete DB
-				db.View(func(tx *buntdb.Tx) error {
-					QueryErr := tx.DeleteAll()
-					return QueryErr
-				})
 				results <- true
 			}
 		}(cli, localLog, results)
@@ -222,7 +222,15 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client, window *widg
 		//Show LoginUI
 		for result := range results {
 			if result {
-				loginUI := NewLoginUI(windowWidth, windowHeight, window)
+				window.DisconnectKeyPressEvent()
+				window.DisconnectResizeEvent()
+				widget.DisconnectResizeEvent()
+				messageScrollArea.DisconnectResizeEvent()
+
+				loginUI, loginUIErr := NewLoginUI(windowWidth, windowHeight, window)
+				if loginUIErr != nil {
+					localLog.Panicln(loginUIErr)
+				}
 				window.SetCentralWidget(loginUI)
 			}
 		}
@@ -238,7 +246,11 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client, window *widg
 	messageListLayout := elements.NewMessageList(messageScrollArea, messagesScrollAreaContent)
 
 	messageListLayout.ConnectTriggerMessage(func(messageBody, sender string) {
-		messageListLayout.NewMessage(messageBody, cli, sender, messageScrollArea)
+		NewMessageErr := messageListLayout.NewMessage(messageBody, cli, sender, messageScrollArea)
+		if NewMessageErr != nil {
+			err = NewMessageErr
+			return
+		}
 	})
 	messageScrollArea.SetWidgetResizable(true)
 	messageScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
@@ -250,20 +262,23 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client, window *widg
 		sender := ev.Sender
 		id := ev.ID
 		timestamp := ev.Timestamp
-		matrix.CacheMessageEvents(id, sender, room, msg, timestamp, db)
+		CacheErr := matrix.CacheMessageEvents(id, sender, room, msg, timestamp)
+		if CacheErr != nil {
+			err = CacheErr
+			return
+		}
 		messageListLayout.TriggerMessage(msg, sender)
 	})
 
 	// Start Non-blocking sync
-	localLog.Println("Syncing now")
 	go func() {
+		localLog.Println("Start sync")
 		for {
-			localLog.Println("sync")
+
 			if e := cli.Sync(); e != nil {
 				localLog.Println("Fatal Sync() error")
-				time.Sleep(10 * time.Second)
+				time.Sleep(5 * time.Second)
 			}
-			localLog.Println("sync done")
 			time.Sleep(10 * time.Second)
 		}
 	}()
@@ -274,9 +289,17 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client, window *widg
 		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
 			mardownMessage := commonmark.Md2Html(message, 0)
 			if mardownMessage == message {
-				cli.SendText("!zTIXGmDjyRcAqbrWab:matrix.ffslfl.net", message)
+				_, SendErr := cli.SendText("!zTIXGmDjyRcAqbrWab:matrix.ffslfl.net", message)
+				if SendErr != nil {
+					err = SendErr
+					return
+				}
 			} else {
-				cli.SendMessageEvent("!zTIXGmDjyRcAqbrWab:matrix.ffslfl.net", "m.room.message", matrix.HTMLMessage{"m.text", message, mardownMessage, "org.matrix.custom.html"})
+				_, SendErr := cli.SendMessageEvent("!zTIXGmDjyRcAqbrWab:matrix.ffslfl.net", "m.room.message", matrix.HTMLMessage{"m.text", message, mardownMessage, "org.matrix.custom.html"})
+				if SendErr != nil {
+					err = SendErr
+					return
+				}
 			}
 			messageInput.Clear()
 		} else {
@@ -287,5 +310,6 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client, window *widg
 		message = value
 	})
 
-	return widget
+	respWidget = widget
+	return
 }

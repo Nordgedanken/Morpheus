@@ -41,8 +41,12 @@ func NewMessageList(scrollArea *widgets.QScrollArea, messageView *widgets.QWidge
 }
 
 // NewMessage adds a new message object to the view
-func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli *gomatrix.Client, sender string, scrollArea *widgets.QScrollArea) {
-	avatar := matrix.GetUserAvatar(cli, sender)
+func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli *gomatrix.Client, sender string, scrollArea *widgets.QScrollArea) (err error) {
+	avatar, AvatarErr := matrix.GetUserAvatar(cli, sender)
+	if err != nil {
+		err = AvatarErr
+		return
+	}
 
 	var widget = widgets.NewQWidget(nil, 0)
 

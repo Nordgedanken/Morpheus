@@ -6,7 +6,6 @@ import (
 	"strings"
 
 	"bytes"
-	"fmt"
 	"github.com/Nordgedanken/Morpheus/util"
 	"github.com/matrix-org/gomatrix"
 	"github.com/therecipe/qt/gui"
@@ -24,8 +23,13 @@ var localLog *log.Logger
 
 func init() {
 	var file *os.File
+	var err error
+
 	localLog = util.Logger()
-	localLog, file = util.StartFileLog(localLog)
+	localLog, file, err = util.StartFileLog(localLog)
+	if err != nil {
+		localLog.Fatalln(err)
+	}
 	defer file.Close()
 }
 
@@ -50,7 +54,7 @@ func (c *circle) At(x, y int) color.Color {
 	return color.Alpha{0}
 }
 
-func generateGenericImages(displayname string) string {
+func generateGenericImages(displayname string) (imgData string, err error) {
 	// Create an 100 x 100 image
 	img := image.NewRGBA(image.Rect(0, 0, 100, 100))
 
@@ -58,33 +62,46 @@ func generateGenericImages(displayname string) string {
 	img.Set(50, 50, color.RGBA{uint8(rand.Intn(200)), uint8(rand.Intn(255)), uint8(rand.Intn(255)), 255})
 
 	buf := new(bytes.Buffer)
-	png.Encode(buf, img)
-	return string(buf.Bytes())
+	EncodeErr := png.Encode(buf, img)
+	if EncodeErr != nil {
+		err = EncodeErr
+		return
+	}
+	imgData = buf.String()
+	return
 }
 
 // GetOwnUserAvatar returns a *gui.QPixmap of an UserAvatar
-func GetOwnUserAvatar(cli *gomatrix.Client) *gui.QPixmap {
-	return GetUserAvatar(cli, cli.UserID)
+func GetOwnUserAvatar(cli *gomatrix.Client) (avatar *gui.QPixmap, err error) {
+	avatar, err = GetUserAvatar(cli, cli.UserID)
+	return
 }
 
 // GetUserAvatar returns a *gui.QPixmap of an UserAvatar
-func GetUserAvatar(cli *gomatrix.Client, mxid string) *gui.QPixmap {
+func GetUserAvatar(cli *gomatrix.Client, mxid string) (avatarResp *gui.QPixmap, err error) {
+	db, DBOpenErr := OpenDB()
+	if DBOpenErr != nil {
+		localLog.Fatalln(DBOpenErr)
+	}
+	defer db.Close()
+
 	// Init local vars
 	var avatarData string
 	var IMGdata string
 
 	// Get cache
-	db.View(func(tx *buntdb.Tx) error {
+	DBErr := db.View(func(tx *buntdb.Tx) error {
 		QueryErr := tx.AscendKeys("user:"+mxid+":avatarData100x100",
 			func(key, value string) bool {
 				avatarData = value
 				return true
 			})
-		if QueryErr != nil {
-			return QueryErr
-		}
-		return nil
+		return QueryErr
 	})
+	if DBErr != nil {
+		err = DBErr
+		return
+	}
 
 	//If cache is empty do a ServerQuery
 	if avatarData == "" {
@@ -94,7 +111,11 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string) *gui.QPixmap {
 			AvatarURL string `json:"avatar_url"`
 		}{}
 
-		cli.MakeRequest("GET", urlPath, nil, &s)
+		_, ReqErr := cli.MakeRequest("GET", urlPath, nil, &s)
+		if ReqErr != nil {
+			err = ReqErr
+			return
+		}
 		avatarURL := s.AvatarURL
 
 		// If avatarURL is not empty (aka. has a avatar set) download it at the size of 100x100. Else make the data string empty
@@ -104,34 +125,41 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string) *gui.QPixmap {
 
 			urlPath := hsURL + "/_matrix/media/r0/thumbnail/" + avatarURLSplits[0] + "/" + avatarURLSplits[1] + "?width=100&height=100"
 
-			data, err := cli.MakeRequest("GET", urlPath, nil, nil)
-			if err != nil {
-				localLog.Println(err)
+			data, ReqErr := cli.MakeRequest("GET", urlPath, nil, nil)
+			if ReqErr != nil {
+				err = ReqErr
+				return
 			}
 			IMGdata = string(data[:])
 		} else {
 			//TODO Generate default image (Step: AfterUI)
 			DisplayNameResp, _ := cli.GetOwnDisplayName()
 			DisplayName := DisplayNameResp.DisplayName
-			IMGdata = generateGenericImages(DisplayName)
+			var GenerateImgErr error
+			IMGdata, GenerateImgErr = generateGenericImages(DisplayName)
+			if GenerateImgErr != nil {
+				err = GenerateImgErr
+				return
+			}
 		}
 
 		// Update cache
 		DBerr := db.Update(func(tx *buntdb.Tx) error {
-			tx.Set("user:"+mxid+":avatarData100x100", IMGdata, nil)
-			return nil
+			_, _, DBSetErr := tx.Set("user:"+mxid+":avatarData100x100", IMGdata, nil)
+			return DBSetErr
 		})
 		if DBerr != nil {
-			localLog.Fatalln("DB ERROR: ", DBerr)
+			err = DBErr
+			return
 		}
 	} else {
 		IMGdata = avatarData
 	}
 
 	r := bytes.NewReader([]byte(IMGdata))
-	srcIMG, _, err := image.Decode(r)
-	if err != nil {
-		localLog.Println("Decoder error: ", err)
+	srcIMG, _, DecodeErr := image.Decode(r)
+	if DecodeErr != nil {
+		err = DecodeErr
 	}
 
 	// Convert avatarimage to QPixmap for usage in QT
@@ -141,12 +169,13 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string) *gui.QPixmap {
 	draw.DrawMask(canvas, canvas.Bounds(), srcIMG, image.ZP, &circle{image.Point{cx, cy}, 110}, image.ZP, draw.Over)
 	avatar := gui.NewQPixmap()
 	buf := new(bytes.Buffer)
-	Converr := png.Encode(buf, canvas)
-	if Converr != nil {
-		localLog.Println("Converting error: ", Converr)
+	ConvErr := png.Encode(buf, canvas)
+	if ConvErr != nil {
+		err = ConvErr
 	}
 
-	str := fmt.Sprintf("%s", buf)
+	str := buf.String()
 	avatar.LoadFromData(str, uint(len(str)), "", 0)
-	return avatar
+	avatarResp = avatar
+	return
 }

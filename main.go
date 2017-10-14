@@ -11,22 +11,27 @@ import (
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
 	"github.com/tidwall/buntdb"
-	_ "image/png"
 	"sync"
 )
 
 var window *widgets.QMainWindow
 var localLog *log.Logger
-var db *buntdb.DB
 
 func main() {
 	var file *os.File
+	var err error
+
 	localLog = util.Logger()
-	localLog, file = util.StartFileLog(localLog)
+	localLog, file, err = util.StartFileLog(localLog)
+	if err != nil {
+		localLog.Fatalln(err)
+	}
 	defer file.Close()
 
-	db = matrix.OpenDB()
-	defer db.Close()
+	db, DBOpenErr := matrix.OpenDB()
+	if DBOpenErr != nil {
+		localLog.Fatalln(DBOpenErr)
+	}
 
 	localLog.Println("Starting Morpheus")
 
@@ -55,7 +60,7 @@ func main() {
 	var userID string
 
 	// Get cache
-	db.View(func(tx *buntdb.Tx) error {
+	DBErr := db.View(func(tx *buntdb.Tx) error {
 		accessTokenErr := tx.AscendKeys("user:accessToken",
 			func(key, value string) bool {
 				accessToken = value
@@ -77,12 +82,12 @@ func main() {
 				userID = value
 				return true
 			})
-		if userIDErr != nil {
-			return userIDErr
-		}
-
-		return nil
+		return userIDErr
 	})
+	if DBErr != nil {
+		localLog.Fatalln(DBErr)
+	}
+	db.Close()
 
 	if accessToken != "" && homeserverURL != "" && userID != "" {
 		var wg sync.WaitGroup
@@ -90,7 +95,7 @@ func main() {
 		results := make(chan *gomatrix.Client)
 
 		wg.Add(1)
-		go DoLogin("", "", homeserverURL, userID, accessToken, localLog, results, &wg)
+		go matrix.DoLogin("", "", homeserverURL, userID, accessToken, localLog, results, &wg)
 
 		go func() {
 			wg.Wait()      // wait for each execTask to return
@@ -100,13 +105,21 @@ func main() {
 		//Show MainUI
 		for result := range results {
 			//TODO Don't switch screen on wrong login data.
-			mainUI := NewMainUI(windowWidth, windowHeight, result, window)
+			mainUI, mainUIErr := NewMainUI(windowWidth, windowHeight, result, window)
+			if mainUIErr != nil {
+				localLog.Fatalln(mainUIErr)
+				return
+			}
 			mainUI.Resize2(windowWidth, windowHeight)
 			window.SetCentralWidget(mainUI)
 		}
 	} else {
 		//Show loginUI
-		loginUI := NewLoginUI(windowWidth, windowHeight, window)
+		loginUI, loginUIErr := NewLoginUI(windowWidth, windowHeight, window)
+		if loginUIErr != nil {
+			localLog.Fatalln(loginUIErr)
+			return
+		}
 		loginUI.Resize2(windowWidth, windowHeight)
 		window.SetCentralWidget(loginUI)
 	}
@@ -115,6 +128,6 @@ func main() {
 	window.Show()
 
 	//enter the main event loop
-	widgets.QApplication_Exec()
+	_ = widgets.QApplication_Exec()
 	localLog.Println("Stopping Morpheus")
 }

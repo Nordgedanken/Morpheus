@@ -8,3 +8,4 @@ package elements
 #cgo LDFLAGS:        -lglu32 -lopengl32 -lgdi32 -luser32 -lmingw32 -LC:/msys64/mingw64/lib -lqtmain -lshell32 -lQt5Widgets -lQt5Gui -lQt5Core
 #cgo LDFLAGS: -Wl,--allow-multiple-definition
 */
+import "C"

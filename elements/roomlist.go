@@ -29,5 +29,4 @@ func NewRoom(name string, roomListViewLayout *widgets.QGridLayout) {
 	roomLayout.AddWidget(room, 0, core.Qt__AlignTop)
 	roomListViewLayout.AddWidget(room, 0, 0, core.Qt__AlignTop)
 
-	return
 }
