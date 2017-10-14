@@ -8,6 +8,7 @@ type HTMLMessage struct {
 	Format        string `json:"format"`
 }
 
+// RoomAliases is the json response when getting the room aliases
 type RoomAliases struct {
 	Age     int `json:"age"`
 	Content struct {
@@ -21,6 +22,7 @@ type RoomAliases struct {
 	Type           string `json:"type"`
 }
 
+// JoinedRooms is the json response when getting the joined rooms list
 type JoinedRooms struct {
 	JoinedRooms []string `json:"joined_rooms"`
 }

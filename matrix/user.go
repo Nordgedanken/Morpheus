@@ -14,7 +14,7 @@ import (
 	"image"
 	"image/color"
 	"image/draw"
-	_ "image/gif"
+	// image/jpeg needed to load jpeg images
 	_ "image/jpeg"
 	"image/png"
 	"math/rand"
@@ -62,7 +62,7 @@ func generateGenericImages(displayname string) string {
 	return string(buf.Bytes())
 }
 
-// getOwnUserAvatar returns a *gui.QPixmap of an UserAvatar
+// GetOwnUserAvatar returns a *gui.QPixmap of an UserAvatar
 func GetOwnUserAvatar(cli *gomatrix.Client) *gui.QPixmap {
 	// Init local vars
 	var avatarData string
@@ -143,7 +143,7 @@ func GetOwnUserAvatar(cli *gomatrix.Client) *gui.QPixmap {
 	return avatar
 }
 
-// getOwnUserAvatar returns a *gui.QPixmap of an UserAvatar
+// GetUserAvatar returns a *gui.QPixmap of an UserAvatar
 func GetUserAvatar(cli *gomatrix.Client, mxid string) *gui.QPixmap {
 	// Init local vars
 	var avatarData string

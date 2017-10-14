@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1585</width>
-    <height>745</height>
+    <width>950</width>
+    <height>600</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -16,8 +16,18 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>950</width>
+    <height>600</height>
+   </size>
+  </property>
   <property name="windowTitle">
-   <string>Neo</string>
+   <string>Morpheus</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../../rcc.qrc">
+    <normaloff>:/qml/resources/logos/MorpheusBig.png</normaloff>:/qml/resources/logos/MorpheusBig.png</iconset>
   </property>
   <property name="autoFillBackground">
    <bool>false</bool>
@@ -171,8 +181,8 @@
                  </property>
                  <property name="minimumSize">
                   <size>
-                   <width>41</width>
-                   <height>41</height>
+                   <width>0</width>
+                   <height>0</height>
                   </size>
                  </property>
                  <property name="toolTip">
@@ -233,8 +243,8 @@
                  </property>
                  <property name="minimumSize">
                   <size>
-                   <width>41</width>
-                   <height>41</height>
+                   <width>0</width>
+                   <height>0</height>
                   </size>
                  </property>
                  <property name="toolTip">
@@ -295,8 +305,8 @@
                  </property>
                  <property name="minimumSize">
                   <size>
-                   <width>41</width>
-                   <height>41</height>
+                   <width>0</width>
+                   <height>0</height>
                   </size>
                  </property>
                  <property name="toolTip">
@@ -357,8 +367,8 @@
                  </property>
                  <property name="minimumSize">
                   <size>
-                   <width>41</width>
-                   <height>41</height>
+                   <width>0</width>
+                   <height>0</height>
                   </size>
                  </property>
                  <property name="mouseTracking">
@@ -419,8 +429,8 @@
                  </property>
                  <property name="minimumSize">
                   <size>
-                   <width>41</width>
-                   <height>41</height>
+                   <width>0</width>
+                   <height>0</height>
                   </size>
                  </property>
                  <property name="toolTip">
@@ -553,15 +563,15 @@ border-radius: 5px;</string>
       <item>
        <widget class="QScrollArea" name="roomBarArea">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+         <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="minimumSize">
          <size>
-          <width>291</width>
-          <height>671</height>
+          <width>0</width>
+          <height>0</height>
          </size>
         </property>
         <property name="styleSheet">
@@ -584,14 +594,14 @@ border-radius: 5px;</string>
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>291</width>
-           <height>696</height>
+           <width>271</width>
+           <height>551</height>
           </rect>
          </property>
          <property name="minimumSize">
           <size>
-           <width>291</width>
-           <height>671</height>
+           <width>0</width>
+           <height>0</height>
           </size>
          </property>
         </widget>
@@ -631,8 +641,8 @@ border-radius: 5px;</string>
        <widget class="QWidget" name="titleBar" native="true">
         <property name="minimumSize">
          <size>
-          <width>901</width>
-          <height>91</height>
+          <width>0</width>
+          <height>0</height>
          </size>
         </property>
         <property name="styleSheet">
@@ -650,8 +660,8 @@ border-radius: 2px;</string>
            </property>
            <property name="minimumSize">
             <size>
-             <width>71</width>
-             <height>71</height>
+             <width>0</width>
+             <height>0</height>
             </size>
            </property>
            <property name="text">
@@ -671,8 +681,8 @@ border-radius: 2px;</string>
             <widget class="QLabel" name="RoomTitel">
              <property name="minimumSize">
               <size>
-               <width>611</width>
-               <height>31</height>
+               <width>0</width>
+               <height>0</height>
               </size>
              </property>
              <property name="font">
@@ -692,8 +702,8 @@ border-radius: 2px;</string>
             <widget class="QLabel" name="subTitle">
              <property name="minimumSize">
               <size>
-               <width>611</width>
-               <height>31</height>
+               <width>0</width>
+               <height>0</height>
               </size>
              </property>
              <property name="font">
@@ -732,8 +742,8 @@ border-radius: 2px;</string>
            </property>
            <property name="minimumSize">
             <size>
-             <width>41</width>
-             <height>41</height>
+             <width>0</width>
+             <height>0</height>
             </size>
            </property>
            <property name="toolTip">
@@ -773,8 +783,8 @@ border-radius: 2px;</string>
            </property>
            <property name="minimumSize">
             <size>
-             <width>41</width>
-             <height>41</height>
+             <width>0</width>
+             <height>0</height>
             </size>
            </property>
            <property name="toolTip">
@@ -812,15 +822,15 @@ border-radius: 2px;</string>
         <item>
          <widget class="QScrollArea" name="messageScroll">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="minimumSize">
            <size>
-            <width>901</width>
-            <height>581</height>
+            <width>0</width>
+            <height>0</height>
            </size>
           </property>
           <property name="styleSheet">
@@ -837,14 +847,14 @@ border-radius: 2px;</string>
             <rect>
              <x>0</x>
              <y>0</y>
-             <width>1216</width>
-             <height>581</height>
+             <width>601</width>
+             <height>425</height>
             </rect>
            </property>
            <property name="minimumSize">
             <size>
-             <width>901</width>
-             <height>581</height>
+             <width>0</width>
+             <height>0</height>
             </size>
            </property>
           </widget>
@@ -853,15 +863,15 @@ border-radius: 2px;</string>
         <item>
          <widget class="QWidget" name="messageInputWrapper" native="true">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="minimumSize">
            <size>
-            <width>889</width>
-            <height>50</height>
+            <width>0</width>
+            <height>0</height>
            </size>
           </property>
           <layout class="QGridLayout" name="gridLayout_3">
@@ -883,15 +893,15 @@ border-radius: 2px;</string>
            <item row="0" column="0">
             <widget class="QLineEdit" name="MessageInput">
              <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+              <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
                <horstretch>0</horstretch>
                <verstretch>0</verstretch>
               </sizepolicy>
              </property>
              <property name="minimumSize">
               <size>
-               <width>861</width>
-               <height>31</height>
+               <width>0</width>
+               <height>0</height>
               </size>
              </property>
              <property name="styleSheet">

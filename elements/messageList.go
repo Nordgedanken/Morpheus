@@ -20,12 +20,14 @@ import (
 //                                                //
 ////////////////////////////////////////////////////
 
+// QVBoxLayoutWithTriggerSlot defines the QVBoxLayout with TriggerMessage slot to add messages to the View
 type QVBoxLayoutWithTriggerSlot struct {
 	widgets.QVBoxLayout
 
 	_ func(messageBody, sender string) `slot:"TriggerMessage"`
 }
 
+// NewMessageList generates a new QVBoxLayoutWithTriggerSlot and adds it to the message scrollArea
 func NewMessageList(scrollArea *widgets.QScrollArea, messageView *widgets.QWidget) (messageViewLayout *QVBoxLayoutWithTriggerSlot) {
 	messageViewLayout = NewQVBoxLayoutWithTriggerSlot2(messageView)
 
@@ -38,6 +40,7 @@ func NewMessageList(scrollArea *widgets.QScrollArea, messageView *widgets.QWidge
 	return
 }
 
+// NewMessage adds a new message object to the view
 func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli *gomatrix.Client, sender string, scrollArea *widgets.QScrollArea) {
 	avatar := matrix.GetUserAvatar(cli, sender)
 
@@ -69,7 +72,7 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 	messageWidget.SetMinimumWidth(messageContent.LineWidth() + 100)
 	messageWidget.Resize(wrapperWidget.Size())
 
-	messageViewLayout.SetSpacing(0)
+	messageViewLayout.SetSpacing(1)
 	messageViewLayout.SetContentsMargins(0, 0, 0, 0)
 
 	messageViewLayout.AddWidget(messageWidget, 0, core.Qt__AlignBottom)

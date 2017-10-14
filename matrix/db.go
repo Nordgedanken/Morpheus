@@ -12,6 +12,7 @@ import (
 
 var db *buntdb.DB
 
+// OpenDB opens or generates the Database file for settings and Cache
 func OpenDB() (expDB *buntdb.DB) {
 	// Open the data.db file. It will be created if it doesn't exist.
 	configDirs := configdir.New("Nordgedanken", "Morpheus")
@@ -27,6 +28,7 @@ func OpenDB() (expDB *buntdb.DB) {
 	return
 }
 
+// InitData inits basic Data like getting aliases of joinedRooms
 func InitData(cli *gomatrix.Client, db *buntdb.DB) {
 	roomsURL := cli.BuildURL("joined_rooms")
 	var rooms JoinedRooms
@@ -56,6 +58,7 @@ func InitData(cli *gomatrix.Client, db *buntdb.DB) {
 	}
 }
 
+// CacheMessageEvents writes message infos into the cache into the defined room
 func CacheMessageEvents(id, sender, roomID, message string, timestamp int64, db *buntdb.DB) {
 	// Update cache
 	DBerr := db.Update(func(tx *buntdb.Tx) error {

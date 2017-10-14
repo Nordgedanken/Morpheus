@@ -19,6 +19,7 @@ import (
 var username string
 var password string
 
+// DoLogin generates the needed Client
 func DoLogin(username, password, homeserverURL, userID, accessToken string, localLog *log.Logger, results chan<- *gomatrix.Client, wg *sync.WaitGroup) {
 	defer wg.Done()
 	var cli *gomatrix.Client
@@ -47,7 +48,7 @@ func DoLogin(username, password, homeserverURL, userID, accessToken string, loca
 }
 
 //NewLoginUI initializes the login Screen
-func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
+func NewLoginUI(windowWidth, windowHeight int, window *widgets.QMainWindow) *widgets.QWidget {
 	widget := widgets.NewQWidget(nil, 0)
 	widget.SetObjectName("LoginWrapper")
 	widget.SetStyleSheet("QWidget#LoginWrapper { border: 0px; };")
@@ -55,7 +56,6 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 
 	formWidget := widgets.NewQWidget(nil, 0)
 	formWrapper := widgets.NewQHBoxLayout()
-	formWidget.SetMinimumSize2(350, 200)
 
 	formLayout := widgets.NewQVBoxLayout()
 	formLayout.SetSpacing(20)
@@ -132,8 +132,7 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 			//Show MainUI
 			for result := range results {
 				//TODO Don't switch screen on wrong login data.
-				mainUI := NewMainUI(windowWidth, windowHeight, result)
-				mainUI.SetMinimumSize2(windowWidth, windowHeight)
+				mainUI := NewMainUI(windowWidth, windowHeight, result, window)
 				window.SetCentralWidget(mainUI)
 			}
 		} else {
@@ -148,7 +147,7 @@ func NewLoginUI(windowWidth, windowHeight int) *widgets.QWidget {
 
 //NewMainUI initializes the login Screen
 //func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWidget {
-func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWidget {
+func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client, window *widgets.QMainWindow) *widgets.QWidget {
 	var widget = widgets.NewQWidget(nil, 0)
 
 	var loader = uitools.NewQUiLoader(nil)
@@ -159,21 +158,12 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWi
 	file.Close()
 
 	matrix.InitData(cli, db)
-	mainWidget.SetMinimumSize2(window.Size().Width(), window.Size().Height())
-	mainWidget.SetGeometry2(0, 0, window.Size().Width(), window.Size().Height())
-	mainWidget.Resize2(window.Size().Width(), window.Size().Height())
-
-	widget.SetMinimumSize2(window.Size().Width(), window.Size().Height())
-	widget.SetGeometry2(0, 0, window.Size().Width(), window.Size().Height())
-
-	chatWidget := widgets.NewQWidgetFromPointer(widget.FindChild("ChatWidget", core.Qt__FindChildrenRecursively).Pointer())
-	chatWidget.SetMinimumSize2(window.Size().Width(), window.Size().Height())
-	chatWidget.SetGeometry2(0, 0, window.Size().Width(), window.Size().Height())
 
 	messageScrollArea := widgets.NewQScrollAreaFromPointer(widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
 	messagesScrollAreaContent := widgets.NewQWidgetFromPointer(widget.FindChild("messagesScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
 
 	mainWidget.SetWindowTitle("Morpheus - MatrixHQ")
+
 	var layout = widgets.NewQHBoxLayout()
 	layout.AddWidget(mainWidget, 1, core.Qt__AlignTop|core.Qt__AlignLeft)
 	widget.SetLayout(layout)
@@ -181,18 +171,16 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWi
 	layout.SetContentsMargins(0, 0, 0, 0)
 
 	window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
-		mainWidget.SetMinimumSize2(1, 1)
-		widget.SetMinimumSize2(1, 1)
-		chatWidget.SetMinimumSize2(1, 1)
+		widget.Resize2(event.Size().Width(), event.Size().Height())
 
-		widget.Resize(event.Size())
-		mainWidget.Resize(event.Size())
-		chatWidget.Resize(event.Size())
+	})
+
+	widget.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+		mainWidget.Resize2(event.Size().Width(), event.Size().Height())
+
 	})
 
 	messageScrollArea.ConnectResizeEvent(func(event *gui.QResizeEvent) {
-		messageScrollArea.SetMinimumSize2(1, 1)
-
 		messageScrollArea.Resize(event.Size())
 	})
 
@@ -234,8 +222,7 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client) *widgets.QWi
 		//Show LoginUI
 		for result := range results {
 			if result {
-				loginUI := NewLoginUI(windowWidth, windowHeight)
-				loginUI.SetMinimumSize2(windowWidth, windowHeight)
+				loginUI := NewLoginUI(windowWidth, windowHeight, window)
 				window.SetCentralWidget(loginUI)
 			}
 		}

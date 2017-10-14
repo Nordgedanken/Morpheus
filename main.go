@@ -38,13 +38,17 @@ func main() {
 	appIcon := gui.NewQIcon5(":/qml/resources/logos/MorpheusBig.png")
 	app.SetWindowIcon(appIcon)
 
+	window = widgets.NewQMainWindow(nil, 0)
+	windowHeight := 600
+	windowWidth := 950
+
 	desktopApp := widgets.QApplication_Desktop()
 	primaryScreen := desktopApp.PrimaryScreen()
 	screen := desktopApp.Screen(primaryScreen)
-	windowWidth := screen.Width() / 2
-	windowHeight := screen.Height() / 2
+	windowX := (screen.Width() - windowHeight) / 2
+	windowY := (screen.Height() - windowWidth) / 2
 
-	window = widgets.NewQMainWindow(nil, 0)
+	window.Move2(windowX, windowY)
 
 	var accessToken string
 	var homeserverURL string
@@ -52,22 +56,32 @@ func main() {
 
 	// Get cache
 	db.View(func(tx *buntdb.Tx) error {
-		QueryErr := tx.AscendKeys("user:accessToken",
+		accessTokenErr := tx.AscendKeys("user:accessToken",
 			func(key, value string) bool {
 				accessToken = value
 				return true
 			})
-		QueryErr = tx.AscendKeys("user:homeserverURL",
+		if accessTokenErr != nil {
+			return accessTokenErr
+		}
+		homeserverURLErr := tx.AscendKeys("user:homeserverURL",
 			func(key, value string) bool {
 				homeserverURL = value
 				return true
 			})
-		QueryErr = tx.AscendKeys("user:userID",
+		if homeserverURLErr != nil {
+			return homeserverURLErr
+		}
+		userIDErr := tx.AscendKeys("user:userID",
 			func(key, value string) bool {
 				userID = value
 				return true
 			})
-		return QueryErr
+		if userIDErr != nil {
+			return userIDErr
+		}
+
+		return nil
 	})
 
 	if accessToken != "" && homeserverURL != "" && userID != "" {
@@ -86,16 +100,18 @@ func main() {
 		//Show MainUI
 		for result := range results {
 			//TODO Don't switch screen on wrong login data.
-			mainUI := NewMainUI(windowWidth, windowHeight, result)
-			mainUI.SetMinimumSize2(windowWidth, windowHeight)
+			mainUI := NewMainUI(windowWidth, windowHeight, result, window)
+			mainUI.Resize2(windowWidth, windowHeight)
 			window.SetCentralWidget(mainUI)
 		}
 	} else {
 		//Show loginUI
-		loginUI := NewLoginUI(windowWidth, windowHeight)
-		loginUI.SetMinimumSize2(windowWidth, windowHeight)
+		loginUI := NewLoginUI(windowWidth, windowHeight, window)
+		loginUI.Resize2(windowWidth, windowHeight)
 		window.SetCentralWidget(loginUI)
 	}
+
+	window.Resize2(windowWidth, windowHeight)
 	window.Show()
 
 	//enter the main event loop
