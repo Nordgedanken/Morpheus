@@ -1,34 +1,28 @@
-<nav id="mainNav" class="navbar navbar-light navbar-fixed-top">
-    <div class="container">
-        <!-- Brand and toggle get grouped for better mobile display -->
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggler collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
-                <span class="sr-only">Toggle navigation</span> Menu <i class="fa fa-bars"></i>
-            </button>
-            <a class="navbar-brand page-scroll" href="{{ site.baseurl }}">{{ site.title }}</a>
-        </div>
+<nav id="mainNav" class="navbar navbar-light navbar-expand-lg bg-primary">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <a class="navbar-brand page-scroll" href="#page-top">{{ site.title }}</a>
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
 
-        <!-- Collect the nav links, forms, and other content for toggling -->
-        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
-            <ul class="nav navbar-nav navbar-right">
-                <li>
-                    <a href="{{ site.baseurl }}">Home</a>
-                </li>
-                <!-- <li>
-                    <a class="page-scroll" href="{{ site.baseurl }}/funds">Help the project</a>
-                </li> -->
-                <li>
-                    <a class="page-scroll" href="{{ site.baseurl }}blog/">Blog</a>
-                </li>
-                <li>
-                    <a class="page-scroll" href="#contact">Contact</a>
-                </li>
-                <li>
-                    <a class="outer-menu">menu</a>
-                </li>
-            </ul>
-        </div>
-        <!-- /.navbar-collapse -->
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav ml-auto"></ul>
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{{ site.baseurl }}">Home</a>
+            </li>
+            <!-- <li class="nav-item">
+                <a class="page-scroll" href="{{ site.baseurl }}/funds">Help the project</a>
+            </li> -->
+            <li class="nav-item">
+                <a class="page-scroll nav-link active" href="{{ site.baseurl }}blog/">Blog</a>
+            </li>
+            <li class="nav-item">
+                <a class="page-scroll nav-link" href="#contact">Contact</a>
+            </li>
+        </ul>
     </div>
-    <!-- /.container-fluid -->
+    <!-- /.navbar-collapse -->
 </nav>
