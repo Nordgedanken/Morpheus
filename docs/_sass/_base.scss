@@ -649,3 +649,10 @@ body {
     }
   }
 }
+
+.device-overwrite {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    max-width: 100%;
+}
