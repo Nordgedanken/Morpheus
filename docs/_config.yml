@@ -2,6 +2,7 @@
 title: Morpheus
 email: info@nordgedanken.de
 description: A windows focused QT Client written in Golang
+author_name: MTRNord
 
 baseurl: "/Morpheus/" # the subpath of your site, e.g. /blog/ (If you use organization leave empty)
 url: "https://nordgedanken.github.io" # the base hostname & protocol for your site
