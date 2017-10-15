@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/Nordgedanken/Morpheus/matrix"
+	"github.com/Nordgedanken/Morpheus/ui"
 	"github.com/Nordgedanken/Morpheus/util"
 	"github.com/matrix-org/gomatrix"
 	"github.com/therecipe/qt/core"
@@ -105,23 +106,34 @@ func main() {
 		//Show MainUI
 		for result := range results {
 			//TODO Don't switch screen on wrong login data.
-			mainUI, mainUIErr := NewMainUI(windowWidth, windowHeight, result, window)
+			MainUIStruct := ui.NewMainUIStruct(windowWidth, windowHeight, window)
+			MainUIStruct.SetCli(result)
+			MainUILoggerInitErr := MainUIStruct.InitLogger()
+			if MainUILoggerInitErr != nil {
+				localLog.Fatalln(MainUILoggerInitErr)
+			}
+			mainUIErr := MainUIStruct.NewUI()
 			if mainUIErr != nil {
 				localLog.Fatalln(mainUIErr)
 				return
 			}
-			mainUI.Resize2(windowWidth, windowHeight)
-			window.SetCentralWidget(mainUI)
+			MainUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
+			window.SetCentralWidget(MainUIStruct.GetWidget())
 		}
 	} else {
 		//Show loginUI
-		loginUI, loginUIErr := NewLoginUI(windowWidth, windowHeight, window)
+		LoginUIStruct := ui.NewLoginUIStruct(windowWidth, windowHeight, window)
+		LoginUIStructInitErr := LoginUIStruct.InitLogger()
+		if LoginUIStructInitErr != nil {
+			localLog.Fatalln(LoginUIStructInitErr)
+		}
+		loginUIErr := LoginUIStruct.NewUI()
 		if loginUIErr != nil {
 			localLog.Fatalln(loginUIErr)
 			return
 		}
-		loginUI.Resize2(windowWidth, windowHeight)
-		window.SetCentralWidget(loginUI)
+		LoginUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
+		window.SetCentralWidget(LoginUIStruct.GetWidget())
 	}
 
 	window.Resize2(windowWidth, windowHeight)
