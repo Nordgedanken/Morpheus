@@ -28,6 +28,7 @@ type MainUI struct {
 	config
 	widget *widgets.QWidget
 	window *widgets.QMainWindow
+	syncer *gomatrix.DefaultSyncer
 }
 
 // LoginUI holds information about the LoginUI

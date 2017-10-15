@@ -177,10 +177,10 @@ func (m *MainUI) NewUI() (err error) {
 	})
 
 	//Start Syncer!
-	syncer := m.cli.Syncer.(*gomatrix.DefaultSyncer)
+	m.syncer = m.cli.Syncer.(*gomatrix.DefaultSyncer)
 	customStore := gomatrix.NewInMemoryStore()
 	m.cli.Store = customStore
-	syncer.Store = customStore
+	m.syncer.Store = customStore
 
 	// Init Message View
 	messageListLayout := elements.NewMessageList(messageScrollArea, messagesScrollAreaContent)
@@ -196,7 +196,7 @@ func (m *MainUI) NewUI() (err error) {
 	messageScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
 	messageScrollArea.SetContentsMargins(0, 0, 0, 0)
 
-	syncer.OnEventType("m.room.message", func(ev *gomatrix.Event) {
+	m.syncer.OnEventType("m.room.message", func(ev *gomatrix.Event) {
 		msg, _ := ev.Body()
 		room := ev.RoomID
 		sender := ev.Sender
