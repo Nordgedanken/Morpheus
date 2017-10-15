@@ -201,10 +201,7 @@ func NewMainUI(windowWidth, windowHeight int, cli *gomatrix.Client, window *widg
 			//Flush complete DB
 			DBErr := db.Update(func(tx *buntdb.Tx) error {
 				QueryErr := tx.DeleteAll()
-				if QueryErr != nil {
-					return QueryErr
-				}
-				return nil
+				return QueryErr
 			})
 			if DBErr != nil {
 				localLog.Panicln(DBErr)

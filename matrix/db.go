@@ -9,8 +9,6 @@ import (
 	"github.com/tidwall/buntdb"
 )
 
-var db *buntdb.DB
-
 // OpenDB opens or generates the Database file for settings and Cache
 func OpenDB() (db *buntdb.DB, err error) {
 	// Open the data.db file. It will be created if it doesn't exist.
