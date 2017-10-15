@@ -6,7 +6,7 @@ layout: default
 <header id="header" class="intro-header bg-primary text-center" style="background-image: url('{{ site.baseurl }}/{% if page.header-img %}{{ page.header-img }}{% else %}{{ site.header-img }}{% endif %}')">
     <div class="container">
         <div class="row">
-            <div class="col-xl-8 col-xl-offset-2 col-lg-10 col-lg-offset-1">
+            <div class="col">
               <div class="post-heading">
                 <h1>{{ page.title }}</h1>
                 {% if page.subtitle %}
@@ -24,35 +24,12 @@ layout: default
 <article>
     <div id="post" class="container">
         <div class="row">
-            <div class="col-xl-8 col-xl-offset-2 col-lg-10 col-lg-offset-1">
-		{% if site.data-ad-client %}  
-		<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-                <!-- jekynewage google ads -->
-                <ins class="adsbygoogle"
-                    style="display:block"
-                    data-ad-client="ca-pub-9204963049240271"
-                    data-ad-slot="2973388149"
-                    data-ad-format="auto"></ins>
-                <script>
-                    (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
-		{% endif %}
-		<hr>
+            <div class="col">
+		        <hr>
 
 				{{ content }}
 
                 <hr>
-		    
-		<script async src="//pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-                <!-- jekynewage google ads -->
-                <ins class="adsbygoogle"
-                    style="display:block"
-                    data-ad-client="ca-pub-9204963049240271"
-                    data-ad-slot="2973388149"
-                    data-ad-format="auto"></ins>
-                <script>
-                    (adsbygoogle = window.adsbygoogle || []).push({});
-                </script>
 
                 <ul class="pager">
                     {% if page.previous.url %}
