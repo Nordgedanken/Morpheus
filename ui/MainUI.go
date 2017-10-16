@@ -13,7 +13,6 @@ import (
 	"github.com/tidwall/buntdb"
 	"log"
 	"sync"
-	"time"
 )
 
 // NewMainUIStruct gives you a MainUI struct with prefilled data
@@ -114,73 +113,12 @@ func (m *MainUI) NewUI() (err error) {
 	//Handle LogoutButton
 	logoutButton := widgets.NewQPushButtonFromPointer(widget.FindChild("LogoutButton", core.Qt__FindChildrenRecursively).Pointer())
 	logoutButton.ConnectClicked(func(_ bool) {
-		//TODO register enter and show loader or so
-		m.localLog.Println("Starting Logout Sequenze in background")
-		var wg sync.WaitGroup
-		results := make(chan bool)
-
-		wg.Add(1)
-		go func(cli *gomatrix.Client, localLog *log.Logger, results chan<- bool) {
-			defer wg.Done()
-			_, LogoutErr := cli.Logout()
-			if LogoutErr != nil {
-				localLog.Println(LogoutErr)
-				results <- false
-			}
-			cli.ClearCredentials()
-
-			db, DBOpenErr := matrix.OpenDB()
-			if DBOpenErr != nil {
-				localLog.Fatalln(DBOpenErr)
-			}
-			defer db.Close()
-
-			//Flush complete DB
-			DBErr := db.Update(func(tx *buntdb.Tx) error {
-				QueryErr := tx.DeleteAll()
-				return QueryErr
-			})
-			if DBErr != nil {
-				localLog.Panicln(DBErr)
-				results <- false
-			} else {
-				results <- true
-			}
-		}(m.cli, m.localLog, results)
-
-		go func() {
-			wg.Wait()      // wait for each execTask to return
-			close(results) // then close the results channel
-		}()
-
-		//Show LoginUI
-		for result := range results {
-			if result {
-				m.window.DisconnectKeyPressEvent()
-				m.window.DisconnectResizeEvent()
-				widget.DisconnectResizeEvent()
-				messageScrollArea.DisconnectResizeEvent()
-
-				LoginUIStruct := NewLoginUIStructWithExistingConfig(m.config, m.window)
-				LoginUIStructInitErr := LoginUIStruct.InitLogger()
-				if LoginUIStructInitErr != nil {
-					err = LoginUIStructInitErr
-					return
-				}
-				loginUIErr := LoginUIStruct.NewUI()
-				if loginUIErr != nil {
-					m.localLog.Panicln(loginUIErr)
-				}
-				m.window.SetCentralWidget(LoginUIStruct.GetWidget())
-			}
+		LogoutErr := m.logout(widget, messageScrollArea)
+		if LogoutErr != nil {
+			err = LogoutErr
+			return
 		}
 	})
-
-	//Start Syncer!
-	m.syncer = m.cli.Syncer.(*gomatrix.DefaultSyncer)
-	customStore := gomatrix.NewInMemoryStore()
-	m.cli.Store = customStore
-	m.syncer.Store = customStore
 
 	// Init Message View
 	messageListLayout := elements.NewMessageList(messageScrollArea, messagesScrollAreaContent)
@@ -196,17 +134,129 @@ func (m *MainUI) NewUI() (err error) {
 	messageScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
 	messageScrollArea.SetContentsMargins(0, 0, 0, 0)
 
+	m.startSync(messageListLayout)
+
+	var message string
+	messageInput := widgets.NewQLineEditFromPointer(widget.FindChild("MessageInput", core.Qt__FindChildrenRecursively).Pointer())
+	messageInput.ConnectTextChanged(func(value string) {
+		message = value
+	})
+
+	m.window.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
+		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
+			MessageErr := m.sendMessage(message)
+			if MessageErr != nil {
+				err = MessageErr
+				return
+			}
+
+			messageInput.Clear()
+		} else {
+			messageInput.KeyPressEventDefault(ev)
+		}
+	})
+
+	m.widget = widget
+	return
+}
+
+func (m *MainUI) sendMessage(message string) (err error) {
+	mardownMessage := commonmark.Md2Html(message, 0)
+	if mardownMessage == message {
+		_, SendErr := m.cli.SendText("!zTIXGmDjyRcAqbrWab:matrix.ffslfl.net", message)
+		if SendErr != nil {
+			err = SendErr
+			return
+		}
+	} else {
+		_, SendErr := m.cli.SendMessageEvent("!zTIXGmDjyRcAqbrWab:matrix.ffslfl.net", "m.room.message", matrix.HTMLMessage{MsgType: "m.text", Body: message, FormattedBody: mardownMessage, Format: "org.matrix.custom.html"})
+		if SendErr != nil {
+			err = SendErr
+			return
+		}
+	}
+	return
+}
+
+func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScrollArea) (err error) {
+	//TODO register enter and show loader or so
+	m.localLog.Println("Starting Logout Sequenze in background")
+	var wg sync.WaitGroup
+	results := make(chan bool)
+
+	wg.Add(1)
+	go func(cli *gomatrix.Client, localLog *log.Logger, results chan<- bool) {
+		defer wg.Done()
+		_, LogoutErr := cli.Logout()
+		if LogoutErr != nil {
+			localLog.Println(LogoutErr)
+			results <- false
+		}
+		cli.ClearCredentials()
+
+		db, DBOpenErr := matrix.OpenDB()
+		if DBOpenErr != nil {
+			localLog.Fatalln(DBOpenErr)
+		}
+		defer db.Close()
+
+		//Flush complete DB
+		DBErr := db.Update(func(tx *buntdb.Tx) error {
+			QueryErr := tx.DeleteAll()
+			return QueryErr
+		})
+		if DBErr != nil {
+			localLog.Panicln(DBErr)
+			results <- false
+		} else {
+			results <- true
+		}
+	}(m.cli, m.localLog, results)
+
+	go func() {
+		wg.Wait()      // wait for each execTask to return
+		close(results) // then close the results channel
+	}()
+
+	//Show LoginUI
+	for result := range results {
+		if result {
+			m.window.DisconnectKeyPressEvent()
+			m.window.DisconnectResizeEvent()
+			widget.DisconnectResizeEvent()
+			messageScrollArea.DisconnectResizeEvent()
+
+			LoginUIStruct := NewLoginUIStructWithExistingConfig(m.config, m.window)
+			LoginUIStructInitErr := LoginUIStruct.InitLogger()
+			if LoginUIStructInitErr != nil {
+				err = LoginUIStructInitErr
+				return
+			}
+			loginUIErr := LoginUIStruct.NewUI()
+			if loginUIErr != nil {
+				err = loginUIErr
+				return
+			}
+			m.window.SetCentralWidget(LoginUIStruct.GetWidget())
+		}
+	}
+	return
+}
+
+func (m *MainUI) startSync(messageListLayout *elements.QVBoxLayoutWithTriggerSlot) (err error) {
+	//Start Syncer!
+	m.syncer = m.cli.Syncer.(*gomatrix.DefaultSyncer)
+	customStore := gomatrix.NewInMemoryStore()
+	m.cli.Store = customStore
+	m.syncer.Store = customStore
+
 	m.syncer.OnEventType("m.room.message", func(ev *gomatrix.Event) {
 		msg, _ := ev.Body()
 		room := ev.RoomID
 		sender := ev.Sender
 		id := ev.ID
 		timestamp := ev.Timestamp
-		CacheErr := matrix.CacheMessageEvents(id, sender, room, msg, timestamp)
-		if CacheErr != nil {
-			err = CacheErr
-			return
-		}
+		go matrix.CacheMessageEvents(id, sender, room, msg, timestamp)
 		messageListLayout.TriggerMessage(msg, sender)
 	})
 
@@ -216,40 +266,9 @@ func (m *MainUI) NewUI() (err error) {
 		for {
 
 			if e := m.cli.Sync(); e != nil {
-				m.localLog.Println("Fatal Sync() error")
-				time.Sleep(5 * time.Second)
+				err = e
 			}
-			time.Sleep(10 * time.Second)
 		}
 	}()
-
-	messageInput := widgets.NewQLineEditFromPointer(widget.FindChild("MessageInput", core.Qt__FindChildrenRecursively).Pointer())
-	var message string
-	m.window.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
-		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
-			mardownMessage := commonmark.Md2Html(message, 0)
-			if mardownMessage == message {
-				_, SendErr := m.cli.SendText("!zTIXGmDjyRcAqbrWab:matrix.ffslfl.net", message)
-				if SendErr != nil {
-					err = SendErr
-					return
-				}
-			} else {
-				_, SendErr := m.cli.SendMessageEvent("!zTIXGmDjyRcAqbrWab:matrix.ffslfl.net", "m.room.message", matrix.HTMLMessage{"m.text", message, mardownMessage, "org.matrix.custom.html"})
-				if SendErr != nil {
-					err = SendErr
-					return
-				}
-			}
-			messageInput.Clear()
-		} else {
-			messageInput.KeyPressEventDefault(ev)
-		}
-	})
-	messageInput.ConnectTextChanged(func(value string) {
-		message = value
-	})
-
-	m.widget = widget
 	return
 }

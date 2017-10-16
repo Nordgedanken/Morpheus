@@ -16,6 +16,7 @@
     "errcheck",
     "vet",
     "megacheck",
-    "goconst"
+    "goconst",
+    "maligned"
   ]
 }

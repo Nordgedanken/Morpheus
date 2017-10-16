@@ -7,6 +7,7 @@ import (
 
 	"bytes"
 	"github.com/Nordgedanken/Morpheus/util"
+	"github.com/disintegration/letteravatar"
 	"github.com/matrix-org/gomatrix"
 	"github.com/therecipe/qt/gui"
 	"github.com/tidwall/buntdb"
@@ -16,7 +17,9 @@ import (
 	// image/jpeg needed to load jpeg images
 	_ "image/jpeg"
 	"image/png"
-	"math/rand"
+	"strconv"
+	"unicode"
+	"unicode/utf8"
 )
 
 var localLog *log.Logger
@@ -54,13 +57,21 @@ func (c *circle) At(x, y int) color.Color {
 	return color.Alpha{0}
 }
 
-func generateGenericImages(displayname string) (imgData string, err error) {
-	// Create an 100 x 100 image
-	img := image.NewRGBA(image.Rect(0, 0, 100, 100))
+func generateGenericImages(displayname string, size int) (imgData string, err error) {
+	identifier := displayname
+	if (identifier[0] == '#' || identifier[0] == '!' || identifier[0] == '@') && len(identifier) > 1 {
+		identifier = identifier[1:]
+	}
 
-	// Draw a red dot at (2, 3)
-	img.Set(50, 50, color.RGBA{uint8(rand.Intn(200)), uint8(rand.Intn(255)), uint8(rand.Intn(255)), 255})
+	avatarChar, _ := utf8.DecodeRuneInString(identifier)
+	img, LetterAvatarErr := letteravatar.Draw(size, unicode.ToUpper(avatarChar), nil)
 
+	if LetterAvatarErr != nil {
+		err = LetterAvatarErr
+		return
+	}
+
+	localLog.Println("generatedIMGBounds: ", img.Bounds())
 	buf := new(bytes.Buffer)
 	EncodeErr := png.Encode(buf, img)
 	if EncodeErr != nil {
@@ -73,12 +84,12 @@ func generateGenericImages(displayname string) (imgData string, err error) {
 
 // GetOwnUserAvatar returns a *gui.QPixmap of an UserAvatar
 func GetOwnUserAvatar(cli *gomatrix.Client) (avatar *gui.QPixmap, err error) {
-	avatar, err = GetUserAvatar(cli, cli.UserID)
+	avatar, err = GetUserAvatar(cli, cli.UserID, 61)
 	return
 }
 
 // GetUserAvatar returns a *gui.QPixmap of an UserAvatar
-func GetUserAvatar(cli *gomatrix.Client, mxid string) (avatarResp *gui.QPixmap, err error) {
+func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui.QPixmap, err error) {
 	db, DBOpenErr := OpenDB()
 	if DBOpenErr != nil {
 		localLog.Fatalln(DBOpenErr)
@@ -91,7 +102,7 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string) (avatarResp *gui.QPixmap, 
 
 	// Get cache
 	DBErr := db.View(func(tx *buntdb.Tx) error {
-		QueryErr := tx.AscendKeys("user:"+mxid+":avatarData100x100",
+		QueryErr := tx.AscendKeys("user:"+mxid+":avatarData"+strconv.Itoa(size)+"x"+strconv.Itoa(size),
 			func(key, value string) bool {
 				avatarData = value
 				return true
@@ -123,7 +134,7 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string) (avatarResp *gui.QPixmap, 
 			hsURL := cli.HomeserverURL.String()
 			avatarURLSplits := strings.Split(strings.Replace(avatarURL, "mxc://", "", -1), "/")
 
-			urlPath := hsURL + "/_matrix/media/r0/thumbnail/" + avatarURLSplits[0] + "/" + avatarURLSplits[1] + "?width=100&height=100"
+			urlPath := hsURL + "/_matrix/media/r0/thumbnail/" + avatarURLSplits[0] + "/" + avatarURLSplits[1] + "?width=" + strconv.Itoa(size) + "&height=" + strconv.Itoa(size) + "&method=crop"
 
 			data, ReqErr := cli.MakeRequest("GET", urlPath, nil, nil)
 			if ReqErr != nil {
@@ -132,11 +143,11 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string) (avatarResp *gui.QPixmap, 
 			}
 			IMGdata = string(data[:])
 		} else {
-			//TODO Generate default image (Step: AfterUI)
-			DisplayNameResp, _ := cli.GetOwnDisplayName()
+			localLog.Println("Generating Avatar")
+			DisplayNameResp, _ := cli.GetDisplayName(mxid)
 			DisplayName := DisplayNameResp.DisplayName
 			var GenerateImgErr error
-			IMGdata, GenerateImgErr = generateGenericImages(DisplayName)
+			IMGdata, GenerateImgErr = generateGenericImages(DisplayName, size)
 			if GenerateImgErr != nil {
 				err = GenerateImgErr
 				return
@@ -145,7 +156,7 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string) (avatarResp *gui.QPixmap, 
 
 		// Update cache
 		DBerr := db.Update(func(tx *buntdb.Tx) error {
-			_, _, DBSetErr := tx.Set("user:"+mxid+":avatarData100x100", IMGdata, nil)
+			_, _, DBSetErr := tx.Set("user:"+mxid+":avatarData"+strconv.Itoa(size)+"x"+strconv.Itoa(size), IMGdata, nil)
 			return DBSetErr
 		})
 		if DBerr != nil {
@@ -166,7 +177,13 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string) (avatarResp *gui.QPixmap, 
 	canvas := image.NewRGBA(srcIMG.Bounds())
 	cx := srcIMG.Bounds().Min.X + srcIMG.Bounds().Dx()/2
 	cy := srcIMG.Bounds().Min.Y + srcIMG.Bounds().Dy()/2
-	draw.DrawMask(canvas, canvas.Bounds(), srcIMG, image.ZP, &circle{image.Point{cx, cy}, 110}, image.ZP, draw.Over)
+	localLog.Println("srcIMGBounds: ", srcIMG.Bounds())
+	localLog.Println("srcIMGCx: ", cx)
+	localLog.Println("srcIMGCy: ", cy)
+	//outerRadius := math.Sqrt(math.Pow(float64(size), 2)+math.Pow(float64(size), 2)) / 2
+	draw.DrawMask(canvas, canvas.Bounds(), srcIMG, image.ZP, &circle{image.Point{cx, cy}, cx}, image.ZP, draw.Over)
+
+	localLog.Println("modIMGBounds: ", canvas.Bounds())
 	avatar := gui.NewQPixmap()
 	buf := new(bytes.Buffer)
 	ConvErr := png.Encode(buf, canvas)

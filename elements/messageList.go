@@ -1,6 +1,7 @@
 package elements
 
 import (
+	"fmt"
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/matrix-org/gomatrix"
 	"github.com/rhinoman/go-commonmark"
@@ -42,7 +43,7 @@ func NewMessageList(scrollArea *widgets.QScrollArea, messageView *widgets.QWidge
 
 // NewMessage adds a new message object to the view
 func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli *gomatrix.Client, sender string, scrollArea *widgets.QScrollArea) (err error) {
-	avatar, AvatarErr := matrix.GetUserAvatar(cli, sender)
+	avatar, AvatarErr := matrix.GetUserAvatar(cli, sender, 61)
 	if err != nil {
 		err = AvatarErr
 		return
@@ -67,6 +68,7 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 	messageContent.SetText(markdownMessage)
 
 	senderDisplayNameResp, _ := cli.GetDisplayName(sender)
+	fmt.Println(senderDisplayNameResp)
 	senderDisplayName := senderDisplayNameResp.DisplayName
 	senderContent.SetText(senderDisplayName)
 	avatarLogo.SetPixmap(avatar)
