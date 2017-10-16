@@ -650,8 +650,16 @@ body {
   }
 }
 
+@media (max-resolution: 1dppx) {
+   .device-overwrite {
+       position: absolute;
+       top: 50%;
+       transform: translateY(-50%);
+       max-width: 100%;
+   }
+}
+
 .device-overwrite {
-    position: absolute;
     top: 50%;
     transform: translateY(-50%);
     max-width: 100%;
