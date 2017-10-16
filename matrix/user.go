@@ -16,6 +16,10 @@ import (
 	"image/draw"
 	// image/jpeg needed to load jpeg images
 	_ "image/jpeg"
+	// golang.org/x/image/webp needed to load webp images
+	_ "golang.org/x/image/webp"
+	// golang.org/x/image/bmp needed to load bmp images
+	_ "golang.org/x/image/bmp"
 	"image/png"
 	"strconv"
 	"unicode"
@@ -177,13 +181,8 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 	canvas := image.NewRGBA(srcIMG.Bounds())
 	cx := srcIMG.Bounds().Min.X + srcIMG.Bounds().Dx()/2
 	cy := srcIMG.Bounds().Min.Y + srcIMG.Bounds().Dy()/2
-	localLog.Println("srcIMGBounds: ", srcIMG.Bounds())
-	localLog.Println("srcIMGCx: ", cx)
-	localLog.Println("srcIMGCy: ", cy)
-	//outerRadius := math.Sqrt(math.Pow(float64(size), 2)+math.Pow(float64(size), 2)) / 2
 	draw.DrawMask(canvas, canvas.Bounds(), srcIMG, image.ZP, &circle{image.Point{cx, cy}, cx}, image.ZP, draw.Over)
 
-	localLog.Println("modIMGBounds: ", canvas.Bounds())
 	avatar := gui.NewQPixmap()
 	buf := new(bytes.Buffer)
 	ConvErr := png.Encode(buf, canvas)
