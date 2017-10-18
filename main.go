@@ -29,7 +29,7 @@ func main() {
 	}
 	defer file.Close()
 
-	db, DBOpenErr := matrix.OpenDB()
+	db, DBOpenErr := matrix.OpenUserDB()
 	if DBOpenErr != nil {
 		localLog.Fatalln(DBOpenErr)
 	}

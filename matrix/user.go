@@ -94,7 +94,7 @@ func GetOwnUserAvatar(cli *gomatrix.Client) (avatar *gui.QPixmap, err error) {
 
 // GetUserAvatar returns a *gui.QPixmap of an UserAvatar
 func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui.QPixmap, err error) {
-	db, DBOpenErr := OpenDB()
+	db, DBOpenErr := OpenCacheDB()
 	if DBOpenErr != nil {
 		localLog.Fatalln(DBOpenErr)
 	}

@@ -11,7 +11,7 @@ import (
 
 //GetClient returns a Client
 func GetClient(homeserverURL, userID, accessToken string) (client *gomatrix.Client, err error) {
-	db, DBOpenErr := OpenDB()
+	db, DBOpenErr := OpenUserDB()
 	if DBOpenErr != nil {
 		localLog.Fatalln(DBOpenErr)
 	}
@@ -75,7 +75,7 @@ func LoginUser(username, password string) (*gomatrix.Client, error) {
 		return nil, err
 	}
 
-	db, DBOpenErr := OpenDB()
+	db, DBOpenErr := OpenUserDB()
 	if DBOpenErr != nil {
 		localLog.Fatalln(DBOpenErr)
 	}

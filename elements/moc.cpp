@@ -27,6 +27,55 @@
 #include <QWidget>
 
 
+class QVBoxLayoutWithTriggerSlot: public QVBoxLayout
+{
+Q_OBJECT
+public:
+	QVBoxLayoutWithTriggerSlot() : QVBoxLayout() {qRegisterMetaType<quintptr>("quintptr");QVBoxLayoutWithTriggerSlot_QVBoxLayoutWithTriggerSlot_QRegisterMetaType();QVBoxLayoutWithTriggerSlot_QVBoxLayoutWithTriggerSlot_QRegisterMetaTypes();callbackQVBoxLayoutWithTriggerSlot_Constructor(this);};
+	QVBoxLayoutWithTriggerSlot(QWidget *parent) : QVBoxLayout(parent) {qRegisterMetaType<quintptr>("quintptr");QVBoxLayoutWithTriggerSlot_QVBoxLayoutWithTriggerSlot_QRegisterMetaType();QVBoxLayoutWithTriggerSlot_QVBoxLayoutWithTriggerSlot_QRegisterMetaTypes();callbackQVBoxLayoutWithTriggerSlot_Constructor(this);};
+	QLayoutItem * takeAt(int index) { return static_cast<QLayoutItem*>(callbackQVBoxLayoutWithTriggerSlot_TakeAt(this, index)); };
+	void addItem(QLayoutItem * item) { callbackQVBoxLayoutWithTriggerSlot_AddItem(this, item); };
+	void invalidate() { callbackQVBoxLayoutWithTriggerSlot_Invalidate(this); };
+	void setGeometry(const QRect & r) { callbackQVBoxLayoutWithTriggerSlot_SetGeometry(this, const_cast<QRect*>(&r)); };
+	QLayoutItem * itemAt(int index) const { return static_cast<QLayoutItem*>(callbackQVBoxLayoutWithTriggerSlot_ItemAt(const_cast<void*>(static_cast<const void*>(this)), index)); };
+	QSize maximumSize() const { return *static_cast<QSize*>(callbackQVBoxLayoutWithTriggerSlot_MaximumSize(const_cast<void*>(static_cast<const void*>(this)))); };
+	QSize minimumSize() const { return *static_cast<QSize*>(callbackQVBoxLayoutWithTriggerSlot_MinimumSize(const_cast<void*>(static_cast<const void*>(this)))); };
+	QSize sizeHint() const { return *static_cast<QSize*>(callbackQVBoxLayoutWithTriggerSlot_SizeHint(const_cast<void*>(static_cast<const void*>(this)))); };
+	Qt::Orientations expandingDirections() const { return static_cast<Qt::Orientation>(callbackQVBoxLayoutWithTriggerSlot_ExpandingDirections(const_cast<void*>(static_cast<const void*>(this)))); };
+	bool hasHeightForWidth() const { return callbackQVBoxLayoutWithTriggerSlot_HasHeightForWidth(const_cast<void*>(static_cast<const void*>(this))) != 0; };
+	int count() const { return callbackQVBoxLayoutWithTriggerSlot_Count(const_cast<void*>(static_cast<const void*>(this))); };
+	int heightForWidth(int w) const { return callbackQVBoxLayoutWithTriggerSlot_HeightForWidth(const_cast<void*>(static_cast<const void*>(this)), w); };
+	int minimumHeightForWidth(int w) const { return callbackQVBoxLayoutWithTriggerSlot_MinimumHeightForWidth(const_cast<void*>(static_cast<const void*>(this)), w); };
+	QLayout * layout() { return static_cast<QLayout*>(callbackQVBoxLayoutWithTriggerSlot_Layout(this)); };
+	void childEvent(QChildEvent * e) { callbackQVBoxLayoutWithTriggerSlot_ChildEvent(this, e); };
+	QRect geometry() const { return *static_cast<QRect*>(callbackQVBoxLayoutWithTriggerSlot_Geometry(const_cast<void*>(static_cast<const void*>(this)))); };
+	QSizePolicy::ControlTypes controlTypes() const { return static_cast<QSizePolicy::ControlType>(callbackQVBoxLayoutWithTriggerSlot_ControlTypes(const_cast<void*>(static_cast<const void*>(this)))); };
+	bool isEmpty() const { return callbackQVBoxLayoutWithTriggerSlot_IsEmpty(const_cast<void*>(static_cast<const void*>(this))) != 0; };
+	int indexOf(QWidget * widget) const { return callbackQVBoxLayoutWithTriggerSlot_IndexOf(const_cast<void*>(static_cast<const void*>(this)), widget); };
+	bool event(QEvent * e) { return callbackQVBoxLayoutWithTriggerSlot_Event(this, e) != 0; };
+	bool eventFilter(QObject * watched, QEvent * event) { return callbackQVBoxLayoutWithTriggerSlot_EventFilter(this, watched, event) != 0; };
+	void connectNotify(const QMetaMethod & sign) { callbackQVBoxLayoutWithTriggerSlot_ConnectNotify(this, const_cast<QMetaMethod*>(&sign)); };
+	void customEvent(QEvent * event) { callbackQVBoxLayoutWithTriggerSlot_CustomEvent(this, event); };
+	void deleteLater() { callbackQVBoxLayoutWithTriggerSlot_DeleteLater(this); };
+	void Signal_Destroyed(QObject * obj) { callbackQVBoxLayoutWithTriggerSlot_Destroyed(this, obj); };
+	void disconnectNotify(const QMetaMethod & sign) { callbackQVBoxLayoutWithTriggerSlot_DisconnectNotify(this, const_cast<QMetaMethod*>(&sign)); };
+	void Signal_ObjectNameChanged(const QString & objectName) { QByteArray taa2c4f = objectName.toUtf8(); Moc_PackedString objectNamePacked = { const_cast<char*>(taa2c4f.prepend("WHITESPACE").constData()+10), taa2c4f.size()-10 };callbackQVBoxLayoutWithTriggerSlot_ObjectNameChanged(this, objectNamePacked); };
+	void timerEvent(QTimerEvent * event) { callbackQVBoxLayoutWithTriggerSlot_TimerEvent(this, event); };
+	
+	QSpacerItem * spacerItem() { return static_cast<QSpacerItem*>(callbackQVBoxLayoutWithTriggerSlot_SpacerItem(this)); };
+	QWidget * widget() { return static_cast<QWidget*>(callbackQVBoxLayoutWithTriggerSlot_Widget(this)); };
+signals:
+public slots:
+	void TriggerMessage(QString messageBody, QString sender, qint64 timestamp) { QByteArray t59bf16 = messageBody.toUtf8(); Moc_PackedString messageBodyPacked = { const_cast<char*>(t59bf16.prepend("WHITESPACE").constData()+10), t59bf16.size()-10 };QByteArray tacc6a3 = sender.toUtf8(); Moc_PackedString senderPacked = { const_cast<char*>(tacc6a3.prepend("WHITESPACE").constData()+10), tacc6a3.size()-10 };callbackQVBoxLayoutWithTriggerSlot_TriggerMessage(this, messageBodyPacked, senderPacked, timestamp); };
+private:
+};
+
+Q_DECLARE_METATYPE(QVBoxLayoutWithTriggerSlot*)
+
+
+void QVBoxLayoutWithTriggerSlot_QVBoxLayoutWithTriggerSlot_QRegisterMetaTypes() {
+}
+
 class QRoomVBoxLayoutWithTriggerSlot: public QVBoxLayout
 {
 Q_OBJECT
@@ -74,55 +123,6 @@ Q_DECLARE_METATYPE(QRoomVBoxLayoutWithTriggerSlot*)
 
 
 void QRoomVBoxLayoutWithTriggerSlot_QRoomVBoxLayoutWithTriggerSlot_QRegisterMetaTypes() {
-}
-
-class QVBoxLayoutWithTriggerSlot: public QVBoxLayout
-{
-Q_OBJECT
-public:
-	QVBoxLayoutWithTriggerSlot() : QVBoxLayout() {qRegisterMetaType<quintptr>("quintptr");QVBoxLayoutWithTriggerSlot_QVBoxLayoutWithTriggerSlot_QRegisterMetaType();QVBoxLayoutWithTriggerSlot_QVBoxLayoutWithTriggerSlot_QRegisterMetaTypes();callbackQVBoxLayoutWithTriggerSlot_Constructor(this);};
-	QVBoxLayoutWithTriggerSlot(QWidget *parent) : QVBoxLayout(parent) {qRegisterMetaType<quintptr>("quintptr");QVBoxLayoutWithTriggerSlot_QVBoxLayoutWithTriggerSlot_QRegisterMetaType();QVBoxLayoutWithTriggerSlot_QVBoxLayoutWithTriggerSlot_QRegisterMetaTypes();callbackQVBoxLayoutWithTriggerSlot_Constructor(this);};
-	QLayoutItem * takeAt(int index) { return static_cast<QLayoutItem*>(callbackQVBoxLayoutWithTriggerSlot_TakeAt(this, index)); };
-	void addItem(QLayoutItem * item) { callbackQVBoxLayoutWithTriggerSlot_AddItem(this, item); };
-	void invalidate() { callbackQVBoxLayoutWithTriggerSlot_Invalidate(this); };
-	void setGeometry(const QRect & r) { callbackQVBoxLayoutWithTriggerSlot_SetGeometry(this, const_cast<QRect*>(&r)); };
-	QLayoutItem * itemAt(int index) const { return static_cast<QLayoutItem*>(callbackQVBoxLayoutWithTriggerSlot_ItemAt(const_cast<void*>(static_cast<const void*>(this)), index)); };
-	QSize maximumSize() const { return *static_cast<QSize*>(callbackQVBoxLayoutWithTriggerSlot_MaximumSize(const_cast<void*>(static_cast<const void*>(this)))); };
-	QSize minimumSize() const { return *static_cast<QSize*>(callbackQVBoxLayoutWithTriggerSlot_MinimumSize(const_cast<void*>(static_cast<const void*>(this)))); };
-	QSize sizeHint() const { return *static_cast<QSize*>(callbackQVBoxLayoutWithTriggerSlot_SizeHint(const_cast<void*>(static_cast<const void*>(this)))); };
-	Qt::Orientations expandingDirections() const { return static_cast<Qt::Orientation>(callbackQVBoxLayoutWithTriggerSlot_ExpandingDirections(const_cast<void*>(static_cast<const void*>(this)))); };
-	bool hasHeightForWidth() const { return callbackQVBoxLayoutWithTriggerSlot_HasHeightForWidth(const_cast<void*>(static_cast<const void*>(this))) != 0; };
-	int count() const { return callbackQVBoxLayoutWithTriggerSlot_Count(const_cast<void*>(static_cast<const void*>(this))); };
-	int heightForWidth(int w) const { return callbackQVBoxLayoutWithTriggerSlot_HeightForWidth(const_cast<void*>(static_cast<const void*>(this)), w); };
-	int minimumHeightForWidth(int w) const { return callbackQVBoxLayoutWithTriggerSlot_MinimumHeightForWidth(const_cast<void*>(static_cast<const void*>(this)), w); };
-	QLayout * layout() { return static_cast<QLayout*>(callbackQVBoxLayoutWithTriggerSlot_Layout(this)); };
-	void childEvent(QChildEvent * e) { callbackQVBoxLayoutWithTriggerSlot_ChildEvent(this, e); };
-	QRect geometry() const { return *static_cast<QRect*>(callbackQVBoxLayoutWithTriggerSlot_Geometry(const_cast<void*>(static_cast<const void*>(this)))); };
-	QSizePolicy::ControlTypes controlTypes() const { return static_cast<QSizePolicy::ControlType>(callbackQVBoxLayoutWithTriggerSlot_ControlTypes(const_cast<void*>(static_cast<const void*>(this)))); };
-	bool isEmpty() const { return callbackQVBoxLayoutWithTriggerSlot_IsEmpty(const_cast<void*>(static_cast<const void*>(this))) != 0; };
-	int indexOf(QWidget * widget) const { return callbackQVBoxLayoutWithTriggerSlot_IndexOf(const_cast<void*>(static_cast<const void*>(this)), widget); };
-	bool event(QEvent * e) { return callbackQVBoxLayoutWithTriggerSlot_Event(this, e) != 0; };
-	bool eventFilter(QObject * watched, QEvent * event) { return callbackQVBoxLayoutWithTriggerSlot_EventFilter(this, watched, event) != 0; };
-	void connectNotify(const QMetaMethod & sign) { callbackQVBoxLayoutWithTriggerSlot_ConnectNotify(this, const_cast<QMetaMethod*>(&sign)); };
-	void customEvent(QEvent * event) { callbackQVBoxLayoutWithTriggerSlot_CustomEvent(this, event); };
-	void deleteLater() { callbackQVBoxLayoutWithTriggerSlot_DeleteLater(this); };
-	void Signal_Destroyed(QObject * obj) { callbackQVBoxLayoutWithTriggerSlot_Destroyed(this, obj); };
-	void disconnectNotify(const QMetaMethod & sign) { callbackQVBoxLayoutWithTriggerSlot_DisconnectNotify(this, const_cast<QMetaMethod*>(&sign)); };
-	void Signal_ObjectNameChanged(const QString & objectName) { QByteArray taa2c4f = objectName.toUtf8(); Moc_PackedString objectNamePacked = { const_cast<char*>(taa2c4f.prepend("WHITESPACE").constData()+10), taa2c4f.size()-10 };callbackQVBoxLayoutWithTriggerSlot_ObjectNameChanged(this, objectNamePacked); };
-	void timerEvent(QTimerEvent * event) { callbackQVBoxLayoutWithTriggerSlot_TimerEvent(this, event); };
-	
-	QSpacerItem * spacerItem() { return static_cast<QSpacerItem*>(callbackQVBoxLayoutWithTriggerSlot_SpacerItem(this)); };
-	QWidget * widget() { return static_cast<QWidget*>(callbackQVBoxLayoutWithTriggerSlot_Widget(this)); };
-signals:
-public slots:
-	void TriggerMessage(QString messageBody, QString sender) { QByteArray t59bf16 = messageBody.toUtf8(); Moc_PackedString messageBodyPacked = { const_cast<char*>(t59bf16.prepend("WHITESPACE").constData()+10), t59bf16.size()-10 };QByteArray tacc6a3 = sender.toUtf8(); Moc_PackedString senderPacked = { const_cast<char*>(tacc6a3.prepend("WHITESPACE").constData()+10), tacc6a3.size()-10 };callbackQVBoxLayoutWithTriggerSlot_TriggerMessage(this, messageBodyPacked, senderPacked); };
-private:
-};
-
-Q_DECLARE_METATYPE(QVBoxLayoutWithTriggerSlot*)
-
-
-void QVBoxLayoutWithTriggerSlot_QVBoxLayoutWithTriggerSlot_QRegisterMetaTypes() {
 }
 
 void QRoomVBoxLayoutWithTriggerSlot_TriggerMessage(void* ptr, struct Moc_PackedString messageBody, struct Moc_PackedString sender)
@@ -395,9 +395,9 @@ void* QRoomVBoxLayoutWithTriggerSlot_WidgetDefault(void* ptr)
 	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::widget();
 }
 
-void QVBoxLayoutWithTriggerSlot_TriggerMessage(void* ptr, struct Moc_PackedString messageBody, struct Moc_PackedString sender)
+void QVBoxLayoutWithTriggerSlot_TriggerMessage(void* ptr, struct Moc_PackedString messageBody, struct Moc_PackedString sender, long long timestamp)
 {
-	QMetaObject::invokeMethod(static_cast<QVBoxLayoutWithTriggerSlot*>(ptr), "TriggerMessage", Q_ARG(QString, QString::fromUtf8(messageBody.data, messageBody.len)), Q_ARG(QString, QString::fromUtf8(sender.data, sender.len)));
+	QMetaObject::invokeMethod(static_cast<QVBoxLayoutWithTriggerSlot*>(ptr), "TriggerMessage", Q_ARG(QString, QString::fromUtf8(messageBody.data, messageBody.len)), Q_ARG(QString, QString::fromUtf8(sender.data, sender.len)), Q_ARG(qint64, timestamp));
 }
 
 int QVBoxLayoutWithTriggerSlot_QVBoxLayoutWithTriggerSlot_QRegisterMetaType()

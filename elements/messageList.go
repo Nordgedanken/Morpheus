@@ -8,6 +8,7 @@ import (
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
+	"time"
 )
 
 ////////////////////////////////////////////////////
@@ -25,7 +26,7 @@ import (
 type QVBoxLayoutWithTriggerSlot struct {
 	widgets.QVBoxLayout
 
-	_ func(messageBody, sender string) `slot:"TriggerMessage"`
+	_ func(messageBody, sender string, timestamp int64) `slot:"TriggerMessage"`
 }
 
 // NewMessageList generates a new QVBoxLayoutWithTriggerSlot and adds it to the message scrollArea
@@ -42,7 +43,7 @@ func NewMessageList(scrollArea *widgets.QScrollArea, messageView *widgets.QWidge
 }
 
 // NewMessage adds a new message object to the view
-func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli *gomatrix.Client, sender string, scrollArea *widgets.QScrollArea) (err error) {
+func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli *gomatrix.Client, sender string, timestamp int64, scrollArea *widgets.QScrollArea) (err error) {
 	avatar, AvatarErr := matrix.GetUserAvatar(cli, sender, 61)
 	if err != nil {
 		err = AvatarErr
@@ -58,9 +59,13 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 	var wrapperWidget = loader.Load(file, widget)
 	file.Close()
 
+	timestampFormat := time.Unix(0, int64(timestamp)*int64(time.Millisecond))
+	timestampString := timestampFormat.Format("15:04:05 - Mon 2.01.2006")
+
 	messageWidget := widgets.NewQWidgetFromPointer(widget.FindChild("message", core.Qt__FindChildrenRecursively).Pointer())
 	avatarLogo := widgets.NewQLabelFromPointer(widget.FindChild("avatar", core.Qt__FindChildrenRecursively).Pointer())
 	messageContent := widgets.NewQLabelFromPointer(widget.FindChild("messageContent", core.Qt__FindChildrenRecursively).Pointer())
+	timestampContent := widgets.NewQLabelFromPointer(widget.FindChild("timestamp", core.Qt__FindChildrenRecursively).Pointer())
 	senderContent := widgets.NewQLabelFromPointer(widget.FindChild("sender", core.Qt__FindChildrenRecursively).Pointer())
 
 	markdownMessage := commonmark.Md2Html(body, 0)
@@ -78,6 +83,7 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 	}
 	fmt.Println(senderDisplayName)
 	senderContent.SetText(senderDisplayName)
+	timestampContent.SetText(timestampString)
 	avatarLogo.SetPixmap(avatar)
 
 	messageContent.SetMinimumWidth(messageContent.LineWidth())

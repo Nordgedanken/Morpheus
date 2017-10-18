@@ -69,7 +69,7 @@ void QRoomVBoxLayoutWithTriggerSlot_TimerEventDefault(void* ptr, void* event);
 ;
 void* QRoomVBoxLayoutWithTriggerSlot_SpacerItemDefault(void* ptr);
 void* QRoomVBoxLayoutWithTriggerSlot_WidgetDefault(void* ptr);
-void QVBoxLayoutWithTriggerSlot_TriggerMessage(void* ptr, struct Moc_PackedString messageBody, struct Moc_PackedString sender);
+void QVBoxLayoutWithTriggerSlot_TriggerMessage(void* ptr, struct Moc_PackedString messageBody, struct Moc_PackedString sender, long long timestamp);
 int QVBoxLayoutWithTriggerSlot_QVBoxLayoutWithTriggerSlot_QRegisterMetaType();
 int QVBoxLayoutWithTriggerSlot_QVBoxLayoutWithTriggerSlot_QRegisterMetaType2(char* typeName);
 int QVBoxLayoutWithTriggerSlot_QVBoxLayoutWithTriggerSlot_QmlRegisterType();

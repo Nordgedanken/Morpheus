@@ -124,8 +124,8 @@ func (m *MainUI) NewUI() (err error) {
 	// Init Message View
 	messageListLayout := elements.NewMessageList(messageScrollArea, messagesScrollAreaContent)
 
-	messageListLayout.ConnectTriggerMessage(func(messageBody, sender string) {
-		NewMessageErr := messageListLayout.NewMessage(messageBody, m.cli, sender, messageScrollArea)
+	messageListLayout.ConnectTriggerMessage(func(messageBody, sender string, timestamp int64) {
+		NewMessageErr := messageListLayout.NewMessage(messageBody, m.cli, sender, timestamp, messageScrollArea)
 		if NewMessageErr != nil {
 			err = NewMessageErr
 			return
@@ -197,7 +197,7 @@ func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScr
 		}
 		cli.ClearCredentials()
 
-		db, DBOpenErr := matrix.OpenDB()
+		db, DBOpenErr := matrix.OpenUserDB()
 		if DBOpenErr != nil {
 			localLog.Fatalln(DBOpenErr)
 		}
@@ -260,7 +260,7 @@ func (m *MainUI) startSync(messageListLayout *elements.QVBoxLayoutWithTriggerSlo
 		id := ev.ID
 		timestamp := ev.Timestamp
 		go matrix.CacheMessageEvents(id, sender, room, msg, timestamp)
-		messageListLayout.TriggerMessage(msg, sender)
+		messageListLayout.TriggerMessage(msg, sender, timestamp)
 	})
 
 	// Start Non-blocking sync
