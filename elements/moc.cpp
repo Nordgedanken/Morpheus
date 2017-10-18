@@ -125,276 +125,6 @@ Q_DECLARE_METATYPE(QVBoxLayoutWithTriggerSlot*)
 void QVBoxLayoutWithTriggerSlot_QVBoxLayoutWithTriggerSlot_QRegisterMetaTypes() {
 }
 
-void QRoomVBoxLayoutWithTriggerSlot_TriggerMessage(void* ptr, struct Moc_PackedString messageBody, struct Moc_PackedString sender)
-{
-	QMetaObject::invokeMethod(static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr), "TriggerMessage", Q_ARG(QString, QString::fromUtf8(messageBody.data, messageBody.len)), Q_ARG(QString, QString::fromUtf8(sender.data, sender.len)));
-}
-
-int QRoomVBoxLayoutWithTriggerSlot_QRoomVBoxLayoutWithTriggerSlot_QRegisterMetaType()
-{
-	return qRegisterMetaType<QRoomVBoxLayoutWithTriggerSlot*>();
-}
-
-int QRoomVBoxLayoutWithTriggerSlot_QRoomVBoxLayoutWithTriggerSlot_QRegisterMetaType2(char* typeName)
-{
-	return qRegisterMetaType<QRoomVBoxLayoutWithTriggerSlot*>(const_cast<const char*>(typeName));
-}
-
-int QRoomVBoxLayoutWithTriggerSlot_QRoomVBoxLayoutWithTriggerSlot_QmlRegisterType()
-{
-#ifdef QT_QML_LIB
-	return qmlRegisterType<QRoomVBoxLayoutWithTriggerSlot>();
-#else
-	return 0;
-#endif
-}
-
-int QRoomVBoxLayoutWithTriggerSlot_QRoomVBoxLayoutWithTriggerSlot_QmlRegisterType2(char* uri, int versionMajor, int versionMinor, char* qmlName)
-{
-#ifdef QT_QML_LIB
-	return qmlRegisterType<QRoomVBoxLayoutWithTriggerSlot>(const_cast<const char*>(uri), versionMajor, versionMinor, const_cast<const char*>(qmlName));
-#else
-	return 0;
-#endif
-}
-
-void* QRoomVBoxLayoutWithTriggerSlot___dynamicPropertyNames_atList(void* ptr, int i)
-{
-	return new QByteArray(static_cast<QList<QByteArray>*>(ptr)->at(i));
-}
-
-void QRoomVBoxLayoutWithTriggerSlot___dynamicPropertyNames_setList(void* ptr, void* i)
-{
-	static_cast<QList<QByteArray>*>(ptr)->append(*static_cast<QByteArray*>(i));
-}
-
-void* QRoomVBoxLayoutWithTriggerSlot___dynamicPropertyNames_newList(void* ptr)
-{
-	Q_UNUSED(ptr);
-	return new QList<QByteArray>;
-}
-
-void* QRoomVBoxLayoutWithTriggerSlot___findChildren_atList2(void* ptr, int i)
-{
-	return const_cast<QObject*>(static_cast<QList<QObject*>*>(ptr)->at(i));
-}
-
-void QRoomVBoxLayoutWithTriggerSlot___findChildren_setList2(void* ptr, void* i)
-{
-	static_cast<QList<QObject*>*>(ptr)->append(static_cast<QObject*>(i));
-}
-
-void* QRoomVBoxLayoutWithTriggerSlot___findChildren_newList2(void* ptr)
-{
-	Q_UNUSED(ptr);
-	return new QList<QObject*>;
-}
-
-void* QRoomVBoxLayoutWithTriggerSlot___findChildren_atList3(void* ptr, int i)
-{
-	return const_cast<QObject*>(static_cast<QList<QObject*>*>(ptr)->at(i));
-}
-
-void QRoomVBoxLayoutWithTriggerSlot___findChildren_setList3(void* ptr, void* i)
-{
-	static_cast<QList<QObject*>*>(ptr)->append(static_cast<QObject*>(i));
-}
-
-void* QRoomVBoxLayoutWithTriggerSlot___findChildren_newList3(void* ptr)
-{
-	Q_UNUSED(ptr);
-	return new QList<QObject*>;
-}
-
-void* QRoomVBoxLayoutWithTriggerSlot___findChildren_atList(void* ptr, int i)
-{
-	return const_cast<QObject*>(static_cast<QList<QObject*>*>(ptr)->at(i));
-}
-
-void QRoomVBoxLayoutWithTriggerSlot___findChildren_setList(void* ptr, void* i)
-{
-	static_cast<QList<QObject*>*>(ptr)->append(static_cast<QObject*>(i));
-}
-
-void* QRoomVBoxLayoutWithTriggerSlot___findChildren_newList(void* ptr)
-{
-	Q_UNUSED(ptr);
-	return new QList<QObject*>;
-}
-
-void* QRoomVBoxLayoutWithTriggerSlot___children_atList(void* ptr, int i)
-{
-	return const_cast<QObject*>(static_cast<QList<QObject *>*>(ptr)->at(i));
-}
-
-void QRoomVBoxLayoutWithTriggerSlot___children_setList(void* ptr, void* i)
-{
-	static_cast<QList<QObject *>*>(ptr)->append(static_cast<QObject*>(i));
-}
-
-void* QRoomVBoxLayoutWithTriggerSlot___children_newList(void* ptr)
-{
-	Q_UNUSED(ptr);
-	return new QList<QObject *>;
-}
-
-void* QRoomVBoxLayoutWithTriggerSlot_NewQRoomVBoxLayoutWithTriggerSlot()
-{
-	return new QRoomVBoxLayoutWithTriggerSlot();
-}
-
-void* QRoomVBoxLayoutWithTriggerSlot_NewQRoomVBoxLayoutWithTriggerSlot2(void* parent)
-{
-		return new QRoomVBoxLayoutWithTriggerSlot(static_cast<QWidget*>(parent));
-}
-
-void QRoomVBoxLayoutWithTriggerSlot_DestroyQRoomVBoxLayoutWithTriggerSlot(void* ptr)
-{
-	static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->~QRoomVBoxLayoutWithTriggerSlot();
-}
-
-void* QRoomVBoxLayoutWithTriggerSlot_TakeAtDefault(void* ptr, int index)
-{
-	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::takeAt(index);
-}
-
-void QRoomVBoxLayoutWithTriggerSlot_AddItemDefault(void* ptr, void* item)
-{
-	static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::addItem(static_cast<QLayoutItem*>(item));
-}
-
-void QRoomVBoxLayoutWithTriggerSlot_InvalidateDefault(void* ptr)
-{
-	static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::invalidate();
-}
-
-void QRoomVBoxLayoutWithTriggerSlot_SetGeometryDefault(void* ptr, void* r)
-{
-	static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::setGeometry(*static_cast<QRect*>(r));
-}
-
-void* QRoomVBoxLayoutWithTriggerSlot_ItemAtDefault(void* ptr, int index)
-{
-	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::itemAt(index);
-}
-
-void* QRoomVBoxLayoutWithTriggerSlot_MaximumSizeDefault(void* ptr)
-{
-	return ({ QSize tmpValue = static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::maximumSize(); new QSize(tmpValue.width(), tmpValue.height()); });
-}
-
-void* QRoomVBoxLayoutWithTriggerSlot_MinimumSizeDefault(void* ptr)
-{
-	return ({ QSize tmpValue = static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::minimumSize(); new QSize(tmpValue.width(), tmpValue.height()); });
-}
-
-void* QRoomVBoxLayoutWithTriggerSlot_SizeHintDefault(void* ptr)
-{
-	return ({ QSize tmpValue = static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::sizeHint(); new QSize(tmpValue.width(), tmpValue.height()); });
-}
-
-long long QRoomVBoxLayoutWithTriggerSlot_ExpandingDirectionsDefault(void* ptr)
-{
-	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::expandingDirections();
-}
-
-char QRoomVBoxLayoutWithTriggerSlot_HasHeightForWidthDefault(void* ptr)
-{
-	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::hasHeightForWidth();
-}
-
-int QRoomVBoxLayoutWithTriggerSlot_CountDefault(void* ptr)
-{
-	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::count();
-}
-
-int QRoomVBoxLayoutWithTriggerSlot_HeightForWidthDefault(void* ptr, int w)
-{
-	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::heightForWidth(w);
-}
-
-int QRoomVBoxLayoutWithTriggerSlot_MinimumHeightForWidthDefault(void* ptr, int w)
-{
-	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::minimumHeightForWidth(w);
-}
-
-void* QRoomVBoxLayoutWithTriggerSlot_LayoutDefault(void* ptr)
-{
-	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::layout();
-}
-
-void QRoomVBoxLayoutWithTriggerSlot_ChildEventDefault(void* ptr, void* e)
-{
-	static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::childEvent(static_cast<QChildEvent*>(e));
-}
-
-void* QRoomVBoxLayoutWithTriggerSlot_GeometryDefault(void* ptr)
-{
-	return ({ QRect tmpValue = static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::geometry(); new QRect(tmpValue.x(), tmpValue.y(), tmpValue.width(), tmpValue.height()); });
-}
-
-long long QRoomVBoxLayoutWithTriggerSlot_ControlTypesDefault(void* ptr)
-{
-	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::controlTypes();
-}
-
-char QRoomVBoxLayoutWithTriggerSlot_IsEmptyDefault(void* ptr)
-{
-	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::isEmpty();
-}
-
-int QRoomVBoxLayoutWithTriggerSlot_IndexOfDefault(void* ptr, void* widget)
-{
-	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::indexOf(static_cast<QWidget*>(widget));
-}
-
-char QRoomVBoxLayoutWithTriggerSlot_EventDefault(void* ptr, void* e)
-{
-	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::event(static_cast<QEvent*>(e));
-}
-
-char QRoomVBoxLayoutWithTriggerSlot_EventFilterDefault(void* ptr, void* watched, void* event)
-{
-	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::eventFilter(static_cast<QObject*>(watched), static_cast<QEvent*>(event));
-}
-
-void QRoomVBoxLayoutWithTriggerSlot_ConnectNotifyDefault(void* ptr, void* sign)
-{
-	static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::connectNotify(*static_cast<QMetaMethod*>(sign));
-}
-
-void QRoomVBoxLayoutWithTriggerSlot_CustomEventDefault(void* ptr, void* event)
-{
-	static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::customEvent(static_cast<QEvent*>(event));
-}
-
-void QRoomVBoxLayoutWithTriggerSlot_DeleteLaterDefault(void* ptr)
-{
-	static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::deleteLater();
-}
-
-void QRoomVBoxLayoutWithTriggerSlot_DisconnectNotifyDefault(void* ptr, void* sign)
-{
-	static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::disconnectNotify(*static_cast<QMetaMethod*>(sign));
-}
-
-void QRoomVBoxLayoutWithTriggerSlot_TimerEventDefault(void* ptr, void* event)
-{
-	static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::timerEvent(static_cast<QTimerEvent*>(event));
-}
-
-
-
-void* QRoomVBoxLayoutWithTriggerSlot_SpacerItemDefault(void* ptr)
-{
-	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::spacerItem();
-}
-
-void* QRoomVBoxLayoutWithTriggerSlot_WidgetDefault(void* ptr)
-{
-	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::widget();
-}
-
 void QVBoxLayoutWithTriggerSlot_TriggerMessage(void* ptr, struct Moc_PackedString messageBody, struct Moc_PackedString sender)
 {
 	QMetaObject::invokeMethod(static_cast<QVBoxLayoutWithTriggerSlot*>(ptr), "TriggerMessage", Q_ARG(QString, QString::fromUtf8(messageBody.data, messageBody.len)), Q_ARG(QString, QString::fromUtf8(sender.data, sender.len)));
@@ -663,6 +393,276 @@ void* QVBoxLayoutWithTriggerSlot_SpacerItemDefault(void* ptr)
 void* QVBoxLayoutWithTriggerSlot_WidgetDefault(void* ptr)
 {
 	return static_cast<QVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::widget();
+}
+
+void QRoomVBoxLayoutWithTriggerSlot_TriggerMessage(void* ptr, struct Moc_PackedString messageBody, struct Moc_PackedString sender)
+{
+	QMetaObject::invokeMethod(static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr), "TriggerMessage", Q_ARG(QString, QString::fromUtf8(messageBody.data, messageBody.len)), Q_ARG(QString, QString::fromUtf8(sender.data, sender.len)));
+}
+
+int QRoomVBoxLayoutWithTriggerSlot_QRoomVBoxLayoutWithTriggerSlot_QRegisterMetaType()
+{
+	return qRegisterMetaType<QRoomVBoxLayoutWithTriggerSlot*>();
+}
+
+int QRoomVBoxLayoutWithTriggerSlot_QRoomVBoxLayoutWithTriggerSlot_QRegisterMetaType2(char* typeName)
+{
+	return qRegisterMetaType<QRoomVBoxLayoutWithTriggerSlot*>(const_cast<const char*>(typeName));
+}
+
+int QRoomVBoxLayoutWithTriggerSlot_QRoomVBoxLayoutWithTriggerSlot_QmlRegisterType()
+{
+#ifdef QT_QML_LIB
+	return qmlRegisterType<QRoomVBoxLayoutWithTriggerSlot>();
+#else
+	return 0;
+#endif
+}
+
+int QRoomVBoxLayoutWithTriggerSlot_QRoomVBoxLayoutWithTriggerSlot_QmlRegisterType2(char* uri, int versionMajor, int versionMinor, char* qmlName)
+{
+#ifdef QT_QML_LIB
+	return qmlRegisterType<QRoomVBoxLayoutWithTriggerSlot>(const_cast<const char*>(uri), versionMajor, versionMinor, const_cast<const char*>(qmlName));
+#else
+	return 0;
+#endif
+}
+
+void* QRoomVBoxLayoutWithTriggerSlot___dynamicPropertyNames_atList(void* ptr, int i)
+{
+	return new QByteArray(static_cast<QList<QByteArray>*>(ptr)->at(i));
+}
+
+void QRoomVBoxLayoutWithTriggerSlot___dynamicPropertyNames_setList(void* ptr, void* i)
+{
+	static_cast<QList<QByteArray>*>(ptr)->append(*static_cast<QByteArray*>(i));
+}
+
+void* QRoomVBoxLayoutWithTriggerSlot___dynamicPropertyNames_newList(void* ptr)
+{
+	Q_UNUSED(ptr);
+	return new QList<QByteArray>;
+}
+
+void* QRoomVBoxLayoutWithTriggerSlot___findChildren_atList2(void* ptr, int i)
+{
+	return const_cast<QObject*>(static_cast<QList<QObject*>*>(ptr)->at(i));
+}
+
+void QRoomVBoxLayoutWithTriggerSlot___findChildren_setList2(void* ptr, void* i)
+{
+	static_cast<QList<QObject*>*>(ptr)->append(static_cast<QObject*>(i));
+}
+
+void* QRoomVBoxLayoutWithTriggerSlot___findChildren_newList2(void* ptr)
+{
+	Q_UNUSED(ptr);
+	return new QList<QObject*>;
+}
+
+void* QRoomVBoxLayoutWithTriggerSlot___findChildren_atList3(void* ptr, int i)
+{
+	return const_cast<QObject*>(static_cast<QList<QObject*>*>(ptr)->at(i));
+}
+
+void QRoomVBoxLayoutWithTriggerSlot___findChildren_setList3(void* ptr, void* i)
+{
+	static_cast<QList<QObject*>*>(ptr)->append(static_cast<QObject*>(i));
+}
+
+void* QRoomVBoxLayoutWithTriggerSlot___findChildren_newList3(void* ptr)
+{
+	Q_UNUSED(ptr);
+	return new QList<QObject*>;
+}
+
+void* QRoomVBoxLayoutWithTriggerSlot___findChildren_atList(void* ptr, int i)
+{
+	return const_cast<QObject*>(static_cast<QList<QObject*>*>(ptr)->at(i));
+}
+
+void QRoomVBoxLayoutWithTriggerSlot___findChildren_setList(void* ptr, void* i)
+{
+	static_cast<QList<QObject*>*>(ptr)->append(static_cast<QObject*>(i));
+}
+
+void* QRoomVBoxLayoutWithTriggerSlot___findChildren_newList(void* ptr)
+{
+	Q_UNUSED(ptr);
+	return new QList<QObject*>;
+}
+
+void* QRoomVBoxLayoutWithTriggerSlot___children_atList(void* ptr, int i)
+{
+	return const_cast<QObject*>(static_cast<QList<QObject *>*>(ptr)->at(i));
+}
+
+void QRoomVBoxLayoutWithTriggerSlot___children_setList(void* ptr, void* i)
+{
+	static_cast<QList<QObject *>*>(ptr)->append(static_cast<QObject*>(i));
+}
+
+void* QRoomVBoxLayoutWithTriggerSlot___children_newList(void* ptr)
+{
+	Q_UNUSED(ptr);
+	return new QList<QObject *>;
+}
+
+void* QRoomVBoxLayoutWithTriggerSlot_NewQRoomVBoxLayoutWithTriggerSlot()
+{
+	return new QRoomVBoxLayoutWithTriggerSlot();
+}
+
+void* QRoomVBoxLayoutWithTriggerSlot_NewQRoomVBoxLayoutWithTriggerSlot2(void* parent)
+{
+		return new QRoomVBoxLayoutWithTriggerSlot(static_cast<QWidget*>(parent));
+}
+
+void QRoomVBoxLayoutWithTriggerSlot_DestroyQRoomVBoxLayoutWithTriggerSlot(void* ptr)
+{
+	static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->~QRoomVBoxLayoutWithTriggerSlot();
+}
+
+void* QRoomVBoxLayoutWithTriggerSlot_TakeAtDefault(void* ptr, int index)
+{
+	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::takeAt(index);
+}
+
+void QRoomVBoxLayoutWithTriggerSlot_AddItemDefault(void* ptr, void* item)
+{
+	static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::addItem(static_cast<QLayoutItem*>(item));
+}
+
+void QRoomVBoxLayoutWithTriggerSlot_InvalidateDefault(void* ptr)
+{
+	static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::invalidate();
+}
+
+void QRoomVBoxLayoutWithTriggerSlot_SetGeometryDefault(void* ptr, void* r)
+{
+	static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::setGeometry(*static_cast<QRect*>(r));
+}
+
+void* QRoomVBoxLayoutWithTriggerSlot_ItemAtDefault(void* ptr, int index)
+{
+	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::itemAt(index);
+}
+
+void* QRoomVBoxLayoutWithTriggerSlot_MaximumSizeDefault(void* ptr)
+{
+	return ({ QSize tmpValue = static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::maximumSize(); new QSize(tmpValue.width(), tmpValue.height()); });
+}
+
+void* QRoomVBoxLayoutWithTriggerSlot_MinimumSizeDefault(void* ptr)
+{
+	return ({ QSize tmpValue = static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::minimumSize(); new QSize(tmpValue.width(), tmpValue.height()); });
+}
+
+void* QRoomVBoxLayoutWithTriggerSlot_SizeHintDefault(void* ptr)
+{
+	return ({ QSize tmpValue = static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::sizeHint(); new QSize(tmpValue.width(), tmpValue.height()); });
+}
+
+long long QRoomVBoxLayoutWithTriggerSlot_ExpandingDirectionsDefault(void* ptr)
+{
+	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::expandingDirections();
+}
+
+char QRoomVBoxLayoutWithTriggerSlot_HasHeightForWidthDefault(void* ptr)
+{
+	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::hasHeightForWidth();
+}
+
+int QRoomVBoxLayoutWithTriggerSlot_CountDefault(void* ptr)
+{
+	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::count();
+}
+
+int QRoomVBoxLayoutWithTriggerSlot_HeightForWidthDefault(void* ptr, int w)
+{
+	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::heightForWidth(w);
+}
+
+int QRoomVBoxLayoutWithTriggerSlot_MinimumHeightForWidthDefault(void* ptr, int w)
+{
+	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::minimumHeightForWidth(w);
+}
+
+void* QRoomVBoxLayoutWithTriggerSlot_LayoutDefault(void* ptr)
+{
+	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::layout();
+}
+
+void QRoomVBoxLayoutWithTriggerSlot_ChildEventDefault(void* ptr, void* e)
+{
+	static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::childEvent(static_cast<QChildEvent*>(e));
+}
+
+void* QRoomVBoxLayoutWithTriggerSlot_GeometryDefault(void* ptr)
+{
+	return ({ QRect tmpValue = static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::geometry(); new QRect(tmpValue.x(), tmpValue.y(), tmpValue.width(), tmpValue.height()); });
+}
+
+long long QRoomVBoxLayoutWithTriggerSlot_ControlTypesDefault(void* ptr)
+{
+	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::controlTypes();
+}
+
+char QRoomVBoxLayoutWithTriggerSlot_IsEmptyDefault(void* ptr)
+{
+	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::isEmpty();
+}
+
+int QRoomVBoxLayoutWithTriggerSlot_IndexOfDefault(void* ptr, void* widget)
+{
+	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::indexOf(static_cast<QWidget*>(widget));
+}
+
+char QRoomVBoxLayoutWithTriggerSlot_EventDefault(void* ptr, void* e)
+{
+	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::event(static_cast<QEvent*>(e));
+}
+
+char QRoomVBoxLayoutWithTriggerSlot_EventFilterDefault(void* ptr, void* watched, void* event)
+{
+	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::eventFilter(static_cast<QObject*>(watched), static_cast<QEvent*>(event));
+}
+
+void QRoomVBoxLayoutWithTriggerSlot_ConnectNotifyDefault(void* ptr, void* sign)
+{
+	static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::connectNotify(*static_cast<QMetaMethod*>(sign));
+}
+
+void QRoomVBoxLayoutWithTriggerSlot_CustomEventDefault(void* ptr, void* event)
+{
+	static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::customEvent(static_cast<QEvent*>(event));
+}
+
+void QRoomVBoxLayoutWithTriggerSlot_DeleteLaterDefault(void* ptr)
+{
+	static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::deleteLater();
+}
+
+void QRoomVBoxLayoutWithTriggerSlot_DisconnectNotifyDefault(void* ptr, void* sign)
+{
+	static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::disconnectNotify(*static_cast<QMetaMethod*>(sign));
+}
+
+void QRoomVBoxLayoutWithTriggerSlot_TimerEventDefault(void* ptr, void* event)
+{
+	static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::timerEvent(static_cast<QTimerEvent*>(event));
+}
+
+
+
+void* QRoomVBoxLayoutWithTriggerSlot_SpacerItemDefault(void* ptr)
+{
+	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::spacerItem();
+}
+
+void* QRoomVBoxLayoutWithTriggerSlot_WidgetDefault(void* ptr)
+{
+	return static_cast<QRoomVBoxLayoutWithTriggerSlot*>(ptr)->QVBoxLayout::widget();
 }
 
 #include "moc_moc.h"

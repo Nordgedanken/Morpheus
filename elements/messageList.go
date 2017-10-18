@@ -68,8 +68,15 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 	messageContent.SetText(markdownMessage)
 
 	senderDisplayNameResp, _ := cli.GetDisplayName(sender)
-	fmt.Println(senderDisplayNameResp)
-	senderDisplayName := senderDisplayNameResp.DisplayName
+	var senderDisplayName string
+	if senderDisplayNameResp == nil {
+		senderDisplayName = sender
+	} else if senderDisplayNameResp.DisplayName == "" {
+		senderDisplayName = sender
+	} else {
+		senderDisplayName = senderDisplayNameResp.DisplayName
+	}
+	fmt.Println(senderDisplayName)
 	senderContent.SetText(senderDisplayName)
 	avatarLogo.SetPixmap(avatar)
 

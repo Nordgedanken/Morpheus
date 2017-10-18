@@ -45,6 +45,24 @@ func main() {
 	app.SetWindowIcon(appIcon)
 
 	window = widgets.NewQMainWindow(nil, 0)
+	/*window.SetWindowFlags(core.Qt__FramelessWindowHint)
+	var dragPositionX int
+	var dragPositionY int
+	window.ConnectMousePressEvent(func(event *gui.QMouseEvent) {
+		if event.Button() == core.Qt__LeftButton {
+			dragPositionX = event.GlobalX() - window.FrameGeometry().TopLeft().X()
+			dragPositionY = event.GlobalY() - window.FrameGeometry().TopLeft().Y()
+			event.Accept()
+		}
+	})
+
+	window.ConnectMouseMoveEvent(func(event *gui.QMouseEvent) {
+		if event.Button() == core.Qt__LeftButton {
+			window.Move2(event.GlobalX()-dragPositionX, event.GlobalY()-dragPositionY)
+			event.Accept()
+		}
+	})*/
+
 	windowHeight := 600
 	windowWidth := 950
 

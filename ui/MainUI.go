@@ -89,16 +89,17 @@ func (m *MainUI) NewUI() (err error) {
 
 	m.window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
 		widget.Resize2(event.Size().Width(), event.Size().Height())
-
+		event.Accept()
 	})
 
 	widget.ConnectResizeEvent(func(event *gui.QResizeEvent) {
 		mainWidget.Resize2(event.Size().Width(), event.Size().Height())
-
+		event.Accept()
 	})
 
 	messageScrollArea.ConnectResizeEvent(func(event *gui.QResizeEvent) {
 		messageScrollArea.Resize(event.Size())
+		event.Accept()
 	})
 
 	//Set Avatar
@@ -151,8 +152,10 @@ func (m *MainUI) NewUI() (err error) {
 			}
 
 			messageInput.Clear()
+			ev.Accept()
 		} else {
 			messageInput.KeyPressEventDefault(ev)
+			ev.Ignore()
 		}
 	})
 
