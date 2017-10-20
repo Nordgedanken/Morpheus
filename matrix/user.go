@@ -1,29 +1,30 @@
 package matrix
 
 import (
+	"bytes"
+	"image"
+	"image/color"
+	"image/draw"
+	"image/png"
 	"log"
 	"os"
+	"strconv"
 	"strings"
+	"unicode"
+	"unicode/utf8"
 
-	"bytes"
 	"github.com/Nordgedanken/Morpheus/util"
 	"github.com/disintegration/letteravatar"
 	"github.com/matrix-org/gomatrix"
 	"github.com/therecipe/qt/gui"
 	"github.com/tidwall/buntdb"
-	"image"
-	"image/color"
-	"image/draw"
+
 	// image/jpeg needed to load jpeg images
 	_ "image/jpeg"
 	// golang.org/x/image/webp needed to load webp images
 	_ "golang.org/x/image/webp"
 	// golang.org/x/image/bmp needed to load bmp images
 	_ "golang.org/x/image/bmp"
-	"image/png"
-	"strconv"
-	"unicode"
-	"unicode/utf8"
 )
 
 var localLog *log.Logger
@@ -106,7 +107,7 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 
 	// Get cache
 	DBErr := db.View(func(tx *buntdb.Tx) error {
-		QueryErr := tx.AscendKeys("user:"+mxid+":avatarData"+strconv.Itoa(size)+"x"+strconv.Itoa(size),
+		QueryErr := tx.AscendKeys("user|"+mxid+"|avatarData"+strconv.Itoa(size)+"x"+strconv.Itoa(size),
 			func(key, value string) bool {
 				avatarData = value
 				return true
@@ -160,7 +161,7 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 
 		// Update cache
 		DBerr := db.Update(func(tx *buntdb.Tx) error {
-			_, _, DBSetErr := tx.Set("user:"+mxid+":avatarData"+strconv.Itoa(size)+"x"+strconv.Itoa(size), IMGdata, nil)
+			_, _, DBSetErr := tx.Set("user|"+mxid+"|avatarData"+strconv.Itoa(size)+"x"+strconv.Itoa(size), IMGdata, nil)
 			return DBSetErr
 		})
 		if DBerr != nil {

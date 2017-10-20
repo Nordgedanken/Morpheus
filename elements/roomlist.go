@@ -2,8 +2,6 @@ package elements
 
 import (
 	"github.com/Nordgedanken/Morpheus/matrix"
-	"github.com/matrix-org/gomatrix"
-	"github.com/rhinoman/go-commonmark"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
@@ -24,7 +22,7 @@ import (
 type QRoomVBoxLayoutWithTriggerSlot struct {
 	widgets.QVBoxLayout
 
-	_ func(messageBody, sender string) `slot:"TriggerMessage"`
+	_ func(roomID string) `slot:"TriggerRoom"`
 }
 
 // NewRoomList generates a new QRoomVBoxLayoutWithTriggerSlot and adds it to the room scrollArea
@@ -41,45 +39,43 @@ func NewRoomList(scrollArea *widgets.QScrollArea, roomView *widgets.QWidget) (ro
 }
 
 // NewRoom adds a new room object to the view
-func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(body string, cli *gomatrix.Client, sender string, scrollArea *widgets.QScrollArea) (err error) {
-	avatar, AvatarErr := matrix.GetUserAvatar(cli, sender, 84)
-	if err != nil {
-		err = AvatarErr
+func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room, scrollArea *widgets.QScrollArea) (err error) {
+	roomAvatar, roomAvatarErr := room.GetRoomAvatar()
+	if roomAvatarErr != nil {
+		err = roomAvatarErr
 		return
 	}
 
 	var widget = widgets.NewQWidget(nil, 0)
 
 	var loader = uitools.NewQUiLoader(nil)
-	var file = core.NewQFile2(":/qml/ui/message.ui")
+	var file = core.NewQFile2(":/qml/ui/room.ui")
 
 	file.Open(core.QIODevice__ReadOnly)
 	var wrapperWidget = loader.Load(file, widget)
 	file.Close()
 
-	messageWidget := widgets.NewQWidgetFromPointer(widget.FindChild("message", core.Qt__FindChildrenRecursively).Pointer())
-	avatarLogo := widgets.NewQLabelFromPointer(widget.FindChild("avatar", core.Qt__FindChildrenRecursively).Pointer())
-	messageContent := widgets.NewQLabelFromPointer(widget.FindChild("messageContent", core.Qt__FindChildrenRecursively).Pointer())
-	senderContent := widgets.NewQLabelFromPointer(widget.FindChild("sender", core.Qt__FindChildrenRecursively).Pointer())
+	roomWidget := widgets.NewQWidgetFromPointer(widget.FindChild("room", core.Qt__FindChildrenRecursively).Pointer())
+	roomAvatarQLabel := widgets.NewQLabelFromPointer(widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
+	roomName := widgets.NewQLabelFromPointer(widget.FindChild("roomName", core.Qt__FindChildrenRecursively).Pointer())
+	/*lastMessageContent := widgets.NewQLabelFromPointer(widget.FindChild("lastMessage", core.Qt__FindChildrenRecursively).Pointer())*/
 
-	markdownMessage := commonmark.Md2Html(body, 0)
+	roomAvatarQLabel.SetPixmap(roomAvatar)
+	roomName.SetText(room.GetRoomName())
 
-	messageContent.SetText(markdownMessage)
+	/*
+		messageContent.SetText(markdownMessage)
 
-	senderDisplayNameResp, _ := cli.GetDisplayName(sender)
-	senderDisplayName := senderDisplayNameResp.DisplayName
-	senderContent.SetText(senderDisplayName)
-	avatarLogo.SetPixmap(avatar)
+		messageContent.SetMinimumWidth(messageContent.LineWidth())
 
-	messageContent.SetMinimumWidth(messageContent.LineWidth())
-
-	messageWidget.SetMinimumWidth(messageContent.LineWidth() + 100)
-	messageWidget.Resize(wrapperWidget.Size())
+		roomWidget.SetMinimumWidth(messageContent.LineWidth() + 100)
+	*/
+	roomWidget.Resize(wrapperWidget.Size())
 
 	roomViewLayout.SetSpacing(1)
 	roomViewLayout.SetContentsMargins(0, 0, 0, 0)
 
-	roomViewLayout.AddWidget(messageWidget, 0, core.Qt__AlignBottom)
+	roomViewLayout.AddWidget(roomWidget, 0, core.Qt__AlignBottom)
 	scrollArea.Widget().SetLayout(roomViewLayout)
 
 	return

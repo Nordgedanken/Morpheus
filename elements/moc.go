@@ -77,48 +77,43 @@ func callbackQRoomVBoxLayoutWithTriggerSlot_Constructor(ptr unsafe.Pointer) {
 	qt.Register(ptr, gPtr)
 }
 
-//export callbackQRoomVBoxLayoutWithTriggerSlot_TriggerMessage
-func callbackQRoomVBoxLayoutWithTriggerSlot_TriggerMessage(ptr unsafe.Pointer, messageBody C.struct_Moc_PackedString, sender C.struct_Moc_PackedString) {
-	if signal := qt.GetSignal(ptr, "TriggerMessage"); signal != nil {
-		signal.(func(string, string))(cGoUnpackString(messageBody), cGoUnpackString(sender))
+//export callbackQRoomVBoxLayoutWithTriggerSlot_TriggerRoom
+func callbackQRoomVBoxLayoutWithTriggerSlot_TriggerRoom(ptr unsafe.Pointer, roomID C.struct_Moc_PackedString) {
+	if signal := qt.GetSignal(ptr, "TriggerRoom"); signal != nil {
+		signal.(func(string))(cGoUnpackString(roomID))
 	}
 
 }
 
-func (ptr *QRoomVBoxLayoutWithTriggerSlot) ConnectTriggerMessage(f func(messageBody string, sender string)) {
+func (ptr *QRoomVBoxLayoutWithTriggerSlot) ConnectTriggerRoom(f func(roomID string)) {
 	if ptr.Pointer() != nil {
 
-		if signal := qt.LendSignal(ptr.Pointer(), "TriggerMessage"); signal != nil {
-			qt.ConnectSignal(ptr.Pointer(), "TriggerMessage", func(messageBody string, sender string) {
-				signal.(func(string, string))(messageBody, sender)
-				f(messageBody, sender)
+		if signal := qt.LendSignal(ptr.Pointer(), "TriggerRoom"); signal != nil {
+			qt.ConnectSignal(ptr.Pointer(), "TriggerRoom", func(roomID string) {
+				signal.(func(string))(roomID)
+				f(roomID)
 			})
 		} else {
-			qt.ConnectSignal(ptr.Pointer(), "TriggerMessage", f)
+			qt.ConnectSignal(ptr.Pointer(), "TriggerRoom", f)
 		}
 	}
 }
 
-func (ptr *QRoomVBoxLayoutWithTriggerSlot) DisconnectTriggerMessage() {
+func (ptr *QRoomVBoxLayoutWithTriggerSlot) DisconnectTriggerRoom() {
 	if ptr.Pointer() != nil {
 
-		qt.DisconnectSignal(ptr.Pointer(), "TriggerMessage")
+		qt.DisconnectSignal(ptr.Pointer(), "TriggerRoom")
 	}
 }
 
-func (ptr *QRoomVBoxLayoutWithTriggerSlot) TriggerMessage(messageBody string, sender string) {
+func (ptr *QRoomVBoxLayoutWithTriggerSlot) TriggerRoom(roomID string) {
 	if ptr.Pointer() != nil {
-		var messageBodyC *C.char
-		if messageBody != "" {
-			messageBodyC = C.CString(messageBody)
-			defer C.free(unsafe.Pointer(messageBodyC))
+		var roomIDC *C.char
+		if roomID != "" {
+			roomIDC = C.CString(roomID)
+			defer C.free(unsafe.Pointer(roomIDC))
 		}
-		var senderC *C.char
-		if sender != "" {
-			senderC = C.CString(sender)
-			defer C.free(unsafe.Pointer(senderC))
-		}
-		C.QRoomVBoxLayoutWithTriggerSlot_TriggerMessage(ptr.Pointer(), C.struct_Moc_PackedString{data: messageBodyC, len: C.longlong(len(messageBody))}, C.struct_Moc_PackedString{data: senderC, len: C.longlong(len(sender))})
+		C.QRoomVBoxLayoutWithTriggerSlot_TriggerRoom(ptr.Pointer(), C.struct_Moc_PackedString{data: roomIDC, len: C.longlong(len(roomID))})
 	}
 }
 

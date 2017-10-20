@@ -561,7 +561,7 @@ border-radius: 5px;</string>
        </widget>
       </item>
       <item>
-       <widget class="QScrollArea" name="roomBarArea">
+       <widget class="QScrollArea" name="roomScroll">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
           <horstretch>0</horstretch>
@@ -589,7 +589,7 @@ border-radius: 5px;</string>
         <property name="alignment">
          <set>Qt::AlignBottom|Qt::AlignLeading|Qt::AlignLeft</set>
         </property>
-        <widget class="QWidget" name="scrollAreaWidgetContents_2">
+        <widget class="QWidget" name="roomScrollAreaContent">
          <property name="geometry">
           <rect>
            <x>0</x>

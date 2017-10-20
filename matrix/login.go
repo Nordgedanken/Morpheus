@@ -1,12 +1,12 @@
 package matrix
 
 import (
+	"log"
 	"strings"
+	"sync"
 
 	"github.com/matrix-org/gomatrix"
 	"github.com/tidwall/buntdb"
-	"log"
-	"sync"
 )
 
 //GetClient returns a Client
@@ -23,22 +23,18 @@ func GetClient(homeserverURL, userID, accessToken string) (client *gomatrix.Clie
 		return
 	}
 
-	if db == nil {
-		localLog.Println("FUCK")
-	}
-
 	DBErr := db.Update(func(tx *buntdb.Tx) error {
-		_, _, DBSetAccessTokenErr := tx.Set("user:accessToken", client.AccessToken, nil)
+		_, _, DBSetAccessTokenErr := tx.Set("user|accessToken", client.AccessToken, nil)
 		if DBSetAccessTokenErr != nil {
 			return DBSetAccessTokenErr
 		}
 
-		_, _, DBSetHomeserverURLErr := tx.Set("user:homeserverURL", client.HomeserverURL.String(), nil)
+		_, _, DBSetHomeserverURLErr := tx.Set("user|homeserverURL", client.HomeserverURL.String(), nil)
 		if DBSetHomeserverURLErr != nil {
 			return DBSetHomeserverURLErr
 		}
 
-		_, _, DBSetUserIDErr := tx.Set("user:userID", client.UserID, nil)
+		_, _, DBSetUserIDErr := tx.Set("user|userID", client.UserID, nil)
 		return DBSetUserIDErr
 	})
 	if DBErr != nil {
@@ -82,22 +78,22 @@ func LoginUser(username, password string) (*gomatrix.Client, error) {
 	defer db.Close()
 	cli.SetCredentials(resp.UserID, resp.AccessToken)
 	DBerr := db.Update(func(tx *buntdb.Tx) error {
-		_, _, DBSetAccessTokenErr := tx.Set("user:accessToken", resp.AccessToken, nil)
+		_, _, DBSetAccessTokenErr := tx.Set("user|accessToken", resp.AccessToken, nil)
 		if DBSetAccessTokenErr != nil {
 			return DBSetAccessTokenErr
 		}
 
-		_, _, DBSetDeviceIDErr := tx.Set("user:deviceID", resp.DeviceID, nil)
+		_, _, DBSetDeviceIDErr := tx.Set("user|deviceID", resp.DeviceID, nil)
 		if DBSetDeviceIDErr != nil {
 			return DBSetDeviceIDErr
 		}
 
-		_, _, DBSetHomeserverURLErr := tx.Set("user:homeserverURL", resp.HomeServer, nil)
+		_, _, DBSetHomeserverURLErr := tx.Set("user|homeserverURL", resp.HomeServer, nil)
 		if DBSetHomeserverURLErr != nil {
 			return DBSetHomeserverURLErr
 		}
 
-		_, _, DBSetUserIDErr := tx.Set("user:userID", resp.UserID, nil)
+		_, _, DBSetUserIDErr := tx.Set("user|userID", resp.UserID, nil)
 		return DBSetUserIDErr
 	})
 	if DBerr != nil {

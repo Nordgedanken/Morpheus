@@ -17,7 +17,7 @@ extern "C" {
 
 struct Moc_PackedString { char* data; long long len; };
 struct Moc_PackedList { void* data; long long len; };
-void QRoomVBoxLayoutWithTriggerSlot_TriggerMessage(void* ptr, struct Moc_PackedString messageBody, struct Moc_PackedString sender);
+void QRoomVBoxLayoutWithTriggerSlot_TriggerRoom(void* ptr, struct Moc_PackedString roomID);
 int QRoomVBoxLayoutWithTriggerSlot_QRoomVBoxLayoutWithTriggerSlot_QRegisterMetaType();
 int QRoomVBoxLayoutWithTriggerSlot_QRoomVBoxLayoutWithTriggerSlot_QRegisterMetaType2(char* typeName);
 int QRoomVBoxLayoutWithTriggerSlot_QRoomVBoxLayoutWithTriggerSlot_QmlRegisterType();

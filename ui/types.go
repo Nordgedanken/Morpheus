@@ -1,9 +1,11 @@
 package ui
 
 import (
+	"log"
+
+	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/matrix-org/gomatrix"
 	"github.com/therecipe/qt/widgets"
-	"log"
 )
 
 // Config holds important reused information in the UI
@@ -26,9 +28,12 @@ type logger struct {
 type MainUI struct {
 	logger
 	config
-	widget *widgets.QWidget
-	window *widgets.QMainWindow
-	syncer *gomatrix.DefaultSyncer
+	widget      *widgets.QWidget
+	window      *widgets.QMainWindow
+	syncer      *gomatrix.DefaultSyncer
+	storage     *gomatrix.InMemoryStore
+	rooms       map[string]*matrix.Room
+	currentRoom string
 }
 
 // LoginUI holds information about the LoginUI

@@ -1,6 +1,10 @@
 package ui
 
 import (
+	"fmt"
+	"log"
+	"sync"
+
 	"github.com/Nordgedanken/Morpheus/elements"
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/util"
@@ -11,8 +15,6 @@ import (
 	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
 	"github.com/tidwall/buntdb"
-	"log"
-	"sync"
 )
 
 // NewMainUIStruct gives you a MainUI struct with prefilled data
@@ -24,6 +26,7 @@ func NewMainUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow)
 	mainUIStruct = MainUI{
 		config: configStruct,
 		window: window,
+		rooms:  make(map[string]*matrix.Room),
 	}
 	return
 }
@@ -61,6 +64,7 @@ func (m *MainUI) InitLogger() error {
 
 // NewUI initializes a new Main Screen
 func (m *MainUI) NewUI() (err error) {
+	fmt.Println((m.window.Width() / 3) / 2)
 	var widget = widgets.NewQWidget(nil, 0)
 
 	var loader = uitools.NewQUiLoader(nil)
@@ -78,6 +82,8 @@ func (m *MainUI) NewUI() (err error) {
 
 	messageScrollArea := widgets.NewQScrollAreaFromPointer(widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
 	messagesScrollAreaContent := widgets.NewQWidgetFromPointer(widget.FindChild("messagesScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
+	roomScrollArea := widgets.NewQScrollAreaFromPointer(widget.FindChild("roomScroll", core.Qt__FindChildrenRecursively).Pointer())
+	roomScrollAreaContent := widgets.NewQWidgetFromPointer(widget.FindChild("roomScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
 
 	mainWidget.SetWindowTitle("Morpheus - MatrixHQ")
 
@@ -99,6 +105,11 @@ func (m *MainUI) NewUI() (err error) {
 
 	messageScrollArea.ConnectResizeEvent(func(event *gui.QResizeEvent) {
 		messageScrollArea.Resize(event.Size())
+		event.Accept()
+	})
+
+	roomScrollArea.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+		roomScrollArea.Resize(event.Size())
 		event.Accept()
 	})
 
@@ -124,18 +135,46 @@ func (m *MainUI) NewUI() (err error) {
 	// Init Message View
 	messageListLayout := elements.NewMessageList(messageScrollArea, messagesScrollAreaContent)
 
-	messageListLayout.ConnectTriggerMessage(func(messageBody, sender string, timestamp int64) {
-		NewMessageErr := messageListLayout.NewMessage(messageBody, m.cli, sender, timestamp, messageScrollArea)
-		if NewMessageErr != nil {
-			err = NewMessageErr
-			return
-		}
-	})
+	// Init Room View
+	roomListLayout := elements.NewRoomList(roomScrollArea, roomScrollAreaContent)
+
 	messageScrollArea.SetWidgetResizable(true)
 	messageScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
 	messageScrollArea.SetContentsMargins(0, 0, 0, 0)
 
+	roomScrollArea.SetWidgetResizable(true)
+	roomScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
+	roomScrollArea.SetContentsMargins(0, 0, 0, 0)
+
+	messageListLayout.ConnectTriggerMessage(func(messageBody, sender string, timestamp int64) {
+		if sender == m.cli.UserID {
+			NewOwnMessageErr := messageListLayout.NewOwnMessage(messageBody, m.cli, sender, timestamp, messageScrollArea)
+			if NewOwnMessageErr != nil {
+				err = NewOwnMessageErr
+				return
+			}
+		} else {
+			NewMessageErr := messageListLayout.NewMessage(messageBody, m.cli, sender, timestamp, messageScrollArea)
+			if NewMessageErr != nil {
+				err = NewMessageErr
+				return
+			}
+		}
+	})
+
 	m.startSync(messageListLayout)
+
+	roomListLayout.ConnectTriggerRoom(func(roomID string) {
+		room := m.rooms[roomID]
+
+		NewRoomErr := roomListLayout.NewRoom(room, roomScrollArea)
+		if NewRoomErr != nil {
+			err = NewRoomErr
+			return
+		}
+	})
+
+	m.initRoomList(roomListLayout)
 
 	var message string
 	messageInput := widgets.NewQLineEditFromPointer(widget.FindChild("MessageInput", core.Qt__FindChildrenRecursively).Pointer())
@@ -249,12 +288,17 @@ func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScr
 func (m *MainUI) startSync(messageListLayout *elements.QVBoxLayoutWithTriggerSlot) (err error) {
 	//Start Syncer!
 	m.syncer = m.cli.Syncer.(*gomatrix.DefaultSyncer)
-	customStore := gomatrix.NewInMemoryStore()
-	m.cli.Store = customStore
-	m.syncer.Store = customStore
+	m.storage = gomatrix.NewInMemoryStore()
+	m.cli.Store = m.storage
+	m.syncer.Store = m.storage
 
 	m.syncer.OnEventType("m.room.message", func(ev *gomatrix.Event) {
-		msg, _ := ev.Body()
+		fomrattedBody, _ := ev.Content["formatted_body"]
+		var msg string
+		msg, _ = fomrattedBody.(string)
+		if msg == "" {
+			msg, _ = ev.Body()
+		}
 		room := ev.RoomID
 		sender := ev.Sender
 		id := ev.ID
@@ -273,5 +317,20 @@ func (m *MainUI) startSync(messageListLayout *elements.QVBoxLayoutWithTriggerSlo
 			}
 		}
 	}()
+	return
+}
+
+func (m *MainUI) initRoomList(roomListLayout *elements.QRoomVBoxLayoutWithTriggerSlot) (err error) {
+	rooms, ReqErr := m.cli.JoinedRooms()
+	if ReqErr != nil {
+		err = ReqErr
+		return
+	}
+
+	for _, roomID := range rooms.JoinedRooms {
+		m.rooms[roomID] = matrix.NewRoom(roomID, m.cli)
+		roomListLayout.TriggerRoom(roomID)
+	}
+
 	return
 }

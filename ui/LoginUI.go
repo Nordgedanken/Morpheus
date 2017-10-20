@@ -1,12 +1,13 @@
 package ui
 
 import (
+	"sync"
+
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/util"
 	"github.com/matrix-org/gomatrix"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/widgets"
-	"sync"
 )
 
 // NewLoginUIStruct gives you a LoginUI struct with prefilled data

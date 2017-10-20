@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"sync"
 
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/ui"
@@ -12,7 +13,6 @@ import (
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
 	"github.com/tidwall/buntdb"
-	"sync"
 )
 
 var window *widgets.QMainWindow
@@ -80,7 +80,7 @@ func main() {
 
 	// Get cache
 	DBErr := db.View(func(tx *buntdb.Tx) error {
-		accessTokenErr := tx.AscendKeys("user:accessToken",
+		accessTokenErr := tx.AscendKeys("user|accessToken",
 			func(key, value string) bool {
 				accessToken = value
 				return true
@@ -88,7 +88,7 @@ func main() {
 		if accessTokenErr != nil {
 			return accessTokenErr
 		}
-		homeserverURLErr := tx.AscendKeys("user:homeserverURL",
+		homeserverURLErr := tx.AscendKeys("user|homeserverURL",
 			func(key, value string) bool {
 				homeserverURL = value
 				return true
@@ -96,7 +96,7 @@ func main() {
 		if homeserverURLErr != nil {
 			return homeserverURLErr
 		}
-		userIDErr := tx.AscendKeys("user:userID",
+		userIDErr := tx.AscendKeys("user|userID",
 			func(key, value string) bool {
 				userID = value
 				return true

@@ -3,11 +3,11 @@ package matrix
 import (
 	"os"
 	"path/filepath"
+	"strconv"
 
 	"github.com/matrix-org/gomatrix"
 	"github.com/shibukawa/configdir"
 	"github.com/tidwall/buntdb"
-	"strconv"
 )
 
 // OpenCacheDB opens or generates the Database file for settings and Cache
@@ -60,15 +60,8 @@ func InitData(cli *gomatrix.Client) (err error) {
 	}
 	defer db.Close()
 
-	roomsURL := cli.BuildURL("joined_rooms")
-	var rooms JoinedRooms
-	_, ReqErr := cli.MakeRequest("GET", roomsURL, nil, &rooms)
-	if ReqErr != nil {
-		err = ReqErr
-		return
-	}
-
-	for _, room := range rooms.JoinedRooms {
+	// Todo Get aliases
+	/*for _, room := range rooms.JoinedRooms {
 		var roomAliases RoomAliases
 		if StateEventErr := cli.StateEvent(room, "m.room.aliases", "", &roomAliases); StateEventErr != nil {
 			localLog.Println(StateEventErr)
@@ -79,7 +72,7 @@ func InitData(cli *gomatrix.Client) (err error) {
 			// Update cache
 			DBerr := db.Update(func(tx *buntdb.Tx) error {
 				localLog.Println(room)
-				_, _, DBSetErr := tx.Set("room:"+room+":aliases:"+string(index), alias, nil)
+				_, _, DBSetErr := tx.Set("room|"+room+"|aliases|"+string(index), alias, nil)
 				return DBSetErr
 			})
 			if DBerr != nil {
@@ -88,7 +81,7 @@ func InitData(cli *gomatrix.Client) (err error) {
 			}
 		}
 
-	}
+	}*/
 	return
 }
 
@@ -103,23 +96,23 @@ func CacheMessageEvents(id, sender, roomID, message string, timestamp int64) (er
 	// Update cache
 	DBerr := db.Update(func(tx *buntdb.Tx) error {
 		localLog.Println(roomID)
-		_, _, DBSetIDErr := tx.Set("room:"+roomID+":messages:"+id+":id", id, nil)
+		_, _, DBSetIDErr := tx.Set("room|"+roomID+"|messages|"+id+"|id", id, nil)
 		if DBSetIDErr != nil {
 			return DBSetIDErr
 		}
 
-		_, _, DBSetSenderErr := tx.Set("room:"+roomID+":messages:"+id+":sender", sender, nil)
+		_, _, DBSetSenderErr := tx.Set("room|"+roomID+"|messages|"+id+"|sender", sender, nil)
 		if DBSetSenderErr != nil {
 			return DBSetSenderErr
 		}
 
-		_, _, DBSetMessageErr := tx.Set("room:"+roomID+":messages:"+id+":message", message, nil)
+		_, _, DBSetMessageErr := tx.Set("room|"+roomID+"|messages|"+id+"|message", message, nil)
 		if DBSetMessageErr != nil {
 			return DBSetMessageErr
 		}
 
 		timestampString := strconv.FormatInt(timestamp, 10)
-		_, _, DBSeTimestampErr := tx.Set("room:"+roomID+":messages:"+id+":timestamp", timestampString, nil)
+		_, _, DBSeTimestampErr := tx.Set("room|"+roomID+"|messages|"+id+"|timestamp", timestampString, nil)
 		return DBSeTimestampErr
 
 	})
