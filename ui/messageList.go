@@ -1,4 +1,4 @@
-package elements
+package ui
 
 import (
 	"fmt"
@@ -38,6 +38,7 @@ func NewMessageList(scrollArea *widgets.QScrollArea, messageView *widgets.QWidge
 	messageViewLayout.SetContentsMargins(0, 0, 0, 0)
 	messageView.SetContentsMargins(0, 0, 0, 0)
 	scrollArea.SetWidget(messageView)
+	scrollArea.SetAlignment(core.Qt__AlignLeading | core.Qt__AlignLeft | core.Qt__AlignVCenter)
 	scrollArea.Widget().SetLayout(messageViewLayout)
 
 	return
@@ -104,8 +105,7 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 	messageViewLayout.SetSpacing(1)
 	messageViewLayout.SetContentsMargins(0, 0, 0, 0)
 
-	messageViewLayout.AddWidget(messageWidget, 0, core.Qt__AlignBottom)
-	scrollArea.Widget().SetLayout(messageViewLayout)
+	messageViewLayout.InsertWidget(0, messageWidget, 0, core.Qt__AlignBottom)
 
 	return
 }
@@ -159,11 +159,10 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewOwnMessage(body string, 
 	messageWidget.SetMinimumWidth(messageContent.LineWidth() + 100)
 	messageWidget.Resize(wrapperWidget.Size())
 
-	messageViewLayout.SetSpacing(1)
+	messageViewLayout.SetSpacing(0)
 	messageViewLayout.SetContentsMargins(0, 0, 0, 0)
 
-	messageViewLayout.AddWidget(messageWidget, 0, core.Qt__AlignBottom)
-	scrollArea.Widget().SetLayout(messageViewLayout)
+	messageViewLayout.InsertWidget(0, messageWidget, 0, core.Qt__AlignBottom)
 
 	return
 }

@@ -1,4 +1,4 @@
-package elements
+package ui
 
 /*
 #cgo CFLAGS: -fno-keep-inline-dllexport -march=nocona -mtune=core2 -pipe -O2 -Wextra -Wall -W -DUNICODE -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_CORE_LIB -DQT_NEEDS_QMAIN

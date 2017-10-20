@@ -5,7 +5,6 @@ import (
 	"log"
 	"sync"
 
-	"github.com/Nordgedanken/Morpheus/elements"
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/util"
 	"github.com/matrix-org/gomatrix"
@@ -64,14 +63,13 @@ func (m *MainUI) InitLogger() error {
 
 // NewUI initializes a new Main Screen
 func (m *MainUI) NewUI() (err error) {
-	fmt.Println((m.window.Width() / 3) / 2)
-	var widget = widgets.NewQWidget(nil, 0)
+	m.widget = widgets.NewQWidget(nil, 0)
 
 	var loader = uitools.NewQUiLoader(nil)
 	var file = core.NewQFile2(":/qml/ui/chat.ui")
 
 	file.Open(core.QIODevice__ReadOnly)
-	var mainWidget = loader.Load(file, widget)
+	m.MainWidget = loader.Load(file, m.widget)
 	file.Close()
 
 	InitDataErr := matrix.InitData(m.cli)
@@ -80,28 +78,28 @@ func (m *MainUI) NewUI() (err error) {
 		return
 	}
 
-	messageScrollArea := widgets.NewQScrollAreaFromPointer(widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
-	messagesScrollAreaContent := widgets.NewQWidgetFromPointer(widget.FindChild("messagesScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
-	roomScrollArea := widgets.NewQScrollAreaFromPointer(widget.FindChild("roomScroll", core.Qt__FindChildrenRecursively).Pointer())
-	roomScrollAreaContent := widgets.NewQWidgetFromPointer(widget.FindChild("roomScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
+	messageScrollArea := widgets.NewQScrollAreaFromPointer(m.widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
+	messagesScrollAreaContent := widgets.NewQWidgetFromPointer(m.widget.FindChild("messagesScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
+	roomScrollArea := widgets.NewQScrollAreaFromPointer(m.widget.FindChild("roomScroll", core.Qt__FindChildrenRecursively).Pointer())
+	roomScrollAreaContent := widgets.NewQWidgetFromPointer(m.widget.FindChild("roomScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
 
-	roomAvatar := widgets.NewQLabelFromPointer(widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
-	roomTitle := widgets.NewQLabelFromPointer(widget.FindChild("RoomTitle", core.Qt__FindChildrenRecursively).Pointer())
-	roomTopic := widgets.NewQLabelFromPointer(widget.FindChild("Topic", core.Qt__FindChildrenRecursively).Pointer())
+	m.RoomAvatar = widgets.NewQLabelFromPointer(m.widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
+	m.RoomTitle = widgets.NewQLabelFromPointer(m.widget.FindChild("RoomTitle", core.Qt__FindChildrenRecursively).Pointer())
+	m.RoomTopic = widgets.NewQLabelFromPointer(m.widget.FindChild("Topic", core.Qt__FindChildrenRecursively).Pointer())
 
 	var layout = widgets.NewQHBoxLayout()
-	layout.AddWidget(mainWidget, 1, core.Qt__AlignTop|core.Qt__AlignLeft)
-	widget.SetLayout(layout)
+	layout.AddWidget(m.MainWidget, 1, core.Qt__AlignTop|core.Qt__AlignLeft)
+	m.widget.SetLayout(layout)
 	layout.SetSpacing(0)
 	layout.SetContentsMargins(0, 0, 0, 0)
 
 	m.window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
-		widget.Resize2(event.Size().Width(), event.Size().Height())
+		m.widget.Resize(event.Size())
 		event.Accept()
 	})
 
-	widget.ConnectResizeEvent(func(event *gui.QResizeEvent) {
-		mainWidget.Resize2(event.Size().Width(), event.Size().Height())
+	m.widget.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+		m.MainWidget.Resize(event.Size())
 		event.Accept()
 	})
 
@@ -116,7 +114,7 @@ func (m *MainUI) NewUI() (err error) {
 	})
 
 	//Set Avatar
-	avatarLogo := widgets.NewQLabelFromPointer(widget.FindChild("UserAvatar", core.Qt__FindChildrenRecursively).Pointer())
+	avatarLogo := widgets.NewQLabelFromPointer(m.widget.FindChild("UserAvatar", core.Qt__FindChildrenRecursively).Pointer())
 	avatar, AvatarErr := matrix.GetOwnUserAvatar(m.cli)
 	if AvatarErr != nil {
 		err = AvatarErr
@@ -125,9 +123,9 @@ func (m *MainUI) NewUI() (err error) {
 	avatarLogo.SetPixmap(avatar)
 
 	//Handle LogoutButton
-	logoutButton := widgets.NewQPushButtonFromPointer(widget.FindChild("LogoutButton", core.Qt__FindChildrenRecursively).Pointer())
+	logoutButton := widgets.NewQPushButtonFromPointer(m.widget.FindChild("LogoutButton", core.Qt__FindChildrenRecursively).Pointer())
 	logoutButton.ConnectClicked(func(_ bool) {
-		LogoutErr := m.logout(widget, messageScrollArea)
+		LogoutErr := m.logout(m.widget, messageScrollArea)
 		if LogoutErr != nil {
 			err = LogoutErr
 			return
@@ -135,28 +133,30 @@ func (m *MainUI) NewUI() (err error) {
 	})
 
 	// Init Message View
-	messageListLayout := elements.NewMessageList(messageScrollArea, messagesScrollAreaContent)
+	m.MessageListLayout = NewMessageList(messageScrollArea, messagesScrollAreaContent)
 
 	// Init Room View
-	roomListLayout := elements.NewRoomList(roomScrollArea, roomScrollAreaContent)
+	roomListLayout := NewRoomList(roomScrollArea, roomScrollAreaContent)
 
 	messageScrollArea.SetWidgetResizable(true)
 	messageScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
 	messageScrollArea.SetContentsMargins(0, 0, 0, 0)
+	//messageScrollArea.SetSizeAdjustPolicy(widgets.QAbstractScrollArea__AdjustToContents)
 
 	roomScrollArea.SetWidgetResizable(true)
 	roomScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
 	roomScrollArea.SetContentsMargins(0, 0, 0, 0)
+	roomScrollArea.SetSizeAdjustPolicy(widgets.QAbstractScrollArea__AdjustToContents)
 
-	messageListLayout.ConnectTriggerMessage(func(messageBody, sender string, timestamp int64) {
+	m.MessageListLayout.ConnectTriggerMessage(func(messageBody, sender string, timestamp int64) {
 		if sender == m.cli.UserID {
-			NewOwnMessageErr := messageListLayout.NewOwnMessage(messageBody, m.cli, sender, timestamp, messageScrollArea)
+			NewOwnMessageErr := m.MessageListLayout.NewOwnMessage(messageBody, m.cli, sender, timestamp, messageScrollArea)
 			if NewOwnMessageErr != nil {
 				err = NewOwnMessageErr
 				return
 			}
 		} else {
-			NewMessageErr := messageListLayout.NewMessage(messageBody, m.cli, sender, timestamp, messageScrollArea)
+			NewMessageErr := m.MessageListLayout.NewMessage(messageBody, m.cli, sender, timestamp, messageScrollArea)
 			if NewMessageErr != nil {
 				err = NewMessageErr
 				return
@@ -164,35 +164,37 @@ func (m *MainUI) NewUI() (err error) {
 		}
 	})
 
-	m.startSync(messageListLayout)
+	m.startSync(m.MessageListLayout)
 
 	roomListLayout.ConnectTriggerRoom(func(roomID string) {
 		room := m.rooms[roomID]
 
-		NewRoomErr := roomListLayout.NewRoom(room, roomScrollArea)
+		NewRoomErr := roomListLayout.NewRoom(room, roomScrollArea, m)
 		if NewRoomErr != nil {
 			err = NewRoomErr
 			return
 		}
+
+		m.widget.Resize(m.window.Size())
 	})
 
-	m.initRoomList(roomListLayout)
+	m.initRoomList(roomListLayout, roomScrollArea)
 
-	mainWidget.SetWindowTitle("Morpheus - " + m.rooms[m.currentRoom].GetRoomTopic())
+	m.MainWidget.SetWindowTitle("Morpheus - " + m.rooms[m.currentRoom].GetRoomTopic())
 
 	avatar, roomAvatarErr := m.rooms[m.currentRoom].GetRoomAvatar()
 	if roomAvatarErr != nil {
 		err = roomAvatarErr
 		return
 	}
-	roomAvatar.SetPixmap(avatar)
+	m.RoomAvatar.SetPixmap(avatar)
 
-	roomTitle.SetText(m.rooms[m.currentRoom].GetRoomName())
+	m.RoomTitle.SetText(m.rooms[m.currentRoom].GetRoomName())
 
-	roomTopic.SetText(m.rooms[m.currentRoom].GetRoomTopic())
+	m.RoomTopic.SetText(m.rooms[m.currentRoom].GetRoomTopic())
 
 	var message string
-	messageInput := widgets.NewQLineEditFromPointer(widget.FindChild("MessageInput", core.Qt__FindChildrenRecursively).Pointer())
+	messageInput := widgets.NewQLineEditFromPointer(m.widget.FindChild("MessageInput", core.Qt__FindChildrenRecursively).Pointer())
 	messageInput.ConnectTextChanged(func(value string) {
 		message = value
 	})
@@ -213,7 +215,6 @@ func (m *MainUI) NewUI() (err error) {
 		}
 	})
 
-	m.widget = widget
 	return
 }
 
@@ -300,7 +301,7 @@ func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScr
 	return
 }
 
-func (m *MainUI) startSync(messageListLayout *elements.QVBoxLayoutWithTriggerSlot) (err error) {
+func (m *MainUI) startSync(messageListLayout *QVBoxLayoutWithTriggerSlot) (err error) {
 	//Start Syncer!
 	m.syncer = m.cli.Syncer.(*gomatrix.DefaultSyncer)
 	m.storage = gomatrix.NewInMemoryStore()
@@ -319,6 +320,8 @@ func (m *MainUI) startSync(messageListLayout *elements.QVBoxLayoutWithTriggerSlo
 		id := ev.ID
 		timestamp := ev.Timestamp
 		go matrix.CacheMessageEvents(id, sender, room, msg, timestamp)
+		fmt.Println(room)
+		fmt.Println(m.currentRoom)
 		if room == m.currentRoom {
 			messageListLayout.TriggerMessage(msg, sender, timestamp)
 		}
@@ -337,7 +340,7 @@ func (m *MainUI) startSync(messageListLayout *elements.QVBoxLayoutWithTriggerSlo
 	return
 }
 
-func (m *MainUI) initRoomList(roomListLayout *elements.QRoomVBoxLayoutWithTriggerSlot) (err error) {
+func (m *MainUI) initRoomList(roomListLayout *QRoomVBoxLayoutWithTriggerSlot, roomScrollArea *widgets.QScrollArea) (err error) {
 	rooms, ReqErr := m.cli.JoinedRooms()
 	if ReqErr != nil {
 		err = ReqErr

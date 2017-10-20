@@ -28,12 +28,23 @@ type logger struct {
 type MainUI struct {
 	logger
 	config
-	widget      *widgets.QWidget
+
+	widget            *widgets.QWidget
+	RoomAvatar        *widgets.QLabel
+	RoomTitle         *widgets.QLabel
+	RoomTopic         *widgets.QLabel
+	MainWidget        *widgets.QWidget
+	MessageListLayout *QVBoxLayoutWithTriggerSlot
+
 	window      *widgets.QMainWindow
 	syncer      *gomatrix.DefaultSyncer
 	storage     *gomatrix.InMemoryStore
 	rooms       map[string]*matrix.Room
 	currentRoom string
+}
+
+func (m *MainUI) SetCurrentRoom(RoomID string) {
+	m.currentRoom = RoomID
 }
 
 // LoginUI holds information about the LoginUI

@@ -1,8 +1,9 @@
-package elements
+package ui
 
 import (
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/therecipe/qt/core"
+	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
 )
@@ -39,7 +40,7 @@ func NewRoomList(scrollArea *widgets.QScrollArea, roomView *widgets.QWidget) (ro
 }
 
 // NewRoom adds a new room object to the view
-func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room, scrollArea *widgets.QScrollArea) (err error) {
+func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room, scrollArea *widgets.QScrollArea, mainUIStruct *MainUI) (err error) {
 	roomAvatar, roomAvatarErr := room.GetRoomAvatar()
 	if roomAvatarErr != nil {
 		err = roomAvatarErr
@@ -55,7 +56,6 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room,
 	var wrapperWidget = loader.Load(file, widget)
 	file.Close()
 
-	roomWidget := widgets.NewQWidgetFromPointer(widget.FindChild("room", core.Qt__FindChildrenRecursively).Pointer())
 	roomAvatarQLabel := widgets.NewQLabelFromPointer(widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
 	roomName := widgets.NewQLabelFromPointer(widget.FindChild("roomName", core.Qt__FindChildrenRecursively).Pointer())
 	/*lastMessageContent := widgets.NewQLabelFromPointer(widget.FindChild("lastMessage", core.Qt__FindChildrenRecursively).Pointer())*/
@@ -70,13 +70,43 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room,
 
 		roomWidget.SetMinimumWidth(messageContent.LineWidth() + 100)
 	*/
-	roomWidget.Resize(wrapperWidget.Size())
+	widget.Resize(wrapperWidget.Size())
 
-	roomViewLayout.SetSpacing(1)
+	var filterObject = core.NewQObject(nil)
+	filterObject.ConnectEventFilter(func(watched *core.QObject, event *core.QEvent) bool {
+		if event.Type() == core.QEvent__MouseButtonPress {
+			var mouseEvent = gui.NewQMouseEventFromPointer(event.Pointer())
+
+			if mouseEvent.Button() == core.Qt__LeftButton {
+				mainUIStruct.SetCurrentRoom(room.RoomID)
+				mainUIStruct.MainWidget.SetWindowTitle("Morpheus - " + room.GetRoomTopic())
+
+				mainUIStruct.RoomAvatar.SetPixmap(roomAvatar)
+
+				mainUIStruct.RoomTitle.SetText(room.GetRoomName())
+
+				mainUIStruct.RoomTopic.SetText(room.GetRoomTopic())
+				count := mainUIStruct.MessageListLayout.Count()
+				for i := 0; i < count; i++ {
+					widgetScroll := mainUIStruct.MessageListLayout.ItemAt(i).Widget()
+					widgetScroll.DeleteLater()
+				}
+				return true
+			}
+
+			return false
+		}
+
+		return false
+	})
+
+	roomViewLayout.SetSpacing(0)
 	roomViewLayout.SetContentsMargins(0, 0, 0, 0)
 
-	roomViewLayout.AddWidget(roomWidget, 0, core.Qt__AlignBottom)
-	scrollArea.Widget().SetLayout(roomViewLayout)
+	wrapperWidget.InstallEventFilter(filterObject)
+	widget.InstallEventFilter(filterObject)
+
+	roomViewLayout.InsertWidget(roomViewLayout.Count()+1, wrapperWidget, 0, 0)
 
 	return
 }
