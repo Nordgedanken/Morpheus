@@ -85,7 +85,9 @@ func (m *MainUI) NewUI() (err error) {
 	roomScrollArea := widgets.NewQScrollAreaFromPointer(widget.FindChild("roomScroll", core.Qt__FindChildrenRecursively).Pointer())
 	roomScrollAreaContent := widgets.NewQWidgetFromPointer(widget.FindChild("roomScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
 
-	mainWidget.SetWindowTitle("Morpheus - MatrixHQ")
+	roomAvatar := widgets.NewQLabelFromPointer(widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
+	roomTitle := widgets.NewQLabelFromPointer(widget.FindChild("RoomTitle", core.Qt__FindChildrenRecursively).Pointer())
+	roomTopic := widgets.NewQLabelFromPointer(widget.FindChild("Topic", core.Qt__FindChildrenRecursively).Pointer())
 
 	var layout = widgets.NewQHBoxLayout()
 	layout.AddWidget(mainWidget, 1, core.Qt__AlignTop|core.Qt__AlignLeft)
@@ -176,6 +178,19 @@ func (m *MainUI) NewUI() (err error) {
 
 	m.initRoomList(roomListLayout)
 
+	mainWidget.SetWindowTitle("Morpheus - " + m.rooms[m.currentRoom].GetRoomTopic())
+
+	avatar, roomAvatarErr := m.rooms[m.currentRoom].GetRoomAvatar()
+	if roomAvatarErr != nil {
+		err = roomAvatarErr
+		return
+	}
+	roomAvatar.SetPixmap(avatar)
+
+	roomTitle.SetText(m.rooms[m.currentRoom].GetRoomName())
+
+	roomTopic.SetText(m.rooms[m.currentRoom].GetRoomTopic())
+
 	var message string
 	messageInput := widgets.NewQLineEditFromPointer(widget.FindChild("MessageInput", core.Qt__FindChildrenRecursively).Pointer())
 	messageInput.ConnectTextChanged(func(value string) {
@@ -205,13 +220,13 @@ func (m *MainUI) NewUI() (err error) {
 func (m *MainUI) sendMessage(message string) (err error) {
 	mardownMessage := commonmark.Md2Html(message, 0)
 	if mardownMessage == message {
-		_, SendErr := m.cli.SendText("!zTIXGmDjyRcAqbrWab:matrix.ffslfl.net", message)
+		_, SendErr := m.cli.SendText(m.currentRoom, message)
 		if SendErr != nil {
 			err = SendErr
 			return
 		}
 	} else {
-		_, SendErr := m.cli.SendMessageEvent("!zTIXGmDjyRcAqbrWab:matrix.ffslfl.net", "m.room.message", matrix.HTMLMessage{MsgType: "m.text", Body: message, FormattedBody: mardownMessage, Format: "org.matrix.custom.html"})
+		_, SendErr := m.cli.SendMessageEvent(m.currentRoom, "m.room.message", matrix.HTMLMessage{MsgType: "m.text", Body: message, FormattedBody: mardownMessage, Format: "org.matrix.custom.html"})
 		if SendErr != nil {
 			err = SendErr
 			return
@@ -222,7 +237,7 @@ func (m *MainUI) sendMessage(message string) (err error) {
 
 func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScrollArea) (err error) {
 	//TODO register enter and show loader or so
-	m.localLog.Println("Starting Logout Sequenze in background")
+	m.localLog.Println("Starting Logout Sequence in background")
 	var wg sync.WaitGroup
 	results := make(chan bool)
 
@@ -293,9 +308,9 @@ func (m *MainUI) startSync(messageListLayout *elements.QVBoxLayoutWithTriggerSlo
 	m.syncer.Store = m.storage
 
 	m.syncer.OnEventType("m.room.message", func(ev *gomatrix.Event) {
-		fomrattedBody, _ := ev.Content["formatted_body"]
+		formattedBody, _ := ev.Content["formatted_body"]
 		var msg string
-		msg, _ = fomrattedBody.(string)
+		msg, _ = formattedBody.(string)
 		if msg == "" {
 			msg, _ = ev.Body()
 		}
@@ -304,7 +319,9 @@ func (m *MainUI) startSync(messageListLayout *elements.QVBoxLayoutWithTriggerSlo
 		id := ev.ID
 		timestamp := ev.Timestamp
 		go matrix.CacheMessageEvents(id, sender, room, msg, timestamp)
-		messageListLayout.TriggerMessage(msg, sender, timestamp)
+		if room == m.currentRoom {
+			messageListLayout.TriggerMessage(msg, sender, timestamp)
+		}
 	})
 
 	// Start Non-blocking sync
@@ -327,7 +344,12 @@ func (m *MainUI) initRoomList(roomListLayout *elements.QRoomVBoxLayoutWithTrigge
 		return
 	}
 
+	x := 0
 	for _, roomID := range rooms.JoinedRooms {
+		if x == 0 {
+			m.currentRoom = roomID
+		}
+		x++
 		m.rooms[roomID] = matrix.NewRoom(roomID, m.cli)
 		roomListLayout.TriggerRoom(roomID)
 	}

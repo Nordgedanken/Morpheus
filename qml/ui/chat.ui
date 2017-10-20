@@ -651,7 +651,7 @@ border-radius: 2px;</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_7">
          <item row="0" column="0">
-          <widget class="QLabel" name="RoomImage">
+          <widget class="QLabel" name="roomAvatar">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
              <horstretch>0</horstretch>
@@ -678,7 +678,7 @@ border-radius: 2px;</string>
          <item row="0" column="1">
           <layout class="QVBoxLayout" name="TitleLayout">
            <item>
-            <widget class="QLabel" name="RoomTitel">
+            <widget class="QLabel" name="RoomTitle">
              <property name="minimumSize">
               <size>
                <width>0</width>
@@ -699,7 +699,7 @@ border-radius: 2px;</string>
             </widget>
            </item>
            <item>
-            <widget class="QLabel" name="subTitle">
+            <widget class="QLabel" name="Topic">
              <property name="minimumSize">
               <size>
                <width>0</width>

@@ -18,6 +18,7 @@ type Room struct {
 	RoomID        string
 	RoomName      string
 	RoomAvatarURL string
+	RoomTopic     string
 }
 
 // NewRoom Inits a new Room struct
@@ -32,6 +33,22 @@ func (r *Room) crawlRoomAvatarURL() {
 	}{}
 	r.cli.StateEvent(r.RoomID, "m.room.avatar", "", &roomAvatar)
 	r.RoomAvatarURL = roomAvatar.URL
+}
+
+func (r *Room) crawlRoomTopic() {
+	roomTopic := struct {
+		Topic string `json:"topic"`
+	}{}
+	r.cli.StateEvent(r.RoomID, "m.room.topic", "", &roomTopic)
+	r.RoomTopic = roomTopic.Topic
+}
+
+func (r *Room) GetRoomTopic() (topic string) {
+	if r.RoomTopic == "" {
+		r.crawlRoomTopic()
+	}
+	topic = r.RoomTopic
+	return
 }
 
 // GetRoomAvatar generates the Avatar Image for a Room

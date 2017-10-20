@@ -8,10 +8,10 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
-class QRoomVBoxLayoutWithTriggerSlot;
-void QRoomVBoxLayoutWithTriggerSlot_QRoomVBoxLayoutWithTriggerSlot_QRegisterMetaTypes();
 class QVBoxLayoutWithTriggerSlot;
 void QVBoxLayoutWithTriggerSlot_QVBoxLayoutWithTriggerSlot_QRegisterMetaTypes();
+class QRoomVBoxLayoutWithTriggerSlot;
+void QRoomVBoxLayoutWithTriggerSlot_QRoomVBoxLayoutWithTriggerSlot_QRegisterMetaTypes();
 extern "C" {
 #endif
 
