@@ -5,6 +5,8 @@ import (
 	"log"
 	"sync"
 
+	"strconv"
+
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/util"
 	"github.com/matrix-org/gomatrix"
@@ -72,12 +74,6 @@ func (m *MainUI) NewUI() (err error) {
 	m.MainWidget = loader.Load(file, m.widget)
 	file.Close()
 
-	InitDataErr := matrix.InitData(m.cli)
-	if InitDataErr != nil {
-		err = InitDataErr
-		return
-	}
-
 	messageScrollArea := widgets.NewQScrollAreaFromPointer(m.widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
 	messagesScrollAreaContent := widgets.NewQWidgetFromPointer(m.widget.FindChild("messagesScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
 	roomScrollArea := widgets.NewQScrollAreaFromPointer(m.widget.FindChild("roomScroll", core.Qt__FindChildrenRecursively).Pointer())
@@ -94,7 +90,6 @@ func (m *MainUI) NewUI() (err error) {
 	layout.SetContentsMargins(0, 0, 0, 0)
 
 	m.widget.ConnectResizeEvent(func(event *gui.QResizeEvent) {
-		fmt.Println("resize Widget")
 		m.MainWidget.Resize(event.Size())
 		event.Accept()
 	})
@@ -148,7 +143,7 @@ func (m *MainUI) NewUI() (err error) {
 		}
 	})
 
-	m.startSync(m.MessageListLayout)
+	m.startSync()
 	m.widget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 	m.MainWidget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 
@@ -163,6 +158,8 @@ func (m *MainUI) NewUI() (err error) {
 	})
 
 	m.initRoomList(roomListLayout, roomScrollArea)
+
+	go m.loadCache()
 
 	m.MainWidget.SetWindowTitle("Morpheus - " + m.rooms[m.currentRoom].GetRoomTopic())
 
@@ -285,7 +282,7 @@ func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScr
 	return
 }
 
-func (m *MainUI) startSync(messageListLayout *QVBoxLayoutWithTriggerSlot) (err error) {
+func (m *MainUI) startSync() (err error) {
 	//Start Syncer!
 	m.syncer = m.cli.Syncer.(*gomatrix.DefaultSyncer)
 	m.storage = gomatrix.NewInMemoryStore()
@@ -307,7 +304,7 @@ func (m *MainUI) startSync(messageListLayout *QVBoxLayoutWithTriggerSlot) (err e
 		fmt.Println(room)
 		fmt.Println(m.currentRoom)
 		if room == m.currentRoom {
-			messageListLayout.TriggerMessage(msg, sender, timestamp)
+			m.MessageListLayout.TriggerMessage(msg, sender, timestamp)
 		}
 	})
 
@@ -341,5 +338,50 @@ func (m *MainUI) initRoomList(roomListLayout *QRoomVBoxLayoutWithTriggerSlot, ro
 		roomListLayout.TriggerRoom(roomID)
 	}
 
+	return
+}
+
+func (m *MainUI) loadCache() (err error) {
+	db, DBOpenErr := matrix.OpenCacheDB()
+	if DBOpenErr != nil {
+		err = DBOpenErr
+	}
+	defer db.Close()
+
+	DBerr := db.View(func(tx *buntdb.Tx) error {
+		IDErr := tx.AscendKeys("room|"+m.currentRoom+"|messages|*|id", func(_, id string) bool {
+			msg, GetMsgErr := tx.Get("room|" + m.currentRoom + "|messages|" + id + "|message")
+			if GetMsgErr != nil {
+				fmt.Println("GetMsgErr: ", GetMsgErr)
+				return false
+			}
+
+			sender, GetSenderErr := tx.Get("room|" + m.currentRoom + "|messages|" + id + "|sender")
+			if GetSenderErr != nil {
+				return false
+			}
+
+			timestamp, GetTimestampErr := tx.Get("room|" + m.currentRoom + "|messages|" + id + "|timestamp")
+			if GetTimestampErr != nil {
+				return false
+			}
+			timestampInt, ConvErr := strconv.ParseInt(timestamp, 10, 64)
+			if ConvErr != nil {
+				return false
+			}
+			m.MessageListLayout.TriggerMessage(msg, sender, timestampInt)
+			return true
+		})
+		if IDErr != nil {
+			fmt.Println("IDErr: ", IDErr)
+			return IDErr
+		}
+		return nil
+	})
+	if DBerr != nil {
+		fmt.Println("DBERR: ", DBerr)
+		err = DBerr
+		return
+	}
 	return
 }

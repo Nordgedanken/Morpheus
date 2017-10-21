@@ -5,7 +5,6 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"github.com/matrix-org/gomatrix"
 	"github.com/shibukawa/configdir"
 	"github.com/tidwall/buntdb"
 )
@@ -52,39 +51,6 @@ func OpenUserDB() (db *buntdb.DB, err error) {
 	return
 }
 
-// InitData inits basic Data like getting aliases of joinedRooms
-func InitData(cli *gomatrix.Client) (err error) {
-	db, DBOpenErr := OpenCacheDB()
-	if DBOpenErr != nil {
-		localLog.Fatalln(DBOpenErr)
-	}
-	defer db.Close()
-
-	// Todo Get aliases
-	/*for _, room := range rooms.JoinedRooms {
-		var roomAliases RoomAliases
-		if StateEventErr := cli.StateEvent(room, "m.room.aliases", "", &roomAliases); StateEventErr != nil {
-			localLog.Println(StateEventErr)
-			// Not returning as a Error NotFound is allowed
-		}
-
-		for index, alias := range roomAliases.Content.Aliases {
-			// Update cache
-			DBerr := db.Update(func(tx *buntdb.Tx) error {
-				localLog.Println(room)
-				_, _, DBSetErr := tx.Set("room|"+room+"|aliases|"+string(index), alias, nil)
-				return DBSetErr
-			})
-			if DBerr != nil {
-				err = DBerr
-				return
-			}
-		}
-
-	}*/
-	return
-}
-
 // CacheMessageEvents writes message infos into the cache into the defined room
 func CacheMessageEvents(id, sender, roomID, message string, timestamp int64) (err error) {
 	db, DBOpenErr := OpenCacheDB()
@@ -95,7 +61,6 @@ func CacheMessageEvents(id, sender, roomID, message string, timestamp int64) (er
 
 	// Update cache
 	DBerr := db.Update(func(tx *buntdb.Tx) error {
-		localLog.Println(roomID)
 		_, _, DBSetIDErr := tx.Set("room|"+roomID+"|messages|"+id+"|id", id, nil)
 		if DBSetIDErr != nil {
 			return DBSetIDErr

@@ -92,6 +92,8 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room,
 					widgetScroll.DeleteLater()
 				}
 
+				go mainUIStruct.loadCache()
+
 				return true
 			}
 
