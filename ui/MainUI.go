@@ -88,28 +88,14 @@ func (m *MainUI) NewUI() (err error) {
 	m.RoomTopic = widgets.NewQLabelFromPointer(m.widget.FindChild("Topic", core.Qt__FindChildrenRecursively).Pointer())
 
 	var layout = widgets.NewQHBoxLayout()
-	layout.AddWidget(m.MainWidget, 1, core.Qt__AlignTop|core.Qt__AlignLeft)
-	m.widget.SetLayout(layout)
+	m.window.SetLayout(layout)
+	layout.InsertWidget(0, m.MainWidget, 0, core.Qt__AlignTop|core.Qt__AlignLeft)
 	layout.SetSpacing(0)
 	layout.SetContentsMargins(0, 0, 0, 0)
 
-	m.window.ConnectResizeEvent(func(event *gui.QResizeEvent) {
-		m.widget.Resize(event.Size())
-		event.Accept()
-	})
-
 	m.widget.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+		fmt.Println("resize Widget")
 		m.MainWidget.Resize(event.Size())
-		event.Accept()
-	})
-
-	messageScrollArea.ConnectResizeEvent(func(event *gui.QResizeEvent) {
-		messageScrollArea.Resize(event.Size())
-		event.Accept()
-	})
-
-	roomScrollArea.ConnectResizeEvent(func(event *gui.QResizeEvent) {
-		roomScrollArea.Resize(event.Size())
 		event.Accept()
 	})
 
@@ -165,6 +151,8 @@ func (m *MainUI) NewUI() (err error) {
 	})
 
 	m.startSync(m.MessageListLayout)
+	m.widget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
+	m.MainWidget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 
 	roomListLayout.ConnectTriggerRoom(func(roomID string) {
 		room := m.rooms[roomID]
@@ -174,8 +162,6 @@ func (m *MainUI) NewUI() (err error) {
 			err = NewRoomErr
 			return
 		}
-
-		m.widget.Resize(m.window.Size())
 	})
 
 	m.initRoomList(roomListLayout, roomScrollArea)

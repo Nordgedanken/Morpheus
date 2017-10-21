@@ -91,6 +91,7 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room,
 					widgetScroll := mainUIStruct.MessageListLayout.ItemAt(i).Widget()
 					widgetScroll.DeleteLater()
 				}
+
 				return true
 			}
 
@@ -104,7 +105,6 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room,
 	roomViewLayout.SetContentsMargins(0, 0, 0, 0)
 
 	wrapperWidget.InstallEventFilter(filterObject)
-	widget.InstallEventFilter(filterObject)
 
 	roomViewLayout.InsertWidget(roomViewLayout.Count()+1, wrapperWidget, 0, 0)
 

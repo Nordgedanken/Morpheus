@@ -153,8 +153,6 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 	avatar.LoadFromData(str, uint(len(str)), "", 0)
 	avatarResp = avatar
 	return
-
-	return
 }
 
 func (r *Room) crawlRoomName() {
