@@ -27,6 +27,7 @@ type JoinedRooms struct {
 	JoinedRooms []string `json:"joined_rooms,omitempty"`
 }
 
+// RoomAvatar is the json response when getting the room avatar list
 type RoomAvatar struct {
 	Age     int `json:"age,omitempty"`
 	Content struct {

@@ -43,6 +43,7 @@ func (r *Room) crawlRoomTopic() {
 	r.RoomTopic = roomTopic.Topic
 }
 
+// GetRoomTopic returns the Topic of the Room and crawls it if needed
 func (r *Room) GetRoomTopic() (topic string) {
 	if r.RoomTopic == "" {
 		r.crawlRoomTopic()

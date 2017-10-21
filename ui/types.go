@@ -43,6 +43,7 @@ type MainUI struct {
 	currentRoom string
 }
 
+// SetCurrentRoom sets the new room ID of the MainUI
 func (m *MainUI) SetCurrentRoom(RoomID string) {
 	m.currentRoom = RoomID
 }
