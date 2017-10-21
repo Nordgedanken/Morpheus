@@ -45,7 +45,7 @@ func NewMessageList(scrollArea *widgets.QScrollArea, messageView *widgets.QWidge
 }
 
 // NewMessage adds a new message object to the view
-func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli *gomatrix.Client, sender string, timestamp int64, scrollArea *widgets.QScrollArea) (err error) {
+func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli *gomatrix.Client, sender string, timestamp int64, scrollArea *widgets.QScrollArea, own bool) (err error) {
 	avatar, AvatarErr := matrix.GetUserAvatar(cli, sender, 61)
 	if err != nil {
 		err = AvatarErr
@@ -55,7 +55,12 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 	var widget = widgets.NewQWidget(nil, 0)
 
 	var loader = uitools.NewQUiLoader(nil)
-	var file = core.NewQFile2(":/qml/ui/message.ui")
+	var file *core.QFile
+	if own {
+		file = core.NewQFile2(":/qml/ui/ownmessage.ui")
+	} else {
+		file = core.NewQFile2(":/qml/ui/message.ui")
+	}
 
 	file.Open(core.QIODevice__ReadOnly)
 	var wrapperWidget = loader.Load(file, widget)
@@ -103,63 +108,6 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 	messageWidget.Resize2(lineLength, wrapperWidget.Size().Height())
 
 	messageViewLayout.SetSpacing(1)
-	messageViewLayout.SetContentsMargins(0, 0, 0, 0)
-
-	messageViewLayout.InsertWidget(0, messageWidget, 0, core.Qt__AlignBottom)
-
-	return
-}
-
-// NewOwnMessage adds a new message object to the view
-func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewOwnMessage(body string, cli *gomatrix.Client, sender string, timestamp int64, scrollArea *widgets.QScrollArea) (err error) {
-	avatar, AvatarErr := matrix.GetUserAvatar(cli, sender, 61)
-	if AvatarErr != nil {
-		err = AvatarErr
-		return
-	}
-
-	var widget = widgets.NewQWidget(nil, 0)
-
-	var loader = uitools.NewQUiLoader(nil)
-	var file = core.NewQFile2(":/qml/ui/ownmessage.ui")
-
-	file.Open(core.QIODevice__ReadOnly)
-	var wrapperWidget = loader.Load(file, widget)
-	file.Close()
-
-	timestampFormat := time.Unix(0, int64(timestamp)*int64(time.Millisecond))
-	timestampString := timestampFormat.Format("15:04:05 - Mon 2.01.2006")
-
-	messageWidget := widgets.NewQWidgetFromPointer(widget.FindChild("message", core.Qt__FindChildrenRecursively).Pointer())
-	avatarLogo := widgets.NewQLabelFromPointer(widget.FindChild("avatar", core.Qt__FindChildrenRecursively).Pointer())
-	messageContent := widgets.NewQLabelFromPointer(widget.FindChild("messageContent", core.Qt__FindChildrenRecursively).Pointer())
-	timestampContent := widgets.NewQLabelFromPointer(widget.FindChild("timestamp", core.Qt__FindChildrenRecursively).Pointer())
-	senderContent := widgets.NewQLabelFromPointer(widget.FindChild("sender", core.Qt__FindChildrenRecursively).Pointer())
-
-	markdownMessage := commonmark.Md2Html(body, 0)
-
-	messageContent.SetText(markdownMessage)
-
-	senderDisplayNameResp, _ := cli.GetDisplayName(sender)
-	var senderDisplayName string
-	if senderDisplayNameResp == nil {
-		senderDisplayName = sender
-	} else if senderDisplayNameResp.DisplayName == "" {
-		senderDisplayName = sender
-	} else {
-		senderDisplayName = senderDisplayNameResp.DisplayName
-	}
-	fmt.Println(senderDisplayName)
-	senderContent.SetText(senderDisplayName)
-	timestampContent.SetText(timestampString)
-	avatarLogo.SetPixmap(avatar)
-
-	messageContent.SetMinimumWidth(messageContent.LineWidth())
-
-	messageWidget.SetMinimumWidth(messageContent.LineWidth() + 100)
-	messageWidget.Resize(wrapperWidget.Size())
-
-	messageViewLayout.SetSpacing(0)
 	messageViewLayout.SetContentsMargins(0, 0, 0, 0)
 
 	messageViewLayout.InsertWidget(0, messageWidget, 0, core.Qt__AlignBottom)

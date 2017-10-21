@@ -135,18 +135,16 @@ func (m *MainUI) NewUI() (err error) {
 	roomScrollArea.SetSizeAdjustPolicy(widgets.QAbstractScrollArea__AdjustToContents)
 
 	m.MessageListLayout.ConnectTriggerMessage(func(messageBody, sender string, timestamp int64) {
+		var own bool
 		if sender == m.cli.UserID {
-			NewOwnMessageErr := m.MessageListLayout.NewOwnMessage(messageBody, m.cli, sender, timestamp, messageScrollArea)
-			if NewOwnMessageErr != nil {
-				err = NewOwnMessageErr
-				return
-			}
+			own = true
 		} else {
-			NewMessageErr := m.MessageListLayout.NewMessage(messageBody, m.cli, sender, timestamp, messageScrollArea)
-			if NewMessageErr != nil {
-				err = NewMessageErr
-				return
-			}
+			own = false
+		}
+		NewMessageErr := m.MessageListLayout.NewMessage(messageBody, m.cli, sender, timestamp, messageScrollArea, own)
+		if NewMessageErr != nil {
+			err = NewMessageErr
+			return
 		}
 	})
 
