@@ -7,6 +7,7 @@ import (
 	"image/png"
 	"strings"
 
+	"github.com/Nordgedanken/Morpheus/matrix/db"
 	"github.com/matrix-org/gomatrix"
 	"github.com/therecipe/qt/gui"
 	"github.com/tidwall/buntdb"
@@ -60,7 +61,7 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 	}
 
 	// Get the image Data
-	db, DBOpenErr := OpenCacheDB()
+	db, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
 		localLog.Fatalln(DBOpenErr)
 	}

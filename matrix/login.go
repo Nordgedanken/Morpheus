@@ -5,13 +5,14 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/Nordgedanken/Morpheus/matrix/db"
 	"github.com/matrix-org/gomatrix"
 	"github.com/tidwall/buntdb"
 )
 
 //GetClient returns a Client
 func GetClient(homeserverURL, userID, accessToken string) (client *gomatrix.Client, err error) {
-	db, DBOpenErr := OpenUserDB()
+	db, DBOpenErr := db.OpenUserDB()
 	if DBOpenErr != nil {
 		localLog.Fatalln(DBOpenErr)
 	}
@@ -71,7 +72,7 @@ func LoginUser(username, password string) (*gomatrix.Client, error) {
 		return nil, err
 	}
 
-	db, DBOpenErr := OpenUserDB()
+	db, DBOpenErr := db.OpenUserDB()
 	if DBOpenErr != nil {
 		localLog.Fatalln(DBOpenErr)
 	}

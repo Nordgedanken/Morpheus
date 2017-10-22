@@ -46,6 +46,12 @@ func NewMessageList(scrollArea *widgets.QScrollArea, messageView *widgets.QWidge
 
 // NewMessage adds a new message object to the view
 func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli *gomatrix.Client, sender string, timestamp int64, scrollArea *widgets.QScrollArea, own bool) (err error) {
+	barAtBottom := false
+	bar := scrollArea.VerticalScrollBar()
+	fmt.Println(bar.Value())
+	if bar.Value() == bar.Maximum() {
+		barAtBottom = true
+	}
 	avatar, AvatarErr := matrix.GetUserAvatar(cli, sender, 61)
 	if err != nil {
 		err = AvatarErr
@@ -95,12 +101,9 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 
 	var lineLength int
 	lineLength = messageContent.FontMetrics().Width(messageContent.Text(), -1) - 87
-	fmt.Println(scrollArea.Widget().Size().Width())
-	fmt.Println("lineLengthO: ", lineLength)
 	if lineLength >= scrollArea.Widget().Size().Width() {
 		lineLength = scrollArea.Widget().Size().Width() - 20 - 87
 	}
-	fmt.Println("lineLengthN: ", lineLength)
 
 	messageContent.SetMinimumWidth(lineLength + 10)
 
@@ -110,7 +113,13 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 	messageViewLayout.SetSpacing(1)
 	messageViewLayout.SetContentsMargins(0, 0, 0, 0)
 
-	messageViewLayout.InsertWidget(0, messageWidget, 0, core.Qt__AlignBottom)
+	messageViewLayout.InsertWidget(messageViewLayout.Count()+1, messageWidget, 0, core.Qt__AlignBottom)
+
+	fmt.Println(barAtBottom)
+	fmt.Println(bar.Maximum())
+	if barAtBottom {
+		bar.SetValue(bar.Maximum())
+	}
 
 	return
 }

@@ -35,6 +35,7 @@ type MainUI struct {
 	RoomTopic         *widgets.QLabel
 	MainWidget        *widgets.QWidget
 	MessageListLayout *QVBoxLayoutWithTriggerSlot
+	messageScrollArea *widgets.QScrollArea
 
 	window      *widgets.QMainWindow
 	syncer      *gomatrix.DefaultSyncer

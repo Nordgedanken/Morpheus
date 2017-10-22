@@ -22,6 +22,7 @@ import (
 	// image/jpeg needed to load jpeg images
 	_ "image/jpeg"
 	// golang.org/x/image/webp needed to load webp images
+	"github.com/Nordgedanken/Morpheus/matrix/db"
 	_ "golang.org/x/image/webp"
 	// golang.org/x/image/bmp needed to load bmp images
 	_ "golang.org/x/image/bmp"
@@ -76,7 +77,6 @@ func generateGenericImages(displayname string, size int) (imgData string, err er
 		return
 	}
 
-	localLog.Println("generatedIMGBounds: ", img.Bounds())
 	buf := new(bytes.Buffer)
 	EncodeErr := png.Encode(buf, img)
 	if EncodeErr != nil {
@@ -95,7 +95,7 @@ func GetOwnUserAvatar(cli *gomatrix.Client) (avatar *gui.QPixmap, err error) {
 
 // GetUserAvatar returns a *gui.QPixmap of an UserAvatar
 func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui.QPixmap, err error) {
-	db, DBOpenErr := OpenCacheDB()
+	db, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
 		localLog.Fatalln(DBOpenErr)
 	}
@@ -148,7 +148,6 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 			}
 			IMGdata = string(data[:])
 		} else {
-			localLog.Println("Generating Avatar")
 			DisplayNameResp, _ := cli.GetDisplayName(mxid)
 			DisplayName := DisplayNameResp.DisplayName
 			var GenerateImgErr error

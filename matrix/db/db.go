@@ -1,4 +1,4 @@
-package matrix
+package db
 
 import (
 	"os"
@@ -55,7 +55,8 @@ func OpenUserDB() (db *buntdb.DB, err error) {
 func CacheMessageEvents(id, sender, roomID, message string, timestamp int64) (err error) {
 	db, DBOpenErr := OpenCacheDB()
 	if DBOpenErr != nil {
-		localLog.Fatalln(DBOpenErr)
+		err = DBOpenErr
+		return
 	}
 	defer db.Close()
 

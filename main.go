@@ -6,6 +6,7 @@ import (
 	"sync"
 
 	"github.com/Nordgedanken/Morpheus/matrix"
+	"github.com/Nordgedanken/Morpheus/matrix/db"
 	"github.com/Nordgedanken/Morpheus/ui"
 	"github.com/Nordgedanken/Morpheus/util"
 	"github.com/matrix-org/gomatrix"
@@ -29,7 +30,7 @@ func main() {
 	}
 	defer file.Close()
 
-	db, DBOpenErr := matrix.OpenUserDB()
+	db, DBOpenErr := db.OpenUserDB()
 	if DBOpenErr != nil {
 		localLog.Fatalln(DBOpenErr)
 	}

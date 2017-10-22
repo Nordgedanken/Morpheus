@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/Nordgedanken/Morpheus/matrix"
+	"github.com/Nordgedanken/Morpheus/matrix/db"
 	"github.com/Nordgedanken/Morpheus/util"
 	"github.com/matrix-org/gomatrix"
 	"github.com/rhinoman/go-commonmark"
@@ -74,7 +75,7 @@ func (m *MainUI) NewUI() (err error) {
 	m.MainWidget = loader.Load(file, m.widget)
 	file.Close()
 
-	messageScrollArea := widgets.NewQScrollAreaFromPointer(m.widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
+	m.messageScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
 	messagesScrollAreaContent := widgets.NewQWidgetFromPointer(m.widget.FindChild("messagesScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
 	roomScrollArea := widgets.NewQScrollAreaFromPointer(m.widget.FindChild("roomScroll", core.Qt__FindChildrenRecursively).Pointer())
 	roomScrollAreaContent := widgets.NewQWidgetFromPointer(m.widget.FindChild("roomScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
@@ -106,7 +107,7 @@ func (m *MainUI) NewUI() (err error) {
 	//Handle LogoutButton
 	logoutButton := widgets.NewQPushButtonFromPointer(m.widget.FindChild("LogoutButton", core.Qt__FindChildrenRecursively).Pointer())
 	logoutButton.ConnectClicked(func(_ bool) {
-		LogoutErr := m.logout(m.widget, messageScrollArea)
+		LogoutErr := m.logout(m.widget, m.messageScrollArea)
 		if LogoutErr != nil {
 			err = LogoutErr
 			return
@@ -114,14 +115,14 @@ func (m *MainUI) NewUI() (err error) {
 	})
 
 	// Init Message View
-	m.MessageListLayout = NewMessageList(messageScrollArea, messagesScrollAreaContent)
+	m.MessageListLayout = NewMessageList(m.messageScrollArea, messagesScrollAreaContent)
 
 	// Init Room View
 	roomListLayout := NewRoomList(roomScrollArea, roomScrollAreaContent)
 
-	messageScrollArea.SetWidgetResizable(true)
-	messageScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
-	messageScrollArea.SetContentsMargins(0, 0, 0, 0)
+	m.messageScrollArea.SetWidgetResizable(true)
+	m.messageScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
+	m.messageScrollArea.SetContentsMargins(0, 0, 0, 0)
 	//messageScrollArea.SetSizeAdjustPolicy(widgets.QAbstractScrollArea__AdjustToContents)
 
 	roomScrollArea.SetWidgetResizable(true)
@@ -136,7 +137,7 @@ func (m *MainUI) NewUI() (err error) {
 		} else {
 			own = false
 		}
-		NewMessageErr := m.MessageListLayout.NewMessage(messageBody, m.cli, sender, timestamp, messageScrollArea, own)
+		NewMessageErr := m.MessageListLayout.NewMessage(messageBody, m.cli, sender, timestamp, m.messageScrollArea, own)
 		if NewMessageErr != nil {
 			err = NewMessageErr
 			return
@@ -233,7 +234,7 @@ func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScr
 		}
 		cli.ClearCredentials()
 
-		db, DBOpenErr := matrix.OpenUserDB()
+		db, DBOpenErr := db.OpenUserDB()
 		if DBOpenErr != nil {
 			localLog.Fatalln(DBOpenErr)
 		}
@@ -300,9 +301,7 @@ func (m *MainUI) startSync() (err error) {
 		sender := ev.Sender
 		id := ev.ID
 		timestamp := ev.Timestamp
-		go matrix.CacheMessageEvents(id, sender, room, msg, timestamp)
-		fmt.Println(room)
-		fmt.Println(m.currentRoom)
+		go db.CacheMessageEvents(id, sender, room, msg, timestamp)
 		if room == m.currentRoom {
 			m.MessageListLayout.TriggerMessage(msg, sender, timestamp)
 		}
@@ -342,7 +341,13 @@ func (m *MainUI) initRoomList(roomListLayout *QRoomVBoxLayoutWithTriggerSlot, ro
 }
 
 func (m *MainUI) loadCache() (err error) {
-	db, DBOpenErr := matrix.OpenCacheDB()
+	/*barAtBottom := false
+	bar := m.messageScrollArea.VerticalScrollBar()
+	if bar.Value() == bar.Maximum() {
+		barAtBottom = true
+	}*/
+
+	db, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
 		err = DBOpenErr
 	}
@@ -383,5 +388,10 @@ func (m *MainUI) loadCache() (err error) {
 		err = DBerr
 		return
 	}
+
+	/*if barAtBottom {
+		bar.SetValue(bar.Maximum())
+	}*/
+
 	return
 }
