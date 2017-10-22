@@ -1,4 +1,4 @@
-package db
+package db_test
 
 import (
 	. "github.com/onsi/ginkgo"
@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestMatrix(t *testing.T) {
+func TestDb(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "Matrix DB Suite")
 }
