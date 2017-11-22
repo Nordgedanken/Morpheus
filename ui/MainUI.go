@@ -3,6 +3,8 @@ package ui
 import (
 	"fmt"
 	"log"
+	"strconv"
+	"strings"
 	"sync"
 
 	"github.com/Nordgedanken/Morpheus/matrix"
@@ -10,6 +12,7 @@ import (
 	"github.com/Nordgedanken/Morpheus/util"
 	"github.com/dgraph-io/badger"
 	"github.com/matrix-org/gomatrix"
+	"github.com/pkg/errors"
 	"github.com/rhinoman/go-commonmark"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
@@ -311,7 +314,7 @@ func (m *MainUI) startSync() (err error) {
 		timestamp := ev.Timestamp
 		go db.CacheMessageEvents(id, sender, room, msg, timestamp)
 		if room == m.currentRoom {
-			m.MessageListLayout.TriggerMessage(msg, sender, timestamp)
+			go m.MessageListLayout.TriggerMessage(msg, sender, timestamp)
 		}
 	})
 
@@ -348,6 +351,16 @@ func (m *MainUI) initRoomList(roomListLayout *QRoomVBoxLayoutWithTriggerSlot, ro
 	return
 }
 
+func contains(slice []string, item string) bool {
+	set := make(map[string]struct{}, len(slice))
+	for _, s := range slice {
+		set[s] = struct{}{}
+	}
+
+	_, ok := set[item]
+	return ok
+}
+
 func (m *MainUI) loadCache() (err error) {
 	/*barAtBottom := false
 	bar := m.messageScrollArea.VerticalScrollBar()
@@ -360,49 +373,217 @@ func (m *MainUI) loadCache() (err error) {
 		err = DBOpenErr
 	}
 
+	log.Println("load cache")
+
 	DBerr := db.View(func(txn *badger.Txn) error {
 		MsgOpts := badger.DefaultIteratorOptions
 		MsgOpts.PrefetchSize = 10
 		MsgIt := txn.NewIterator(MsgOpts)
 		MsgPrefix := []byte("room|" + m.currentRoom + "|messages|")
+
+		var doneMsg []string
+
 		for MsgIt.Seek(MsgPrefix); MsgIt.ValidForPrefix(MsgPrefix); MsgIt.Next() {
 			item := MsgIt.Item()
-			k := item.Key()
-			value, err := item.Value()
-			if err != nil {
-				return err
+			key := item.Key()
+			stringKey := fmt.Sprintf("%s", key)
+			value, ValueErr := item.Value()
+			if ValueErr != nil {
+				return ValueErr
 			}
-			fmt.Sprintf("Value: %s Key: %s", value, k)
-			//msg := fmt.Sprintf("%s", value)
+			stringValue := fmt.Sprintf("%s", value)
+
+			if strings.HasSuffix(stringKey, "|id") {
+				if !contains(doneMsg, stringValue) {
+					// Remember we already added this message to the view
+					doneMsg = append(doneMsg, stringKey)
+
+					// Get all Data
+					senderItem, senderErr := txn.Get([]byte(strings.Replace(stringKey, "|id", "|sender", -1)))
+					if senderErr != nil {
+						return errors.WithMessage(senderErr, "Key: "+strings.Replace(stringKey, "|id", "|sender", -1))
+					}
+
+					senderValue, senderValueErr := senderItem.Value()
+					if senderValueErr != nil {
+						return senderValueErr
+					}
+					sender := fmt.Sprintf("%s", senderValue)
+
+					messageItem, messageErr := txn.Get([]byte(strings.Replace(stringKey, "|id", "|messageString", -1)))
+					if messageErr != nil {
+						return errors.WithMessage(messageErr, "Key: "+strings.Replace(stringKey, "|id", "|messageString", -1))
+					}
+
+					messageValue, messageValueErr := messageItem.Value()
+					if messageValueErr != nil {
+						return messageValueErr
+					}
+					msg := fmt.Sprintf("%s", messageValue)
+
+					timestampItem, timestampErr := txn.Get([]byte(strings.Replace(stringKey, "|id", "|timestamp", -1)))
+					if timestampErr != nil {
+						return errors.WithMessage(timestampErr, "Key: "+strings.Replace(stringKey, "|id", "|timestamp", -1))
+					}
+
+					timestampValue, timestampValueErr := timestampItem.Value()
+					if timestampValueErr != nil {
+						return timestampValueErr
+					}
+					timestamp := fmt.Sprintf("%s", timestampValue)
+					timestampInt, ConvErr := strconv.ParseInt(timestamp, 10, 64)
+					if ConvErr != nil {
+						return ConvErr
+					}
+
+					m.MessageListLayout.TriggerMessage(msg, sender, timestampInt)
+				}
+			}
+
+			if strings.HasSuffix(stringKey, "|sender") {
+				if !contains(doneMsg, stringValue) {
+					// Remember we already added this message to the view
+					idItem, idErr := txn.Get([]byte(strings.Replace(stringKey, "|sender", "|id", -1)))
+					if idErr != nil {
+						return errors.WithMessage(idErr, "Key: "+strings.Replace(stringKey, "|sender", "|id", -1))
+					}
+					idValue, idValueErr := idItem.Value()
+					if idValueErr != nil {
+						return idValueErr
+					}
+					id := fmt.Sprintf("%s", idValue)
+					doneMsg = append(doneMsg, id)
+
+					// Get all Data
+					sender := stringValue
+
+					messageItem, messageErr := txn.Get([]byte(strings.Replace(stringKey, "|sender", "|messageString", -1)))
+					if messageErr != nil {
+						return errors.WithMessage(messageErr, "Key: "+strings.Replace(stringKey, "|sender", "|messageString", -1))
+					}
+
+					messageValue, messageValueErr := messageItem.Value()
+					if messageValueErr != nil {
+						return messageValueErr
+					}
+					msg := fmt.Sprintf("%s", messageValue)
+
+					timestampItem, timestampErr := txn.Get([]byte(strings.Replace(stringKey, "|sender", "|timestamp", -1)))
+					if timestampErr != nil {
+						return errors.WithMessage(timestampErr, "Key: "+strings.Replace(stringKey, "|sender", "|timestamp", -1))
+					}
+
+					timestampValue, timestampValueErr := timestampItem.Value()
+					if timestampValueErr != nil {
+						return timestampValueErr
+					}
+					timestamp := fmt.Sprintf("%s", timestampValue)
+
+					timestampInt, ConvErr := strconv.ParseInt(timestamp, 10, 64)
+					if ConvErr != nil {
+						return ConvErr
+					}
+
+					m.MessageListLayout.TriggerMessage(msg, sender, timestampInt)
+				}
+			}
+
+			if strings.HasSuffix(stringKey, "|messageString") {
+				if !contains(doneMsg, stringValue) {
+					// Remember we already added this message to the view
+					idItem, idErr := txn.Get([]byte(strings.Replace(stringKey, "|messageString", "|id", -1)))
+					if idErr != nil {
+						return errors.WithMessage(idErr, "Key: "+strings.Replace(stringKey, "|messageString", "|id", -1))
+					}
+
+					idValue, idValueErr := idItem.Value()
+					if idValueErr != nil {
+						return idValueErr
+					}
+					id := fmt.Sprintf("%s", idValue)
+					doneMsg = append(doneMsg, id)
+
+					// Get all Data
+					senderItem, senderErr := txn.Get([]byte(strings.Replace(stringKey, "|messageString", "|sender", -1)))
+					if senderErr != nil {
+						return errors.WithMessage(senderErr, "Key: "+strings.Replace(stringKey, "|messageString", "|sender", -1))
+					}
+
+					senderValue, senderValueErr := senderItem.Value()
+					if senderValueErr != nil {
+						return senderValueErr
+					}
+					sender := fmt.Sprintf("%s", senderValue)
+
+					msg := stringValue
+
+					timestampItem, timestampErr := txn.Get([]byte(strings.Replace(stringKey, "|messageString", "|timestamp", -1)))
+					if timestampErr != nil {
+						return errors.WithMessage(timestampErr, "Key: "+strings.Replace(stringKey, "|messageString", "|timestamp", -1))
+					}
+
+					timestampValue, timestampValueErr := timestampItem.Value()
+					if timestampValueErr != nil {
+						return timestampValueErr
+					}
+					timestamp := fmt.Sprintf("%s", timestampValue)
+
+					timestampInt, ConvErr := strconv.ParseInt(timestamp, 10, 64)
+					if ConvErr != nil {
+						return ConvErr
+					}
+
+					m.MessageListLayout.TriggerMessage(msg, sender, timestampInt)
+				}
+			}
+
+			if strings.HasSuffix(stringKey, "|timestamp") {
+				if !contains(doneMsg, stringValue) {
+					// Remember we already added this message to the view
+					idItem, idErr := txn.Get([]byte(strings.Replace(stringKey, "|timestamp", "|id", -1)))
+					if idErr != nil {
+						return errors.WithMessage(idErr, "Key: "+strings.Replace(stringKey, "|timestamp", "|id", -1))
+					}
+					idValue, idValueErr := idItem.Value()
+					if idValueErr != nil {
+						return idValueErr
+					}
+					id := fmt.Sprintf("%s", idValue)
+					doneMsg = append(doneMsg, id)
+
+					// Get all Data
+					senderItem, senderErr := txn.Get([]byte(strings.Replace(stringKey, "|timestamp", "|sender", -1)))
+					if senderErr != nil {
+						return errors.WithMessage(senderErr, "Key: "+strings.Replace(stringKey, "|timestamp", "|sender", -1))
+					}
+					senderValue, senderValueErr := senderItem.Value()
+					if senderValueErr != nil {
+						return senderValueErr
+					}
+					sender := fmt.Sprintf("%s", senderValue)
+
+					messageItem, messageErr := txn.Get([]byte(strings.Replace(stringKey, "|timestamp", "|messageString", -1)))
+					if messageErr != nil {
+						return errors.WithMessage(messageErr, "Key: "+strings.Replace(stringKey, "|timestamp", "|messageString", -1))
+					}
+					messageValue, messageValueErr := messageItem.Value()
+					if messageValueErr != nil {
+						return messageValueErr
+					}
+					msg := fmt.Sprintf("%s", messageValue)
+
+					timestamp := stringValue
+
+					timestampInt, ConvErr := strconv.ParseInt(timestamp, 10, 64)
+					if ConvErr != nil {
+						return ConvErr
+					}
+
+					m.MessageListLayout.TriggerMessage(msg, sender, timestampInt)
+				}
+			}
 		}
 
-		/*IDErr := tx.AscendKeys("room|"+m.currentRoom+"|messages|*|id", func(_, id string) bool {
-			msg, GetMsgErr := tx.Get("room|" + m.currentRoom + "|messages|" + id + "|message")
-			if GetMsgErr != nil {
-				fmt.Println("GetMsgErr: ", GetMsgErr)
-				return false
-			}
-
-			sender, GetSenderErr := tx.Get("room|" + m.currentRoom + "|messages|" + id + "|sender")
-			if GetSenderErr != nil {
-				return false
-			}
-
-			timestamp, GetTimestampErr := tx.Get("room|" + m.currentRoom + "|messages|" + id + "|timestamp")
-			if GetTimestampErr != nil {
-				return false
-			}
-			timestampInt, ConvErr := strconv.ParseInt(timestamp, 10, 64)
-			if ConvErr != nil {
-				return false
-			}
-
-			return true
-		})
-		if IDErr != nil {
-			fmt.Println("IDErr: ", IDErr)
-			return IDErr
-		}*/
 		return nil
 	})
 	if DBerr != nil {

@@ -104,6 +104,7 @@ func OpenUserDB() (db *badger.DB, err error) {
 
 // CacheMessageEvents writes message infos into the cache into the defined room
 func CacheMessageEvents(id, sender, roomID, message string, timestamp int64) (err error) {
+	log.Println("start Caching")
 	db, DBOpenErr := OpenCacheDB()
 	if DBOpenErr != nil {
 		err = DBOpenErr
@@ -111,34 +112,32 @@ func CacheMessageEvents(id, sender, roomID, message string, timestamp int64) (er
 	}
 
 	// Update cache
-	txn := db.NewTransaction(true) // Read-write txn
-	DBSetIDErr := txn.Set([]byte("room|"+roomID+"|messages|"+id+"|id"), []byte(id))
-	if DBSetIDErr != nil {
-		err = DBSetIDErr
-		return
-	}
+	DBerr := db.Update(func(txn *badger.Txn) error {
+		log.Println(id)
+		DBSetIDErr := txn.Set([]byte("room|"+roomID+"|messages|"+id+"|id"), []byte(id))
+		if DBSetIDErr != nil {
+			return DBSetIDErr
+		}
 
-	DBSetSenderErr := txn.Set([]byte("room|"+roomID+"|messages|"+id+"|sender"), []byte(sender))
-	if DBSetSenderErr != nil {
-		err = DBSetSenderErr
-		return
-	}
+		DBSetSenderErr := txn.Set([]byte("room|"+roomID+"|messages|"+id+"|sender"), []byte(sender))
+		if DBSetSenderErr != nil {
+			return DBSetSenderErr
+		}
 
-	DBSetMessageErr := txn.Set([]byte("room|"+roomID+"|messages|"+id+"|message"), []byte(message))
-	if DBSetMessageErr != nil {
-		err = DBSetMessageErr
-		return
-	}
+		DBSetMessageErr := txn.Set([]byte("room|"+roomID+"|messages|"+id+"|messageString"), []byte(message))
+		if DBSetMessageErr != nil {
+			return DBSetMessageErr
+		}
 
-	timestampString := strconv.FormatInt(timestamp, 10)
-	DBSeTimestampErr := txn.Set([]byte("room|"+roomID+"|messages|"+id+"|timestamp"), []byte(timestampString))
-	if DBSeTimestampErr != nil {
-		err = DBSeTimestampErr
+		timestampString := strconv.FormatInt(timestamp, 10)
+		DBSeTimestampErr := txn.Set([]byte("room|"+roomID+"|messages|"+id+"|timestamp"), []byte(timestampString))
+		return DBSeTimestampErr
+	})
+
+	if DBerr != nil {
+		log.Println("DBERR: ", DBerr)
+		err = DBerr
 		return
-	}
-	CommitErr := txn.Commit(nil)
-	if CommitErr != nil {
-		err = CommitErr
 	}
 
 	return

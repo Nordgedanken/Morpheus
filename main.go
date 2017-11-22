@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
 	"runtime"
 	"sync"
+	"syscall"
 
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
@@ -23,6 +25,15 @@ var localLog *log.Logger
 
 func main() {
 	runtime.GOMAXPROCS(128)
+
+	c := make(chan os.Signal, 2)
+	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
+	go func() {
+		<-c
+		cleanup()
+		os.Exit(1)
+	}()
+
 	var file *os.File
 	var err error
 
@@ -182,4 +193,20 @@ func main() {
 	defer UserDB.Close()
 	defer CacheDB.Close()
 	localLog.Println("Stopping Morpheus")
+}
+
+func cleanup() {
+	fmt.Println("cleanup")
+	UserDB, DBOpenErr := db.OpenUserDB()
+	if DBOpenErr != nil {
+		localLog.Fatalln(DBOpenErr)
+	}
+
+	CacheDB, DBOpenErr := db.OpenCacheDB()
+	if DBOpenErr != nil {
+		localLog.Fatalln(DBOpenErr)
+	}
+
+	UserDB.Close()
+	CacheDB.Close()
 }
