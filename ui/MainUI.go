@@ -396,7 +396,7 @@ func (m *MainUI) loadCache() (err error) {
 			if strings.HasSuffix(stringKey, "|id") {
 				if !contains(doneMsg, stringValue) {
 					// Remember we already added this message to the view
-					doneMsg = append(doneMsg, stringKey)
+					doneMsg = append(doneMsg, stringValue)
 
 					// Get all Data
 					senderItem, senderErr := txn.Get([]byte(strings.Replace(stringKey, "|id", "|sender", -1)))
@@ -441,17 +441,18 @@ func (m *MainUI) loadCache() (err error) {
 			}
 
 			if strings.HasSuffix(stringKey, "|sender") {
-				if !contains(doneMsg, stringValue) {
+				idItem, idErr := txn.Get([]byte(strings.Replace(stringKey, "|sender", "|id", -1)))
+				if idErr != nil {
+					return errors.WithMessage(idErr, "Key: "+strings.Replace(stringKey, "|sender", "|id", -1))
+				}
+				idValue, idValueErr := idItem.Value()
+				if idValueErr != nil {
+					return idValueErr
+				}
+				id := fmt.Sprintf("%s", idValue)
+
+				if !contains(doneMsg, id) {
 					// Remember we already added this message to the view
-					idItem, idErr := txn.Get([]byte(strings.Replace(stringKey, "|sender", "|id", -1)))
-					if idErr != nil {
-						return errors.WithMessage(idErr, "Key: "+strings.Replace(stringKey, "|sender", "|id", -1))
-					}
-					idValue, idValueErr := idItem.Value()
-					if idValueErr != nil {
-						return idValueErr
-					}
-					id := fmt.Sprintf("%s", idValue)
 					doneMsg = append(doneMsg, id)
 
 					// Get all Data
@@ -489,18 +490,19 @@ func (m *MainUI) loadCache() (err error) {
 			}
 
 			if strings.HasSuffix(stringKey, "|messageString") {
-				if !contains(doneMsg, stringValue) {
-					// Remember we already added this message to the view
-					idItem, idErr := txn.Get([]byte(strings.Replace(stringKey, "|messageString", "|id", -1)))
-					if idErr != nil {
-						return errors.WithMessage(idErr, "Key: "+strings.Replace(stringKey, "|messageString", "|id", -1))
-					}
+				idItem, idErr := txn.Get([]byte(strings.Replace(stringKey, "|messageString", "|id", -1)))
+				if idErr != nil {
+					return errors.WithMessage(idErr, "Key: "+strings.Replace(stringKey, "|messageString", "|id", -1))
+				}
 
-					idValue, idValueErr := idItem.Value()
-					if idValueErr != nil {
-						return idValueErr
-					}
-					id := fmt.Sprintf("%s", idValue)
+				idValue, idValueErr := idItem.Value()
+				if idValueErr != nil {
+					return idValueErr
+				}
+				id := fmt.Sprintf("%s", idValue)
+
+				if !contains(doneMsg, id) {
+					// Remember we already added this message to the view
 					doneMsg = append(doneMsg, id)
 
 					// Get all Data
@@ -538,17 +540,18 @@ func (m *MainUI) loadCache() (err error) {
 			}
 
 			if strings.HasSuffix(stringKey, "|timestamp") {
-				if !contains(doneMsg, stringValue) {
+				idItem, idErr := txn.Get([]byte(strings.Replace(stringKey, "|timestamp", "|id", -1)))
+				if idErr != nil {
+					return errors.WithMessage(idErr, "Key: "+strings.Replace(stringKey, "|timestamp", "|id", -1))
+				}
+				idValue, idValueErr := idItem.Value()
+				if idValueErr != nil {
+					return idValueErr
+				}
+				id := fmt.Sprintf("%s", idValue)
+
+				if !contains(doneMsg, id) {
 					// Remember we already added this message to the view
-					idItem, idErr := txn.Get([]byte(strings.Replace(stringKey, "|timestamp", "|id", -1)))
-					if idErr != nil {
-						return errors.WithMessage(idErr, "Key: "+strings.Replace(stringKey, "|timestamp", "|id", -1))
-					}
-					idValue, idValueErr := idItem.Value()
-					if idValueErr != nil {
-						return idValueErr
-					}
-					id := fmt.Sprintf("%s", idValue)
 					doneMsg = append(doneMsg, id)
 
 					// Get all Data

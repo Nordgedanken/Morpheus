@@ -124,12 +124,15 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 		}
 
 		// Update cache
-		txn := db.NewTransaction(true) // Read-write txn
-		DBSetErr := txn.Set([]byte("room|"+r.RoomID+"|84x84"), []byte(IMGdata))
+		DBSetErr := db.Update(func(txn *badger.Txn) error {
+			DBSetErr := txn.Set([]byte("room|"+r.RoomID+"|84x84"), []byte(IMGdata))
+			return DBSetErr
+		})
 		if DBSetErr != nil {
 			err = DBSetErr
 			return
 		}
+
 	} else {
 		IMGdata = roomAvatarData
 	}
