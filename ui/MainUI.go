@@ -5,18 +5,16 @@ import (
 	"log"
 	"sync"
 
-	"strconv"
-
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
 	"github.com/Nordgedanken/Morpheus/util"
+	"github.com/dgraph-io/badger"
 	"github.com/matrix-org/gomatrix"
 	"github.com/rhinoman/go-commonmark"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
-	"github.com/tidwall/buntdb"
 )
 
 // NewMainUIStruct gives you a MainUI struct with prefilled data
@@ -38,6 +36,7 @@ func NewMainUIStructWithExistingConfig(configStruct config, window *widgets.QMai
 	mainUIStruct = MainUI{
 		config: configStruct,
 		window: window,
+		rooms:  make(map[string]*matrix.Room),
 	}
 	return
 }
@@ -238,15 +237,24 @@ func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScr
 		if DBOpenErr != nil {
 			localLog.Fatalln(DBOpenErr)
 		}
-		defer db.Close()
 
 		//Flush complete DB
-		DBErr := db.Update(func(tx *buntdb.Tx) error {
-			QueryErr := tx.DeleteAll()
-			return QueryErr
-		})
-		if DBErr != nil {
-			localLog.Panicln(DBErr)
+		txn := db.NewTransaction(true) // Read-write txn
+		QueryErr := txn.Delete([]byte(""))
+		if QueryErr != nil {
+			localLog.Println(QueryErr)
+			results <- false
+		}
+
+		CommitErr := txn.Commit(nil)
+		if CommitErr != nil {
+			localLog.Println(CommitErr)
+			results <- false
+		}
+
+		DBPurgeErr := db.PurgeOlderVersions()
+		if DBPurgeErr != nil {
+			localLog.Println(DBPurgeErr)
 			results <- false
 		} else {
 			results <- true
@@ -351,10 +359,24 @@ func (m *MainUI) loadCache() (err error) {
 	if DBOpenErr != nil {
 		err = DBOpenErr
 	}
-	defer db.Close()
 
-	DBerr := db.View(func(tx *buntdb.Tx) error {
-		IDErr := tx.AscendKeys("room|"+m.currentRoom+"|messages|*|id", func(_, id string) bool {
+	DBerr := db.View(func(txn *badger.Txn) error {
+		MsgOpts := badger.DefaultIteratorOptions
+		MsgOpts.PrefetchSize = 10
+		MsgIt := txn.NewIterator(MsgOpts)
+		MsgPrefix := []byte("room|" + m.currentRoom + "|messages|")
+		for MsgIt.Seek(MsgPrefix); MsgIt.ValidForPrefix(MsgPrefix); MsgIt.Next() {
+			item := MsgIt.Item()
+			k := item.Key()
+			value, err := item.Value()
+			if err != nil {
+				return err
+			}
+			fmt.Sprintf("Value: %s Key: %s", value, k)
+			//msg := fmt.Sprintf("%s", value)
+		}
+
+		/*IDErr := tx.AscendKeys("room|"+m.currentRoom+"|messages|*|id", func(_, id string) bool {
 			msg, GetMsgErr := tx.Get("room|" + m.currentRoom + "|messages|" + id + "|message")
 			if GetMsgErr != nil {
 				fmt.Println("GetMsgErr: ", GetMsgErr)
@@ -374,13 +396,13 @@ func (m *MainUI) loadCache() (err error) {
 			if ConvErr != nil {
 				return false
 			}
-			m.MessageListLayout.TriggerMessage(msg, sender, timestampInt)
+
 			return true
 		})
 		if IDErr != nil {
 			fmt.Println("IDErr: ", IDErr)
 			return IDErr
-		}
+		}*/
 		return nil
 	})
 	if DBerr != nil {

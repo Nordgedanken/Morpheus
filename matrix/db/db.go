@@ -1,53 +1,104 @@
 package db
 
 import (
+	"errors"
+	"log"
 	"os"
 	"path/filepath"
 	"strconv"
+	"sync"
 
+	"github.com/dgraph-io/badger"
 	"github.com/shibukawa/configdir"
-	"github.com/tidwall/buntdb"
 )
 
+var UserDB *badger.DB
+var CacheDB *badger.DB
+var onceCache sync.Once
+var onceUser sync.Once
+
 // OpenCacheDB opens or generates the Database file for settings and Cache
-func OpenCacheDB() (db *buntdb.DB, err error) {
-	// Open the data.db file. It will be created if it doesn't exist.
-	configDirs := configdir.New("Nordgedanken", "Morpheus")
-	if _, StatErr := os.Stat(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/"); os.IsNotExist(StatErr) {
-		MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/data/", 0666)
-		if MkdirErr != nil {
-			err = MkdirErr
+func OpenCacheDB() (db *badger.DB, err error) {
+	onceCache.Do(func() {
+		// Open the data.db file. It will be created if it doesn't exist.
+		configDirs := configdir.New("Nordgedanken", "Morpheus")
+		if _, StatErr := os.Stat(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/"); os.IsNotExist(StatErr) {
+			MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/data/", 0666)
+			if MkdirErr != nil {
+				err = MkdirErr
+				return
+			}
+		}
+		if _, StatErr := os.Stat(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/cache/"); os.IsNotExist(StatErr) {
+			MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/data/cache/", 0666)
+			if MkdirErr != nil {
+				err = MkdirErr
+				return
+			}
+		}
+		opts := badger.DefaultOptions
+		opts.SyncWrites = false
+		opts.Dir = filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/cache"
+		opts.ValueDir = filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/cache"
+
+		expDB, DBErr := badger.Open(opts)
+		if DBErr != nil {
+			err = DBErr
 			return
 		}
-	}
-	expDB, DBErr := buntdb.Open(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/cache.db")
-	if DBErr != nil {
-		err = DBErr
+		CacheDB = expDB
+	})
+
+	if CacheDB == nil {
+		log.Println(CacheDB)
+		err = errors.New("missing CacheDB")
 		return
 	}
 
-	db = expDB
+	db = CacheDB
 	return
 }
 
 // OpenUserDB opens or generates the Database file for settings and Cache
-func OpenUserDB() (db *buntdb.DB, err error) {
-	// Open the data.db file. It will be created if it doesn't exist.
-	configDirs := configdir.New("Nordgedanken", "Morpheus")
-	if _, StatErr := os.Stat(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/"); os.IsNotExist(StatErr) {
-		MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/data/", 0666)
-		if MkdirErr != nil {
-			err = MkdirErr
+func OpenUserDB() (db *badger.DB, err error) {
+	onceUser.Do(func() {
+		// Open the data.db file. It will be created if it doesn't exist.
+		configDirs := configdir.New("Nordgedanken", "Morpheus")
+		if _, StatErr := os.Stat(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/"); os.IsNotExist(StatErr) {
+			MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/data/", 0666)
+			if MkdirErr != nil {
+				err = MkdirErr
+				return
+			}
+		}
+		if _, StatErr := os.Stat(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/user/"); os.IsNotExist(StatErr) {
+			MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/data/user/", 0666)
+			if MkdirErr != nil {
+				err = MkdirErr
+				return
+			}
+		}
+		opts := badger.DefaultOptions
+		opts.SyncWrites = false
+		opts.Dir = filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/user"
+		opts.ValueDir = filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/user"
+
+		expDB, DBErr := badger.Open(opts)
+		if DBErr != nil {
+			err = DBErr
 			return
 		}
-	}
-	expDB, DBErr := buntdb.Open(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/userData.db")
-	if DBErr != nil {
-		err = DBErr
+
+		UserDB = expDB
+	})
+
+	if UserDB == nil {
+		log.Println(UserDB)
+		err = errors.New("missing UserDB")
 		return
 	}
 
-	db = expDB
+	db = UserDB
 	return
 }
 
@@ -58,33 +109,37 @@ func CacheMessageEvents(id, sender, roomID, message string, timestamp int64) (er
 		err = DBOpenErr
 		return
 	}
-	defer db.Close()
 
 	// Update cache
-	DBerr := db.Update(func(tx *buntdb.Tx) error {
-		_, _, DBSetIDErr := tx.Set("room|"+roomID+"|messages|"+id+"|id", id, nil)
-		if DBSetIDErr != nil {
-			return DBSetIDErr
-		}
-
-		_, _, DBSetSenderErr := tx.Set("room|"+roomID+"|messages|"+id+"|sender", sender, nil)
-		if DBSetSenderErr != nil {
-			return DBSetSenderErr
-		}
-
-		_, _, DBSetMessageErr := tx.Set("room|"+roomID+"|messages|"+id+"|message", message, nil)
-		if DBSetMessageErr != nil {
-			return DBSetMessageErr
-		}
-
-		timestampString := strconv.FormatInt(timestamp, 10)
-		_, _, DBSeTimestampErr := tx.Set("room|"+roomID+"|messages|"+id+"|timestamp", timestampString, nil)
-		return DBSeTimestampErr
-
-	})
-	if DBerr != nil {
-		err = DBerr
+	txn := db.NewTransaction(true) // Read-write txn
+	DBSetIDErr := txn.Set([]byte("room|"+roomID+"|messages|"+id+"|id"), []byte(id))
+	if DBSetIDErr != nil {
+		err = DBSetIDErr
 		return
 	}
+
+	DBSetSenderErr := txn.Set([]byte("room|"+roomID+"|messages|"+id+"|sender"), []byte(sender))
+	if DBSetSenderErr != nil {
+		err = DBSetSenderErr
+		return
+	}
+
+	DBSetMessageErr := txn.Set([]byte("room|"+roomID+"|messages|"+id+"|message"), []byte(message))
+	if DBSetMessageErr != nil {
+		err = DBSetMessageErr
+		return
+	}
+
+	timestampString := strconv.FormatInt(timestamp, 10)
+	DBSeTimestampErr := txn.Set([]byte("room|"+roomID+"|messages|"+id+"|timestamp"), []byte(timestampString))
+	if DBSeTimestampErr != nil {
+		err = DBSeTimestampErr
+		return
+	}
+	CommitErr := txn.Commit(nil)
+	if CommitErr != nil {
+		err = CommitErr
+	}
+
 	return
 }

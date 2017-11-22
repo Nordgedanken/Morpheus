@@ -2,15 +2,16 @@ package matrix
 
 import (
 	"bytes"
+	"fmt"
 	"image"
 	"image/draw"
 	"image/png"
 	"strings"
 
 	"github.com/Nordgedanken/Morpheus/matrix/db"
+	"github.com/dgraph-io/badger"
 	"github.com/matrix-org/gomatrix"
 	"github.com/therecipe/qt/gui"
-	"github.com/tidwall/buntdb"
 )
 
 // Room saves the information of a Room
@@ -65,20 +66,23 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 	if DBOpenErr != nil {
 		localLog.Fatalln(DBOpenErr)
 	}
-	defer db.Close()
 
 	// Init local vars
 	var roomAvatarData string
 	var IMGdata string
 
 	// Get cache
-	DBErr := db.View(func(tx *buntdb.Tx) error {
-		QueryErr := tx.AscendKeys("room|"+r.RoomID+"|84x84",
-			func(key, value string) bool {
-				roomAvatarData = value
-				return true
-			})
-		return QueryErr
+	DBErr := db.View(func(txn *badger.Txn) error {
+		roomAvatarDataItem, QueryErr := txn.Get([]byte("room|" + r.RoomID + "|84x84"))
+		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
+			return QueryErr
+		}
+		if QueryErr != badger.ErrKeyNotFound {
+			roomAvatarDataBytes, roomAvatarDataErr := roomAvatarDataItem.Value()
+			roomAvatarData = fmt.Sprintf("%s", roomAvatarDataBytes)
+			return roomAvatarDataErr
+		}
+		return nil
 	})
 	if DBErr != nil {
 		err = DBErr
@@ -120,12 +124,10 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 		}
 
 		// Update cache
-		DBerr := db.Update(func(tx *buntdb.Tx) error {
-			_, _, DBSetErr := tx.Set("room|"+r.RoomID+"|84x84", IMGdata, nil)
-			return DBSetErr
-		})
-		if DBerr != nil {
-			err = DBErr
+		txn := db.NewTransaction(true) // Read-write txn
+		DBSetErr := txn.Set([]byte("room|"+r.RoomID+"|84x84"), []byte(IMGdata))
+		if DBSetErr != nil {
+			err = DBSetErr
 			return
 		}
 	} else {

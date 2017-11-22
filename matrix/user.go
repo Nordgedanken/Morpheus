@@ -2,9 +2,12 @@ package matrix
 
 import (
 	"bytes"
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
+	// image/jpeg needed to load jpeg images
+	_ "image/jpeg"
 	"image/png"
 	"log"
 	"os"
@@ -13,17 +16,16 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/Nordgedanken/Morpheus/matrix/db"
 	"github.com/Nordgedanken/Morpheus/util"
 	"github.com/disintegration/letteravatar"
 	"github.com/matrix-org/gomatrix"
 	"github.com/therecipe/qt/gui"
-	"github.com/tidwall/buntdb"
 
-	// image/jpeg needed to load jpeg images
-	_ "image/jpeg"
+	"github.com/dgraph-io/badger"
 	// golang.org/x/image/webp needed to load webp images
-	"github.com/Nordgedanken/Morpheus/matrix/db"
 	_ "golang.org/x/image/webp"
+
 	// golang.org/x/image/bmp needed to load bmp images
 	_ "golang.org/x/image/bmp"
 )
@@ -99,23 +101,24 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 	if DBOpenErr != nil {
 		localLog.Fatalln(DBOpenErr)
 	}
-	defer db.Close()
 
 	// Init local vars
 	var avatarData string
 	var IMGdata string
 
 	// Get cache
-	DBErr := db.View(func(tx *buntdb.Tx) error {
-		QueryErr := tx.AscendKeys("user|"+mxid+"|avatarData"+strconv.Itoa(size)+"x"+strconv.Itoa(size),
-			func(key, value string) bool {
-				avatarData = value
-				return true
-			})
-		return QueryErr
-	})
-	if DBErr != nil {
-		err = DBErr
+	txn := db.NewTransaction(false)
+	avatarDataItem, QueryErr := txn.Get([]byte("user|" + mxid + "|avatarData" + strconv.Itoa(size) + "x" + strconv.Itoa(size)))
+	if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
+		err = QueryErr
+		return
+	}
+	if QueryErr != badger.ErrKeyNotFound {
+		avatarDataByte, avatarDataErr := avatarDataItem.Value()
+		avatarData = fmt.Sprintf("%s", avatarDataByte)
+		if avatarDataErr != nil {
+			err = avatarDataErr
+		}
 		return
 	}
 
@@ -159,12 +162,10 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 		}
 
 		// Update cache
-		DBerr := db.Update(func(tx *buntdb.Tx) error {
-			_, _, DBSetErr := tx.Set("user|"+mxid+"|avatarData"+strconv.Itoa(size)+"x"+strconv.Itoa(size), IMGdata, nil)
-			return DBSetErr
-		})
-		if DBerr != nil {
-			err = DBErr
+		txn := db.NewTransaction(true)
+		DBSetErr := txn.Set([]byte("user|"+mxid+"|avatarData"+strconv.Itoa(size)+"x"+strconv.Itoa(size)), []byte(IMGdata))
+		if DBSetErr != nil {
+			err = DBSetErr
 			return
 		}
 	} else {

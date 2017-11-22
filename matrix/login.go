@@ -7,7 +7,6 @@ import (
 
 	"github.com/Nordgedanken/Morpheus/matrix/db"
 	"github.com/matrix-org/gomatrix"
-	"github.com/tidwall/buntdb"
 )
 
 //GetClient returns a Client
@@ -16,7 +15,6 @@ func GetClient(homeserverURL, userID, accessToken string) (client *gomatrix.Clie
 	if DBOpenErr != nil {
 		localLog.Fatalln(DBOpenErr)
 	}
-	defer db.Close()
 
 	client, ClientErr := gomatrix.NewClient(homeserverURL, userID, accessToken)
 	if ClientErr != nil {
@@ -24,25 +22,29 @@ func GetClient(homeserverURL, userID, accessToken string) (client *gomatrix.Clie
 		return
 	}
 
-	DBErr := db.Update(func(tx *buntdb.Tx) error {
-		_, _, DBSetAccessTokenErr := tx.Set("user|accessToken", client.AccessToken, nil)
-		if DBSetAccessTokenErr != nil {
-			return DBSetAccessTokenErr
-		}
-
-		_, _, DBSetHomeserverURLErr := tx.Set("user|homeserverURL", client.HomeserverURL.String(), nil)
-		if DBSetHomeserverURLErr != nil {
-			return DBSetHomeserverURLErr
-		}
-
-		_, _, DBSetUserIDErr := tx.Set("user|userID", client.UserID, nil)
-		return DBSetUserIDErr
-	})
-	if DBErr != nil {
-		err = DBErr
+	txn := db.NewTransaction(true) // Read-write txn
+	DBSetAccessTokenErr := txn.Set([]byte("user|accessToken"), []byte(client.AccessToken))
+	if DBSetAccessTokenErr != nil {
+		err = DBSetAccessTokenErr
 		return
 	}
 
+	DBSetHomeserverURLErr := txn.Set([]byte("user|homeserverURL"), []byte(client.HomeserverURL.String()))
+	if DBSetHomeserverURLErr != nil {
+		err = DBSetHomeserverURLErr
+		return
+	}
+
+	DBSetUserIDErr := txn.Set([]byte("user|userID"), []byte(client.UserID))
+	if DBSetUserIDErr != nil {
+		err = DBSetUserIDErr
+		return
+	}
+
+	CommitErr := txn.Commit(nil)
+	if CommitErr != nil {
+		err = CommitErr
+	}
 	return
 }
 
@@ -76,29 +78,33 @@ func LoginUser(username, password string) (*gomatrix.Client, error) {
 	if DBOpenErr != nil {
 		localLog.Fatalln(DBOpenErr)
 	}
-	defer db.Close()
 	cli.SetCredentials(resp.UserID, resp.AccessToken)
-	DBerr := db.Update(func(tx *buntdb.Tx) error {
-		_, _, DBSetAccessTokenErr := tx.Set("user|accessToken", resp.AccessToken, nil)
-		if DBSetAccessTokenErr != nil {
-			return DBSetAccessTokenErr
-		}
 
-		_, _, DBSetDeviceIDErr := tx.Set("user|deviceID", resp.DeviceID, nil)
-		if DBSetDeviceIDErr != nil {
-			return DBSetDeviceIDErr
-		}
+	txn := db.NewTransaction(true) // Read-write txn
+	DBSetAccessTokenErr := txn.Set([]byte("user|accessToken"), []byte(resp.AccessToken))
+	if DBSetAccessTokenErr != nil {
+		return nil, DBSetAccessTokenErr
+	}
 
-		_, _, DBSetHomeserverURLErr := tx.Set("user|homeserverURL", resp.HomeServer, nil)
-		if DBSetHomeserverURLErr != nil {
-			return DBSetHomeserverURLErr
-		}
+	DBSetDeviceIDErr := txn.Set([]byte("user|deviceID"), []byte(resp.DeviceID))
+	if DBSetDeviceIDErr != nil {
+		return nil, DBSetDeviceIDErr
+	}
 
-		_, _, DBSetUserIDErr := tx.Set("user|userID", resp.UserID, nil)
-		return DBSetUserIDErr
-	})
-	if DBerr != nil {
-		return nil, DBerr
+	DBSetHomeserverURLErr := txn.Set([]byte("user|homeserverURL"), []byte(resp.HomeServer))
+	if DBSetHomeserverURLErr != nil {
+		return nil, DBSetHomeserverURLErr
+	}
+
+	DBSetUserIDErr := txn.Set([]byte("user|userID"), []byte(resp.UserID))
+	if DBSetUserIDErr != nil {
+		return nil, DBSetUserIDErr
+
+	}
+
+	CommitErr := txn.Commit(nil)
+	if CommitErr != nil {
+		return nil, CommitErr
 	}
 	return cli, nil
 }
