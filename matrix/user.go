@@ -2,13 +2,16 @@ package matrix
 
 import (
 	"bytes"
-	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
+	// image/gif needed to load gif images
+	_ "image/gif"
 	// image/jpeg needed to load jpeg images
 	_ "image/jpeg"
 	"image/png"
+	// image/png needed to load png images
+	_ "image/png"
 	"log"
 	"os"
 	"strconv"
@@ -28,6 +31,12 @@ import (
 
 	// golang.org/x/image/bmp needed to load bmp images
 	_ "golang.org/x/image/bmp"
+
+	// golang.org/x/image/riff needed to load riff images
+	_ "golang.org/x/image/riff"
+
+	// golang.org/x/image/tiff needed to load tiff images
+	_ "golang.org/x/image/tiff"
 )
 
 var localLog *log.Logger
@@ -60,12 +69,12 @@ func (c *circle) Bounds() image.Rectangle {
 func (c *circle) At(x, y int) color.Color {
 	xx, yy, rr := float64(x-c.p.X)+0.5, float64(y-c.p.Y)+0.5, float64(c.r)
 	if xx*xx+yy*yy < rr*rr {
-		return color.Alpha{255}
+		return color.Alpha{A: 255}
 	}
-	return color.Alpha{0}
+	return color.Alpha{A: 0}
 }
 
-func generateGenericImages(displayname string, size int) (imgData string, err error) {
+func generateGenericImages(displayname string, size int) (imgData []byte, err error) {
 	identifier := displayname
 	if (identifier[0] == '#' || identifier[0] == '!' || identifier[0] == '@') && len(identifier) > 1 {
 		identifier = identifier[1:]
@@ -85,7 +94,7 @@ func generateGenericImages(displayname string, size int) (imgData string, err er
 		err = EncodeErr
 		return
 	}
-	imgData = buf.String()
+	imgData = buf.Bytes()
 	return
 }
 
@@ -97,17 +106,17 @@ func GetOwnUserAvatar(cli *gomatrix.Client) (avatar *gui.QPixmap, err error) {
 
 // GetUserAvatar returns a *gui.QPixmap of an UserAvatar
 func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui.QPixmap, err error) {
-	db, DBOpenErr := db.OpenCacheDB()
+	cacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
 		localLog.Fatalln(DBOpenErr)
 	}
 
 	// Init local vars
-	var avatarData string
-	var IMGdata string
+	var avatarData []byte
+	var IMGdata []byte
 
 	// Get cache
-	txn := db.NewTransaction(false)
+	txn := cacheDB.NewTransaction(false)
 	avatarDataItem, QueryErr := txn.Get([]byte("user|" + mxid + "|avatarData" + strconv.Itoa(size) + "x" + strconv.Itoa(size)))
 	if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
 		err = QueryErr
@@ -115,7 +124,7 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 	}
 	if QueryErr != badger.ErrKeyNotFound {
 		avatarDataByte, avatarDataErr := avatarDataItem.Value()
-		avatarData = fmt.Sprintf("%s", avatarDataByte)
+		avatarData = avatarDataByte
 		if avatarDataErr != nil {
 			err = avatarDataErr
 		}
@@ -123,7 +132,7 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 	}
 
 	//If cache is empty do a ServerQuery
-	if avatarData == "" {
+	if len(avatarData) <= 0 {
 		// Get avatarURL
 		urlPath := cli.BuildURL("profile", mxid, "avatar_url")
 		s := struct {
@@ -149,7 +158,7 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 				err = ReqErr
 				return
 			}
-			IMGdata = string(data[:])
+			IMGdata = data
 		} else {
 			DisplayNameResp, _ := cli.GetDisplayName(mxid)
 			DisplayName := DisplayNameResp.DisplayName
@@ -162,8 +171,8 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 		}
 
 		// Update cache
-		txn := db.NewTransaction(true)
-		DBSetErr := txn.Set([]byte("user|"+mxid+"|avatarData"+strconv.Itoa(size)+"x"+strconv.Itoa(size)), []byte(IMGdata))
+		txn := cacheDB.NewTransaction(true)
+		DBSetErr := txn.Set([]byte("user|"+mxid+"|avatarData"+strconv.Itoa(size)+"x"+strconv.Itoa(size)), IMGdata)
 		if DBSetErr != nil {
 			err = DBSetErr
 			return
@@ -172,7 +181,7 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 		IMGdata = avatarData
 	}
 
-	r := bytes.NewReader([]byte(IMGdata))
+	r := bytes.NewReader(IMGdata)
 	srcIMG, _, DecodeErr := image.Decode(r)
 	if DecodeErr != nil {
 		err = DecodeErr
@@ -191,8 +200,9 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 		err = ConvErr
 	}
 
-	str := buf.String()
-	avatar.LoadFromData(str, uint(len(str)), "", 0)
+	str := buf.Bytes()
+
+	avatar.LoadFromData(string(str[:]), uint(len(str)), "PNG", 0)
 	avatarResp = avatar
 	return
 }

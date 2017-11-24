@@ -362,11 +362,11 @@ func contains(slice []string, item string) bool {
 }
 
 func (m *MainUI) loadCache() (err error) {
-	/*barAtBottom := false
+	barAtBottom := false
 	bar := m.messageScrollArea.VerticalScrollBar()
 	if bar.Value() == bar.Maximum() {
 		barAtBottom = true
-	}*/
+	}
 
 	db, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
@@ -595,9 +595,9 @@ func (m *MainUI) loadCache() (err error) {
 		return
 	}
 
-	/*if barAtBottom {
+	if !barAtBottom {
 		bar.SetValue(bar.Maximum())
-	}*/
+	}
 
 	return
 }

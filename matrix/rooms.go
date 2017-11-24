@@ -2,7 +2,6 @@ package matrix
 
 import (
 	"bytes"
-	"fmt"
 	"image"
 	"image/draw"
 	"image/png"
@@ -62,24 +61,24 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 	}
 
 	// Get the image Data
-	db, DBOpenErr := db.OpenCacheDB()
+	cacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
 		localLog.Fatalln(DBOpenErr)
 	}
 
 	// Init local vars
-	var roomAvatarData string
-	var IMGdata string
+	var roomAvatarData []byte
+	var IMGdata []byte
 
 	// Get cache
-	DBErr := db.View(func(txn *badger.Txn) error {
+	DBErr := cacheDB.View(func(txn *badger.Txn) error {
 		roomAvatarDataItem, QueryErr := txn.Get([]byte("room|" + r.RoomID + "|84x84"))
 		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
 			return QueryErr
 		}
 		if QueryErr != badger.ErrKeyNotFound {
 			roomAvatarDataBytes, roomAvatarDataErr := roomAvatarDataItem.Value()
-			roomAvatarData = fmt.Sprintf("%s", roomAvatarDataBytes)
+			roomAvatarData = roomAvatarDataBytes
 			return roomAvatarDataErr
 		}
 		return nil
@@ -90,7 +89,7 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 	}
 
 	//If cache is empty do a ServerQuery
-	if roomAvatarData == "" {
+	if len(roomAvatarData) <= 0 {
 		// If avatarURL is not empty (aka. has a avatar set) download it at the size of 100x100. Else make the data string empty
 		if r.RoomAvatarURL != "" {
 			hsURL := r.cli.HomeserverURL.String()
@@ -103,7 +102,7 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 				err = ReqErr
 				return
 			}
-			IMGdata = string(data[:])
+			IMGdata = data
 		} else {
 			localLog.Println("Generating Room Avatar")
 			var GenerateImgErr error
@@ -124,8 +123,8 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 		}
 
 		// Update cache
-		DBSetErr := db.Update(func(txn *badger.Txn) error {
-			DBSetErr := txn.Set([]byte("room|"+r.RoomID+"|84x84"), []byte(IMGdata))
+		DBSetErr := cacheDB.Update(func(txn *badger.Txn) error {
+			DBSetErr := txn.Set([]byte("room|"+r.RoomID+"|84x84"), IMGdata)
 			return DBSetErr
 		})
 		if DBSetErr != nil {
@@ -137,7 +136,7 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 		IMGdata = roomAvatarData
 	}
 
-	reader := bytes.NewReader([]byte(IMGdata))
+	reader := bytes.NewReader(IMGdata)
 	srcIMG, _, DecodeErr := image.Decode(reader)
 	if DecodeErr != nil {
 		err = DecodeErr
