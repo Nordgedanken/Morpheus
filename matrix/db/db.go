@@ -2,7 +2,6 @@ package db
 
 import (
 	"errors"
-	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -50,7 +49,6 @@ func OpenCacheDB() (db *badger.DB, err error) {
 	})
 
 	if CacheDB == nil {
-		log.Println(CacheDB)
 		err = errors.New("missing CacheDB")
 		return
 	}
@@ -93,7 +91,6 @@ func OpenUserDB() (db *badger.DB, err error) {
 	})
 
 	if UserDB == nil {
-		log.Println(UserDB)
 		err = errors.New("missing UserDB")
 		return
 	}
@@ -104,7 +101,6 @@ func OpenUserDB() (db *badger.DB, err error) {
 
 // CacheMessageEvents writes message infos into the cache into the defined room
 func CacheMessageEvents(id, sender, roomID, message string, timestamp int64) (err error) {
-	log.Println("start Caching")
 	db, DBOpenErr := OpenCacheDB()
 	if DBOpenErr != nil {
 		err = DBOpenErr
@@ -113,7 +109,6 @@ func CacheMessageEvents(id, sender, roomID, message string, timestamp int64) (er
 
 	// Update cache
 	DBerr := db.Update(func(txn *badger.Txn) error {
-		log.Println(id)
 		DBSetIDErr := txn.Set([]byte("room|"+roomID+"|messages|"+id+"|id"), []byte(id))
 		if DBSetIDErr != nil {
 			return DBSetIDErr
@@ -135,7 +130,6 @@ func CacheMessageEvents(id, sender, roomID, message string, timestamp int64) (er
 	})
 
 	if DBerr != nil {
-		log.Println("DBERR: ", DBerr)
 		err = DBerr
 		return
 	}

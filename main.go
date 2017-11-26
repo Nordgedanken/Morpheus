@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"runtime"
 	"sync"
 	"syscall"
@@ -12,19 +12,43 @@ import (
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
 	"github.com/Nordgedanken/Morpheus/ui"
-	"github.com/Nordgedanken/Morpheus/util"
 	"github.com/dgraph-io/badger"
+	"github.com/matrix-org/dugong"
 	"github.com/matrix-org/gomatrix"
+	"github.com/shibukawa/configdir"
+	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
 )
 
 var window *widgets.QMainWindow
-var localLog *log.Logger
 
 func main() {
 	runtime.GOMAXPROCS(128)
+
+	// Init Logs
+	configDirs := configdir.New("Nordgedanken", "Morpheus")
+
+	log.SetFormatter(&log.TextFormatter{
+		TimestampFormat:  "2006-01-02 15:04:05.000000",
+		DisableColors:    false,
+		DisableTimestamp: true,
+		DisableSorting:   true,
+		QuoteEmptyFields: true,
+	})
+
+	log.AddHook(dugong.NewFSHook(
+		filepath.Join(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/log/", "info.log"),
+		filepath.Join(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/log/", "warn.log"),
+		filepath.Join(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/log/", "error.log"),
+		&log.TextFormatter{
+			TimestampFormat:  "2006-01-02 15:04:05.000000",
+			DisableColors:    true,
+			DisableTimestamp: false,
+			DisableSorting:   false,
+		}, &dugong.DailyRotationSchedule{GZip: false},
+	))
 
 	c := make(chan os.Signal, 2)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -34,27 +58,17 @@ func main() {
 		os.Exit(1)
 	}()
 
-	var file *os.File
-	var err error
-
-	localLog = util.Logger()
-	localLog, file, err = util.StartFileLog(localLog)
-	if err != nil {
-		localLog.Fatalln(err)
-	}
-	defer file.Close()
-
 	UserDB, DBOpenErr := db.OpenUserDB()
 	if DBOpenErr != nil {
-		localLog.Fatalln(DBOpenErr)
+		log.Fatalln(DBOpenErr)
 	}
 
 	CacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
-		localLog.Fatalln(DBOpenErr)
+		log.Fatalln(DBOpenErr)
 	}
 
-	localLog.Println("Starting Morpheus")
+	log.Infoln("Starting Morpheus")
 
 	app := widgets.NewQApplication(len(os.Args), os.Args)
 
@@ -136,16 +150,16 @@ func main() {
 		return nil
 	})
 	if DBErr != nil {
-		localLog.Fatalln("Login: ", DBErr)
+		log.Errorln("Login: ", DBErr)
 	}
 
 	if accessToken != "" && homeserverURL != "" && userID != "" {
 		var wg sync.WaitGroup
-		localLog.Println("Starting Auto Login Sequenze in background")
+		log.Infoln("Starting Auto Login Sequenze in background")
 		results := make(chan *gomatrix.Client)
 
 		wg.Add(1)
-		go matrix.DoLogin("", "", homeserverURL, userID, accessToken, localLog, results, &wg)
+		go matrix.DoLogin("", "", homeserverURL, userID, accessToken, results, &wg)
 
 		go func() {
 			wg.Wait()      // wait for each execTask to return
@@ -157,13 +171,9 @@ func main() {
 			//TODO Don't switch screen on wrong login data.
 			MainUIStruct := ui.NewMainUIStruct(windowWidth, windowHeight, window)
 			MainUIStruct.SetCli(result)
-			MainUILoggerInitErr := MainUIStruct.InitLogger()
-			if MainUILoggerInitErr != nil {
-				localLog.Fatalln(MainUILoggerInitErr)
-			}
 			mainUIErr := MainUIStruct.NewUI()
 			if mainUIErr != nil {
-				localLog.Fatalln("mainUI: ", mainUIErr)
+				log.Errorln("mainUI: ", mainUIErr)
 				return
 			}
 			MainUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
@@ -172,13 +182,9 @@ func main() {
 	} else {
 		//Show loginUI
 		LoginUIStruct := ui.NewLoginUIStruct(windowWidth, windowHeight, window)
-		LoginUIStructInitErr := LoginUIStruct.InitLogger()
-		if LoginUIStructInitErr != nil {
-			localLog.Fatalln(LoginUIStructInitErr)
-		}
 		loginUIErr := LoginUIStruct.NewUI()
 		if loginUIErr != nil {
-			localLog.Fatalln("Login Err: ", loginUIErr)
+			log.Errorln("Login Err: ", loginUIErr)
 			return
 		}
 		LoginUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
@@ -192,19 +198,19 @@ func main() {
 	_ = widgets.QApplication_Exec()
 	defer UserDB.Close()
 	defer CacheDB.Close()
-	localLog.Println("Stopping Morpheus")
+	log.Infoln("Stopping Morpheus")
 }
 
 func cleanup() {
-	fmt.Println("cleanup")
+	log.Infoln("cleanup")
 	UserDB, DBOpenErr := db.OpenUserDB()
 	if DBOpenErr != nil {
-		localLog.Fatalln(DBOpenErr)
+		log.Errorln(DBOpenErr)
 	}
 
 	CacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
-		localLog.Fatalln(DBOpenErr)
+		log.Errorln(DBOpenErr)
 	}
 
 	UserDB.Close()

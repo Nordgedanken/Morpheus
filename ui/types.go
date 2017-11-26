@@ -1,10 +1,11 @@
 package ui
 
 import (
-	"log"
-
 	"github.com/Nordgedanken/Morpheus/matrix"
+	"github.com/Nordgedanken/Morpheus/matrix/db"
+	"github.com/Nordgedanken/Morpheus/matrix/syncer"
 	"github.com/matrix-org/gomatrix"
+	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/widgets"
 )
 
@@ -16,30 +17,40 @@ type config struct {
 	windowWidth  int
 	windowHeight int
 
-	cli *gomatrix.Client
+	matrixClient
 }
 
-// Logger holds the initialised Logger
-type logger struct {
-	localLog *log.Logger
+type matrixClient struct {
+	databases
+	cli    *gomatrix.Client
+	syncer *syncer.MorpheusSyncer
+}
+
+type databases struct {
+	cacheDB db.Storer
+}
+
+// SetCurrentRoom sets the new room ID of the MainUI
+func (d *databases) SetCacheDB(db db.Storer) {
+	d.cacheDB = db
 }
 
 // MainUI holds information about the MainUI
 type MainUI struct {
-	logger
 	config
 
-	widget            *widgets.QWidget
-	RoomAvatar        *widgets.QLabel
-	RoomTitle         *widgets.QLabel
-	RoomTopic         *widgets.QLabel
-	MainWidget        *widgets.QWidget
-	MessageListLayout *QVBoxLayoutWithTriggerSlot
-	messageScrollArea *widgets.QScrollArea
+	widget                  *widgets.QWidget
+	widgetThread            *core.QThread
+	RoomAvatar              *widgets.QLabel
+	RoomTitle               *widgets.QLabel
+	RoomTopic               *widgets.QLabel
+	MainWidget              *widgets.QWidget
+	MessageListLayout       *QVBoxLayoutWithTriggerSlot
+	messageScrollArea       *widgets.QScrollArea
+	messageScrollAreaThread *core.QThread
 
 	window      *widgets.QMainWindow
-	syncer      *gomatrix.DefaultSyncer
-	storage     *gomatrix.InMemoryStore
+	storage     *syncer.MorpheusStore
 	rooms       map[string]*matrix.Room
 	currentRoom string
 }
@@ -51,7 +62,6 @@ func (m *MainUI) SetCurrentRoom(RoomID string) {
 
 // LoginUI holds information about the LoginUI
 type LoginUI struct {
-	logger
 	config
 	widget *widgets.QWidget
 	window *widgets.QMainWindow

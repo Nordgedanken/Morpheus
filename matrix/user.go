@@ -12,15 +12,14 @@ import (
 	"image/png"
 	// image/png needed to load png images
 	_ "image/png"
-	"log"
-	"os"
 	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/Nordgedanken/Morpheus/matrix/db"
-	"github.com/Nordgedanken/Morpheus/util"
 	"github.com/disintegration/letteravatar"
 	"github.com/matrix-org/gomatrix"
 	"github.com/therecipe/qt/gui"
@@ -38,20 +37,6 @@ import (
 	// golang.org/x/image/tiff needed to load tiff images
 	_ "golang.org/x/image/tiff"
 )
-
-var localLog *log.Logger
-
-func init() {
-	var file *os.File
-	var err error
-
-	localLog = util.Logger()
-	localLog, file, err = util.StartFileLog(localLog)
-	if err != nil {
-		localLog.Fatalln(err)
-	}
-	defer file.Close()
-}
 
 type circle struct {
 	p image.Point
@@ -108,7 +93,7 @@ func GetOwnUserAvatar(cli *gomatrix.Client) (avatar *gui.QPixmap, err error) {
 func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui.QPixmap, err error) {
 	cacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
-		localLog.Fatalln(DBOpenErr)
+		log.Fatalln(DBOpenErr)
 	}
 
 	// Init local vars
@@ -116,18 +101,20 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 	var IMGdata []byte
 
 	// Get cache
-	txn := cacheDB.NewTransaction(false)
-	avatarDataItem, QueryErr := txn.Get([]byte("user|" + mxid + "|avatarData" + strconv.Itoa(size) + "x" + strconv.Itoa(size)))
-	if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
-		err = QueryErr
-		return
-	}
-	if QueryErr != badger.ErrKeyNotFound {
-		avatarDataByte, avatarDataErr := avatarDataItem.Value()
-		avatarData = avatarDataByte
-		if avatarDataErr != nil {
-			err = avatarDataErr
+	DBErr := cacheDB.View(func(txn *badger.Txn) error {
+		roomAvatarDataItem, QueryErr := txn.Get([]byte("user|" + mxid + "|avatarData" + strconv.Itoa(size) + "x" + strconv.Itoa(size)))
+		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
+			return QueryErr
 		}
+		if QueryErr != badger.ErrKeyNotFound {
+			avatarDataBytes, avatarDataErr := roomAvatarDataItem.Value()
+			avatarData = avatarDataBytes
+			return avatarDataErr
+		}
+		return nil
+	})
+	if DBErr != nil {
+		err = DBErr
 		return
 	}
 
@@ -171,8 +158,10 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 		}
 
 		// Update cache
-		txn := cacheDB.NewTransaction(true)
-		DBSetErr := txn.Set([]byte("user|"+mxid+"|avatarData"+strconv.Itoa(size)+"x"+strconv.Itoa(size)), IMGdata)
+		DBSetErr := cacheDB.Update(func(txn *badger.Txn) error {
+			DBSetErr := txn.Set([]byte("user|"+mxid+"|avatarData"+strconv.Itoa(size)+"x"+strconv.Itoa(size)), IMGdata)
+			return DBSetErr
+		})
 		if DBSetErr != nil {
 			err = DBSetErr
 			return

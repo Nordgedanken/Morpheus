@@ -4,8 +4,8 @@ import (
 	"sync"
 
 	"github.com/Nordgedanken/Morpheus/matrix"
-	"github.com/Nordgedanken/Morpheus/util"
 	"github.com/matrix-org/gomatrix"
+	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/widgets"
 )
@@ -36,17 +36,6 @@ func NewLoginUIStructWithExistingConfig(configStruct config, window *widgets.QMa
 func (l *LoginUI) GetWidget() (widget *widgets.QWidget) {
 	widget = l.widget
 	return
-}
-
-// InitLogger adds a new logger to the LoginUI struct
-func (l *LoginUI) InitLogger() error {
-	localLog := util.Logger()
-	localLog, _, err := util.StartFileLog(localLog)
-	if err != nil {
-		return err
-	}
-	l.localLog = localLog
-	return nil
 }
 
 // NewUI initializes a new login Screen
@@ -134,11 +123,11 @@ func (l *LoginUI) login() (err error) {
 	var wg sync.WaitGroup
 
 	if l.username != "" && l.password != "" {
-		l.localLog.Println("Starting Login Sequenze in background")
+		log.Infoln("Starting Login Sequenze in background")
 		results := make(chan *gomatrix.Client)
 
 		wg.Add(1)
-		go matrix.DoLogin(l.username, l.password, "", "", "", l.localLog, results, &wg)
+		go matrix.DoLogin(l.username, l.password, "", "", "", results, &wg)
 
 		go func() {
 			wg.Wait()      // wait for each execTask to return
@@ -150,11 +139,6 @@ func (l *LoginUI) login() (err error) {
 			//TODO Don't switch screen on wrong login data.
 			l.cli = result
 			MainUIStruct := NewMainUIStructWithExistingConfig(l.config, l.window)
-			MainUILoggerInitErr := MainUIStruct.InitLogger()
-			if MainUILoggerInitErr != nil {
-				err = MainUILoggerInitErr
-				return
-			}
 			mainUIErr := MainUIStruct.NewUI()
 			if mainUIErr != nil {
 				err = mainUIErr
@@ -164,7 +148,7 @@ func (l *LoginUI) login() (err error) {
 			l.window.Resize(l.widget.Size())
 		}
 	} else {
-		l.localLog.Println("Username and/or password is empty. Do Nothing.")
+		log.Warningln("Username and/or password is empty. Do Nothing.")
 	}
 	return
 }

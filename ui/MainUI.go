@@ -2,18 +2,18 @@ package ui
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 	"sync"
 
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
-	"github.com/Nordgedanken/Morpheus/util"
+	"github.com/Nordgedanken/Morpheus/matrix/syncer"
 	"github.com/dgraph-io/badger"
 	"github.com/matrix-org/gomatrix"
 	"github.com/pkg/errors"
 	"github.com/rhinoman/go-commonmark"
+	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/uitools"
@@ -55,20 +55,12 @@ func (m *MainUI) GetWidget() (widget *widgets.QWidget) {
 	return
 }
 
-// InitLogger adds a new logger to the MainUI struct
-func (m *MainUI) InitLogger() error {
-	localLog := util.Logger()
-	localLog, _, err := util.StartFileLog(localLog)
-	if err != nil {
-		return err
-	}
-	m.localLog = localLog
-	return nil
-}
-
 // NewUI initializes a new Main Screen
 func (m *MainUI) NewUI() (err error) {
 	m.widget = widgets.NewQWidget(nil, 0)
+	m.widgetThread = core.NewQThread(nil)
+	m.widget.MoveToThread(m.widgetThread)
+	m.widgetThread.Start()
 
 	var loader = uitools.NewQUiLoader(nil)
 	var file = core.NewQFile2(":/qml/ui/chat.ui")
@@ -78,6 +70,9 @@ func (m *MainUI) NewUI() (err error) {
 	file.Close()
 
 	m.messageScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
+	m.messageScrollAreaThread = core.NewQThread(nil)
+	m.messageScrollArea.MoveToThread(m.messageScrollAreaThread)
+	m.messageScrollAreaThread.Start()
 	messagesScrollAreaContent := widgets.NewQWidgetFromPointer(m.widget.FindChild("messagesScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
 	roomScrollArea := widgets.NewQScrollAreaFromPointer(m.widget.FindChild("roomScroll", core.Qt__FindChildrenRecursively).Pointer())
 	roomScrollAreaContent := widgets.NewQWidgetFromPointer(m.widget.FindChild("roomScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
@@ -139,7 +134,7 @@ func (m *MainUI) NewUI() (err error) {
 		} else {
 			own = false
 		}
-		NewMessageErr := m.MessageListLayout.NewMessage(messageBody, m.cli, sender, timestamp, m.messageScrollArea, own)
+		NewMessageErr := m.MessageListLayout.NewMessage(messageBody, m.cli, sender, timestamp, m.messageScrollArea, own, m)
 		if NewMessageErr != nil {
 			err = NewMessageErr
 			return
@@ -222,47 +217,47 @@ func (m *MainUI) sendMessage(message string) (err error) {
 
 func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScrollArea) (err error) {
 	//TODO register enter and show loader or so
-	m.localLog.Println("Starting Logout Sequence in background")
+	log.Infoln("Starting Logout Sequence in background")
 	var wg sync.WaitGroup
 	results := make(chan bool)
 
 	wg.Add(1)
-	go func(cli *gomatrix.Client, localLog *log.Logger, results chan<- bool) {
+	go func(cli *gomatrix.Client, results chan<- bool) {
 		defer wg.Done()
 		_, LogoutErr := cli.Logout()
 		if LogoutErr != nil {
-			localLog.Println(LogoutErr)
+			log.Errorln(LogoutErr)
 			results <- false
 		}
 		cli.ClearCredentials()
 
-		db, DBOpenErr := db.OpenUserDB()
+		userDB, DBOpenErr := db.OpenUserDB()
 		if DBOpenErr != nil {
-			localLog.Fatalln(DBOpenErr)
+			log.Errorln(DBOpenErr)
 		}
 
 		//Flush complete DB
-		txn := db.NewTransaction(true) // Read-write txn
+		txn := userDB.NewTransaction(true) // Read-write txn
 		QueryErr := txn.Delete([]byte(""))
 		if QueryErr != nil {
-			localLog.Println(QueryErr)
+			log.Errorln(QueryErr)
 			results <- false
 		}
 
 		CommitErr := txn.Commit(nil)
 		if CommitErr != nil {
-			localLog.Println(CommitErr)
+			log.Errorln(CommitErr)
 			results <- false
 		}
 
-		DBPurgeErr := db.PurgeOlderVersions()
+		DBPurgeErr := userDB.PurgeOlderVersions()
 		if DBPurgeErr != nil {
-			localLog.Println(DBPurgeErr)
+			log.Errorln(DBPurgeErr)
 			results <- false
 		} else {
 			results <- true
 		}
-	}(m.cli, m.localLog, results)
+	}(m.cli, results)
 
 	go func() {
 		wg.Wait()      // wait for each execTask to return
@@ -278,11 +273,6 @@ func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScr
 			messageScrollArea.DisconnectResizeEvent()
 
 			LoginUIStruct := NewLoginUIStructWithExistingConfig(m.config, m.window)
-			LoginUIStructInitErr := LoginUIStruct.InitLogger()
-			if LoginUIStructInitErr != nil {
-				err = LoginUIStructInitErr
-				return
-			}
 			loginUIErr := LoginUIStruct.NewUI()
 			if loginUIErr != nil {
 				err = loginUIErr
@@ -296,9 +286,23 @@ func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScr
 
 func (m *MainUI) startSync() (err error) {
 	//Start Syncer!
-	m.syncer = m.cli.Syncer.(*gomatrix.DefaultSyncer)
-	m.storage = gomatrix.NewInMemoryStore()
+	CacheDB, DBOpenErr := db.OpenCacheDB()
+	if DBOpenErr != nil {
+		log.Errorln(DBOpenErr)
+	}
+
+	m.SetCacheDB(&db.MorpheusStorage{
+		Database: CacheDB,
+	})
+	m.storage = &syncer.MorpheusStore{
+		InMemoryStore: *gomatrix.NewInMemoryStore(),
+		CacheDatabase: m.cacheDB,
+	}
+
+	m.syncer = syncer.NewMorpheusSyncer(m.cli.UserID, m.storage)
+
 	m.cli.Store = m.storage
+	m.cli.Syncer = m.syncer
 	m.syncer.Store = m.storage
 
 	m.syncer.OnEventType("m.room.message", func(ev *gomatrix.Event) {
@@ -320,7 +324,7 @@ func (m *MainUI) startSync() (err error) {
 
 	// Start Non-blocking sync
 	go func() {
-		m.localLog.Println("Start sync")
+		log.Infoln("Start sync")
 		for {
 
 			if e := m.cli.Sync(); e != nil {
@@ -368,14 +372,12 @@ func (m *MainUI) loadCache() (err error) {
 		barAtBottom = true
 	}
 
-	db, DBOpenErr := db.OpenCacheDB()
+	cacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
 		err = DBOpenErr
 	}
 
-	log.Println("load cache")
-
-	DBerr := db.View(func(txn *badger.Txn) error {
+	DBerr := cacheDB.View(func(txn *badger.Txn) error {
 		MsgOpts := badger.DefaultIteratorOptions
 		MsgOpts.PrefetchSize = 10
 		MsgIt := txn.NewIterator(MsgOpts)
@@ -590,12 +592,12 @@ func (m *MainUI) loadCache() (err error) {
 		return nil
 	})
 	if DBerr != nil {
-		fmt.Println("DBERR: ", DBerr)
+		log.Errorln("DBERR: ", DBerr)
 		err = DBerr
 		return
 	}
 
-	if !barAtBottom {
+	if barAtBottom {
 		bar.SetValue(bar.Maximum())
 	}
 

@@ -1,19 +1,19 @@
 package matrix
 
 import (
-	"log"
 	"strings"
 	"sync"
 
 	"github.com/Nordgedanken/Morpheus/matrix/db"
 	"github.com/matrix-org/gomatrix"
+	log "github.com/sirupsen/logrus"
 )
 
 //GetClient returns a Client
 func GetClient(homeserverURL, userID, accessToken string) (client *gomatrix.Client, err error) {
-	db, DBOpenErr := db.OpenUserDB()
+	userDB, DBOpenErr := db.OpenUserDB()
 	if DBOpenErr != nil {
-		localLog.Fatalln(DBOpenErr)
+		log.Errorln(DBOpenErr)
 	}
 
 	client, ClientErr := gomatrix.NewClient(homeserverURL, userID, accessToken)
@@ -22,7 +22,7 @@ func GetClient(homeserverURL, userID, accessToken string) (client *gomatrix.Clie
 		return
 	}
 
-	txn := db.NewTransaction(true) // Read-write txn
+	txn := userDB.NewTransaction(true) // Read-write txn
 	DBSetAccessTokenErr := txn.Set([]byte("user|accessToken"), []byte(client.AccessToken))
 	if DBSetAccessTokenErr != nil {
 		err = DBSetAccessTokenErr
@@ -74,13 +74,13 @@ func LoginUser(username, password string) (*gomatrix.Client, error) {
 		return nil, err
 	}
 
-	db, DBOpenErr := db.OpenUserDB()
+	userDB, DBOpenErr := db.OpenUserDB()
 	if DBOpenErr != nil {
-		localLog.Fatalln(DBOpenErr)
+		log.Errorln(DBOpenErr)
 	}
 	cli.SetCredentials(resp.UserID, resp.AccessToken)
 
-	txn := db.NewTransaction(true) // Read-write txn
+	txn := userDB.NewTransaction(true) // Read-write txn
 	DBSetAccessTokenErr := txn.Set([]byte("user|accessToken"), []byte(resp.AccessToken))
 	if DBSetAccessTokenErr != nil {
 		return nil, DBSetAccessTokenErr
@@ -110,7 +110,7 @@ func LoginUser(username, password string) (*gomatrix.Client, error) {
 }
 
 // DoLogin generates the needed Client
-func DoLogin(username, password, homeserverURL, userID, accessToken string, localLog *log.Logger, results chan<- *gomatrix.Client, wg *sync.WaitGroup) {
+func DoLogin(username, password, homeserverURL, userID, accessToken string, results chan<- *gomatrix.Client, wg *sync.WaitGroup) {
 	defer wg.Done()
 	var cli *gomatrix.Client
 	if accessToken != "" && homeserverURL != "" && userID != "" {
@@ -123,14 +123,14 @@ func DoLogin(username, password, homeserverURL, userID, accessToken string, loca
 			cli, cliErr = GetClient("https://"+homeserverURL, userID, accessToken)
 		}
 		if cliErr != nil {
-			localLog.Println(cliErr)
+			log.Errorln(cliErr)
 		}
 		cli.SetCredentials(userID, accessToken)
 	} else {
 		var err error
 		cli, err = LoginUser(username, password)
 		if err != nil {
-			localLog.Println(err)
+			log.Errorln(err)
 		}
 	}
 

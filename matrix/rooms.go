@@ -10,6 +10,7 @@ import (
 	"github.com/Nordgedanken/Morpheus/matrix/db"
 	"github.com/dgraph-io/badger"
 	"github.com/matrix-org/gomatrix"
+	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/gui"
 )
 
@@ -63,7 +64,7 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 	// Get the image Data
 	cacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
-		localLog.Fatalln(DBOpenErr)
+		log.Fatalln(DBOpenErr)
 	}
 
 	// Init local vars
@@ -104,14 +105,14 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 			}
 			IMGdata = data
 		} else {
-			localLog.Println("Generating Room Avatar")
+			log.Println("Generating Room Avatar")
 			var GenerateImgErr error
 			var roomName string
 			if r.RoomName == "" {
 				r.crawlRoomName()
 			}
 			roomName = r.RoomName
-			localLog.Println(roomName)
+			log.Println(roomName)
 			if roomName == "" {
 				roomName = "#"
 			}
@@ -170,12 +171,12 @@ func (r *Room) crawlRoomName() {
 	}{}
 
 	if roomNameStateEventErr := r.cli.StateEvent(r.RoomID, "m.room.name", "", &roomName); roomNameStateEventErr != nil {
-		localLog.Println(roomNameStateEventErr)
+		log.Println(roomNameStateEventErr)
 		// Not returning as a Error NotFound is allowed
 	}
 	if roomName.Name == "" {
 		if roomCanoncialAliasStateEventErr := r.cli.StateEvent(r.RoomID, "m.room.canonical_alias", "", &roomCanoncialAlias); roomCanoncialAliasStateEventErr != nil {
-			localLog.Println(roomCanoncialAliasStateEventErr)
+			log.Println(roomCanoncialAliasStateEventErr)
 			// Not returning as a Error NotFound is allowed
 		}
 		if roomCanoncialAlias.Alias == "" {

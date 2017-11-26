@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/Nordgedanken/Morpheus/matrix"
@@ -45,10 +44,9 @@ func NewMessageList(scrollArea *widgets.QScrollArea, messageView *widgets.QWidge
 }
 
 // NewMessage adds a new message object to the view
-func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli *gomatrix.Client, sender string, timestamp int64, scrollArea *widgets.QScrollArea, own bool) (err error) {
+func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli *gomatrix.Client, sender string, timestamp int64, scrollArea *widgets.QScrollArea, own bool, mainUIStruct *MainUI) (err error) {
 	barAtBottom := false
 	bar := scrollArea.VerticalScrollBar()
-	fmt.Println(bar.Value())
 	if bar.Value() == bar.Maximum() {
 		barAtBottom = true
 	}
@@ -59,6 +57,9 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 	}
 
 	var widget = widgets.NewQWidget(nil, 0)
+	widgetThread := core.NewQThread(nil)
+	widget.MoveToThread(widgetThread)
+	widgetThread.Start()
 
 	var loader = uitools.NewQUiLoader(nil)
 	var file *core.QFile
@@ -76,6 +77,9 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 	timestampString := timestampFormat.Format("15:04:05 - Mon 2.01.2006")
 
 	messageWidget := widgets.NewQWidgetFromPointer(widget.FindChild("message", core.Qt__FindChildrenRecursively).Pointer())
+	messageWidgetThread := core.NewQThread(nil)
+	messageWidget.MoveToThread(messageWidgetThread)
+	messageWidgetThread.Start()
 	avatarLogo := widgets.NewQLabelFromPointer(widget.FindChild("avatar", core.Qt__FindChildrenRecursively).Pointer())
 	messageContent := widgets.NewQLabelFromPointer(widget.FindChild("messageContent", core.Qt__FindChildrenRecursively).Pointer())
 	timestampContent := widgets.NewQLabelFromPointer(widget.FindChild("timestamp", core.Qt__FindChildrenRecursively).Pointer())
@@ -94,7 +98,6 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 	} else {
 		senderDisplayName = senderDisplayNameResp.DisplayName
 	}
-	fmt.Println(senderDisplayName)
 	senderContent.SetText(senderDisplayName)
 	timestampContent.SetText(timestampString)
 	avatarLogo.SetPixmap(avatar)
@@ -115,8 +118,6 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 
 	messageViewLayout.InsertWidget(messageViewLayout.Count()+1, messageWidget, 0, core.Qt__AlignBottom)
 
-	fmt.Println(barAtBottom)
-	fmt.Println(bar.Maximum())
 	if barAtBottom {
 		bar.SetValue(bar.Maximum())
 	}
