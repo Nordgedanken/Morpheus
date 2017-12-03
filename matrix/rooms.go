@@ -10,6 +10,7 @@ import (
 	"github.com/Nordgedanken/Morpheus/matrix/db"
 	"github.com/dgraph-io/badger"
 	"github.com/matrix-org/gomatrix"
+	"github.com/rhinoman/go-commonmark"
 	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/gui"
 )
@@ -50,8 +51,17 @@ func (r *Room) GetRoomTopic() (topic string) {
 	if r.RoomTopic == "" {
 		r.crawlRoomTopic()
 	}
-	topic = r.RoomTopic
-	return
+
+	mardownMessage := commonmark.Md2Html(r.RoomTopic, 0)
+
+	if mardownMessage == r.RoomTopic {
+		topic = r.RoomTopic
+		return
+	} else {
+		r.RoomTopic = mardownMessage
+		topic = r.RoomTopic
+		return
+	}
 }
 
 // GetRoomAvatar generates the Avatar Image for a Room

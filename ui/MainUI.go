@@ -18,6 +18,7 @@ import (
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
+	"github.com/opennota/linkify"
 )
 
 // NewMainUIStruct gives you a MainUI struct with prefilled data
@@ -134,6 +135,33 @@ func (m *MainUI) NewUI() (err error) {
 		} else {
 			own = false
 		}
+		lm := linkify.Links(messageBody)
+		for _, l := range lm {
+			link := messageBody[l.Start:l.End]
+			if l.Start-9 > 0 {
+				log.Infoln("if1: ",messageBody[l.Start-9:l.Start])
+				if !strings.Contains(messageBody[l.Start-9:l.Start], "<a href='") {
+					if l.Start-(1+l.Start+l.End) > 0 {
+						log.Infoln("if2: ",messageBody[l.Start-(1+l.Start+l.End):l.Start])
+						if !strings.Contains(messageBody[l.Start-(1+l.Start+l.End):l.Start], "<a href='"+link+"'>") {
+							messageBody = strings.Replace(messageBody, link, "<a href='"+link+"'>"+link+"</a>", -1)
+						}
+					}else if l.Start-(1+l.Start+l.End) <= 0 {
+						log.Infoln("else2: ",messageBody[0:l.Start])
+						if !strings.Contains(messageBody[0:l.Start], "<a href='"+link+"'>") {
+							messageBody = strings.Replace(messageBody, link, "<a href='" + link + "'>" + link + "</a>", -1)
+						}
+					}
+				}
+			} else if l.Start-9 <= 0 {
+				log.Infoln(messageBody[0:l.Start])
+				if !strings.Contains(messageBody[0:l.Start], "<a href='") {
+					if !strings.Contains(messageBody[0:l.Start], "<a href='"+link+"'>") {
+						messageBody = strings.Replace(messageBody, link, "<a href='" + link + "'>" + link + "</a>", -1)
+					}
+				}
+			}
+		}
 		NewMessageErr := m.MessageListLayout.NewMessage(messageBody, m.cli, sender, timestamp, m.messageScrollArea, own, m)
 		if NewMessageErr != nil {
 			err = NewMessageErr
@@ -198,9 +226,16 @@ func (m *MainUI) NewUI() (err error) {
 }
 
 func (m *MainUI) sendMessage(message string) (err error) {
+	messageOriginal := message
+	lm := linkify.Links(message)
+	for _, l := range lm {
+		link := message[l.Start:l.End]
+		message = strings.Replace(message, link, "<a href='" + link + "'>" + link + "</a>", -1)
+	}
+
 	mardownMessage := commonmark.Md2Html(message, 0)
 	if mardownMessage == message {
-		_, SendErr := m.cli.SendText(m.currentRoom, message)
+		_, SendErr := m.cli.SendMessageEvent(m.currentRoom, "m.room.message", matrix.HTMLMessage{MsgType: "m.text", Body: messageOriginal, FormattedBody: message, Format: "org.matrix.custom.html"})
 		if SendErr != nil {
 			err = SendErr
 			return

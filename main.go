@@ -55,6 +55,7 @@ func main() {
 	go func() {
 		<-c
 		cleanup()
+		close(c)
 		os.Exit(1)
 	}()
 
