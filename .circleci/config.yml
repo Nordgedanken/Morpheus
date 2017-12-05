@@ -1,0 +1,23 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/golang:latest
+    steps:
+      - checkout
+      - run: echo 'export OS=linux' >> $BASH_ENV
+      - run: echo 'export DESKTOP=true' >> $BASH_ENV
+      - run: echo 'export QT_PKG_CONFIG=true' >> $BASH_ENV
+      - run:
+        name: qt-binding
+        command: go get -u -v github.com/therecipe/qt/cmd/...
+      - run:
+        name: qt
+        command: if [[ "$OS" == "linux" ]]; then chmod +x ./.ci/linux.sh && ./.ci/linux.sh; fi
+      - run:
+        name: qt-binding setup
+        command: qtsetup full desktop
+      - run:
+        name: get Morpheus
+        command: go get -v github.com/Nordgedanken/Morpheus/...
+      - run: if [[ "$DESKTOP" == "true" ]]; then cd $GOPATH/src/github.com/Nordgedanken/Morpheus/ && qtdeploy test desktop; fi
