@@ -26,8 +26,8 @@ sudo apt-get update
 sudo apt-get -y install qt3d5-dev qtbase5-dev qtconnectivity5-dev qtcreator qtdeclarative5-dev qt5-doc qtlocation5-dev qtmultimedia5-dev qtquickcontrols2-5-dev qtquick1-5-dev qtscript5-dev qtbase5-dev-tools qttools5-dev qttranslations5-l10n qtwebengine5-dev qtxmlpatterns5-dev-tools && sudo apt-get clean
 
 #prepare env
-sudo chown $USER /usr/local/bin
-sudo chown $USER $GOROOT/pkg | true
+sudo chown circleci /usr/local/bin
+sudo chown circleci $GOROOT/pkg | true
 
 #check env
 df -h
