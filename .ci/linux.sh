@@ -14,8 +14,6 @@ export QT_QPA_PLATFORM=minimal
 sudo apt-get -y install libpulse-dev software-properties-common && sudo apt-get clean
 
 #replace gcc4 with gcc5
-sudo apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 1E9377A2BA9EF27F
-sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
 sudo apt-get update
 sudo apt-get -y install gcc-5 g++-5 && sudo apt-get clean
 sudo rm -f /usr/bin/gcc; sudo ln -s /usr/bin/gcc-5 /usr/bin/gcc
