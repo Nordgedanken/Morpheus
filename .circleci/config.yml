@@ -7,8 +7,8 @@ jobs:
           DESKTOP: true
     steps:
       - run:
-          name: get morpheus
-          command: go get -u -v github.com/Nordgedanken/Morpheus/...
+          name: Get Morpheus
+          command: go get -u -v -d github.com/Nordgedanken/Morpheus/...
       - run:
           name: qt-binding
           command: go get -u -v github.com/therecipe/qt/cmd/...
@@ -18,7 +18,4 @@ jobs:
       - run:
           name: qt-binding setup
           command: qtsetup full desktop
-      - run:
-          name: get Morpheus
-          command: go get -v github.com/Nordgedanken/Morpheus/...
       - run: if [[ "$DESKTOP" == "true" ]]; then cd $GOPATH/src/github.com/Nordgedanken/Morpheus/ && qtdeploy test desktop; fi
