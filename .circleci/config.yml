@@ -3,11 +3,12 @@ jobs:
   build:
     docker:
       - image: circleci/golang:latest
+        environment:
+          OS: linux
+          DESKTOP: true
+          QT_PKG_CONFIG: true
     steps:
       - checkout
-      - run: echo 'export OS=linux' >> $BASH_ENV
-      - run: echo 'export DESKTOP=true' >> $BASH_ENV
-      - run: echo 'export QT_PKG_CONFIG=true' >> $BASH_ENV
       - run:
           name: qt-binding
           command: go get -u -v github.com/therecipe/qt/cmd/...
