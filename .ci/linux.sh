@@ -24,11 +24,6 @@ sudo rm -f /usr/bin/g++; sudo ln -s /usr/bin/g++-5 /usr/bin/g++
 sudo add-apt-repository -y ppa:beineri/opt-qt58-trusty
 sudo apt-get -qq update
 sudo apt-get -y -qq install qt583d qt58base qt58canvas3d qt58charts-no-lgpl qt58connectivity qt58creator qt58datavis3d-no-lgpl qt58declarative qt58doc qt58gamepad qt58graphicaleffects qt58imageformats qt58location qt58multimedia qt58qbs qt58quickcontrols qt58quickcontrols2 qt58script qt58scxml qt58sensors qt58serialbus qt58serialport qt58svg qt58tools qt58translations qt58virtualkeyboard-no-lgpl qt58webchannel qt58webengine qt58websockets qt58x11extras qt58xmlpatterns qt58speech qt58networkauth-no-lgpl && sudo apt-get -qq clean
-QT=qt-unified-linux-x64-online.run
-curl -sL --retry 10 --retry-delay 10 -o /tmp/$QT https://download.qt.io/official_releases/online_installers/$QT
-chmod +x /tmp/$QT
-/tmp/$QT --script $GOPATH/src/github.com/therecipe/qt/internal/ci/iscript.qs
-rm -f /tmp/$QT
 
 #prepare env
 sudo chown $USER /usr/local/bin
