@@ -17,7 +17,7 @@ Join the Matrix Room at [#Morpheus:matrix.ffslfl.net](https://matrix.to/#/#Morph
 2. Clone this repo by doing `go get -u github.com/Nordgedanken/Morpheus`
 
 ### Build
-1. Run `qtdeploy build desktop .` inside  `$GOPATH/src/github.com/Nordgedanken/Morpheus`
+1. Run `qtdeploy build desktop` inside  `$GOPATH/src/github.com/Nordgedanken/Morpheus`
 2. Run the Application from within `deploy/**`
 
 
