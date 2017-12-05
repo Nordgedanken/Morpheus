@@ -8,12 +8,12 @@ dependencies:
   pre:
   override:
       - go get -u -v github.com/therecipe/qt/cmd/...
-      - if [[ "$OS" == "linux" ]]; then chmod +x ./.ci/linux.sh && ./.ci/linux.sh; fi
+      #- if [[ "$OS" == "linux" ]]; then chmod +x ./.ci/linux.sh && ./.ci/linux.sh; fi
       - /home/ubuntu/.go_project/bin/qtsetup full desktop
       - go get -v github.com/Nordgedanken/Morpheus/...
   post:
 test:
   pre:
   override:
-    - if [[ "$DESKTOP" == "true" ]]; then /home/ubuntu/.go_project/bin/qtsetup && /home/ubuntu/.go_project/bin/qtdeploy test desktop; fi
+    - if [[ "$DESKTOP" == "true" ]]; then /home/ubuntu/.go_project/bin/qtsetup && cd /home/ubuntu/.go_project/src/github.com/Nordgedanken/Morpheus/ && /home/ubuntu/.go_project/bin/qtdeploy test desktop; fi
   post:
