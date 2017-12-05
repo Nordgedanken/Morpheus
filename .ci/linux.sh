@@ -11,15 +11,19 @@ du -sh $HOME/*
 export QT_QPA_PLATFORM=minimal
 
 #additional deps for multimedia
-sudo apt-get -y install libpulse-dev software-properties-common && sudo apt-get clean
+sudo apt-get -y install libpulse-dev software-properties-common python-software-properties && sudo apt-get clean
 
 #replace gcc4 with gcc5
+echo "deb http://ftp.us.debian.org/debian unstable main contrib non-free" | sudo tee --append /etc/apt/sources.list.d/unstable.list
 sudo apt-get update
+sudo apt-get install -t unstable gcc-5 g++-5 && sudo apt-get clean
+sudo rm -f /etc/apt/sources.list.d/unstable.list
+sudo rm -f /usr/bin/gcc; sudo ln -s /usr/bin/gcc-5 /usr/bin/gcc
+sudo rm -f /usr/bin/g++; sudo ln -s /usr/bin/g++-5 /usr/bin/g++
 
 #download and install qt
-sudo add-apt-repository -y ppa:beineri/opt-qt58-trusty
 sudo apt-get update
-sudo apt-get -y install qt583d qt58base qt58canvas3d qt58charts-no-lgpl qt58connectivity qt58creator qt58datavis3d-no-lgpl qt58declarative qt58doc qt58gamepad qt58graphicaleffects qt58imageformats qt58location qt58multimedia qt58qbs qt58quickcontrols qt58quickcontrols2 qt58script qt58scxml qt58sensors qt58serialbus qt58serialport qt58svg qt58tools qt58translations qt58virtualkeyboard-no-lgpl qt58webchannel qt58webengine qt58websockets qt58x11extras qt58xmlpatterns qt58speech qt58networkauth-no-lgpl && sudo apt-get clean
+sudo apt-get -y install qt3d5-dev qtbase5-dev qtconnectivity5-dev qtcreator qtdeclarative5-dev qt5-doc qtlocation5-dev qtmultimedia5-dev qtquickcontrols2-5-dev qtquick1-5-dev qtscript5-dev qtbase5-dev-tools qttools5-dev qttranslations5-l10n qtwebengine5-dev qtxmlpatterns5-dev-tools && sudo apt-get clean
 
 #prepare env
 sudo chown $USER /usr/local/bin
