@@ -6,7 +6,6 @@ jobs:
         environment:
           OS: linux
           DESKTOP: true
-          QT_PKG_CONFIG: true
     steps:
       - checkout
       - run:

@@ -22,8 +22,11 @@ sudo rm -f /usr/bin/gcc; sudo ln -s /usr/bin/gcc-5 /usr/bin/gcc
 sudo rm -f /usr/bin/g++; sudo ln -s /usr/bin/g++-5 /usr/bin/g++
 
 #download and install qt
-sudo apt-get update
-sudo apt-get -y install qt3d5-dev qtbase5-dev qtconnectivity5-dev qtcreator qtdeclarative5-dev qt5-doc qtlocation5-dev qtmultimedia5-dev qtquickcontrols2-5-dev qtscript5-dev qtbase5-dev-tools qttools5-dev qttranslations5-l10n qtwebengine5-dev qtxmlpatterns5-dev-tools && sudo apt-get clean
+QT=qt-unified-linux-x64-online.run
+curl -sL --retry 10 --retry-delay 10 -o /tmp/$QT https://download.qt.io/official_releases/online_installers/$QT
+chmod +x /tmp/$QT
+/tmp/$QT --script $GOPATH/src/github.com/therecipe/qt/internal/ci/iscript.qs
+rm -f /tmp/$QT
 
 #prepare env
 sudo chown circleci /usr/local/bin
