@@ -2,18 +2,17 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/golang:latest
+      - image: therecipe/qt:linux
         environment:
-          OS: linux
           DESKTOP: true
     steps:
       - checkout
       - run:
           name: qt-binding
           command: go get -u -v github.com/therecipe/qt/cmd/...
-      - run:
-          name: qt
-          command: if [[ "$OS" == "linux" ]]; then chmod +x ./.ci/linux.sh && ./.ci/linux.sh; fi
+      #- run:
+      #    name: qt
+      #    command: if [[ "$OS" == "linux" ]]; then chmod +x ./.ci/linux.sh && ./.ci/linux.sh; fi
       - run:
           name: qt-binding setup
           command: qtsetup full desktop
