@@ -2,12 +2,13 @@ version: 2
 jobs:
   build:
     docker:
-      # TODO: CHANGE ON PUSH TO DEVELOP
-      - image: mtrnord/morpheus:feature_CI_Changes
+      - image: therecipe/qt:linux
         environment:
           DESKTOP: true
     steps:
-      - checkout
+      - run:
+          name: get morpheus
+          command: go get -u -v github.com/Nordgedanken/Morpheus/...
       - run:
           name: qt-binding
           command: go get -u -v github.com/therecipe/qt/cmd/...
