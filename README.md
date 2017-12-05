@@ -13,7 +13,7 @@ Join the Matrix Room at [#Morpheus:matrix.ffslfl.net](https://matrix.to/#/#Morph
 ## How to build
 ### Prerequisites
 1. https://github.com/therecipe/qt
- * Follow https://github.com/therecipe/qt/wiki/Installation
+   * Follow https://github.com/therecipe/qt/wiki/Installation
 2. Clone this repo by doing `go get -u github.com/Nordgedanken/Morpheus`
 
 ### Build
