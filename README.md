@@ -9,6 +9,7 @@ A Matrix client written in Go-QT
 
 ## Contributing - Matrix Room
 Join the Matrix Room at [#Morpheus:matrix.ffslfl.net](https://matrix.to/#/#Morpheus:matrix.ffslfl.net)
+Read the [Contribution Guideline](CONTRIBUTING.md)
 
 ## How to build
 ### Prerequisites
