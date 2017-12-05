@@ -3,7 +3,7 @@ jobs:
   build:
     docker:
       # TODO: CHANGE ON PUSH TO DEVELOP
-      - image: mtrnord/morpheus:Changesfeature_CI_Changes
+      - image: mtrnord/morpheus:feature_CI_Changes
         environment:
           DESKTOP: true
     steps:
