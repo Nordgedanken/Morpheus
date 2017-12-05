@@ -17,5 +17,5 @@ jobs:
       #    command: if [[ "$OS" == "linux" ]]; then chmod +x ./.ci/linux.sh && ./.ci/linux.sh; fi
       - run:
           name: qt-binding setup
-          command: qtsetup full desktop
-      - run: if [[ "$DESKTOP" == "true" ]]; then cd $GOPATH/src/github.com/Nordgedanken/Morpheus/ && qtdeploy test desktop; fi
+          command: $GOPATH/bin/qtsetup full desktop
+      - run: if [[ "$DESKTOP" == "true" ]]; then cd $GOPATH/src/github.com/Nordgedanken/Morpheus/ && $GOPATH/bin/qtdeploy test desktop; fi
