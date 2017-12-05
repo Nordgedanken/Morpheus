@@ -11,7 +11,7 @@ du -sh $HOME/*
 export QT_QPA_PLATFORM=minimal
 
 #additional deps for multimedia
-sudo apt-get -y install libpulse-dev && sudo apt-get clean
+sudo apt-get -y install libpulse-dev software-properties-common && sudo apt-get clean
 
 #replace gcc4 with gcc5
 sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
