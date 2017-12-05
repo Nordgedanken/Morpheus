@@ -2,7 +2,8 @@ version: 2
 jobs:
   build:
     docker:
-      - image: therecipe/qt:linux
+      # TODO: CHANGE ON PUSH TO DEVELOP
+      - image: mtrnord/morpheus:Changesfeature_CI_Changes
         environment:
           DESKTOP: true
     steps:
