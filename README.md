@@ -1,5 +1,5 @@
 # Morpheus
-CircleCi [![CircleCI branch](https://img.shields.io/circleci/project/github/Nordgedanken/Morpheus/master.svg)](https://circleci.com/gh/Nordgedanken/Morpheus)
+[![CircleCI branch](https://img.shields.io/circleci/project/github/Nordgedanken/Morpheus/master.svg)](https://circleci.com/gh/Nordgedanken/Morpheus)
 
 [![Github All Releases](https://img.shields.io/github/downloads/Nordgedanken/Morpheus/total.svg)]()
 ---
