@@ -1,0 +1,34 @@
+{
+  "name": "Morpheus",
+  "maintainer": "MTRNord <info@nordgedanken.de>",
+  "files": [
+    {
+      "from": "deploy/linux/Morpheus",
+      "to": "/usr/bin",
+      "base": "deploy/linux",
+      "fperm": "0755"
+    }
+  ],
+  "copyrights": [
+    {
+      "files": "*",
+      "copyright": "2017 MTRNord <info@nordgedanken.de>",
+      "license": "GPLv3",
+      "file": "LICENSE"
+    }
+  ],
+  "description": "A Matrix client written in Go-QT ",
+  "menus": [
+    {
+      "name":"Morpheus",
+      "description":"A Matrix client written in Go-QT ",
+      "generic-name":"Matrix Client",
+      "exec":"/usr/bin/Morpheus",
+      "icon":"qml/resources/logos/MorpheusBig.png",
+      "type":"Application",
+      "keywords":"matrix;Morpheus",
+      "startup-notify": false,
+      "categories":"Network/InstantMessaging"
+    }
+  ]
+}
