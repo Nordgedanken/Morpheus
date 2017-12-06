@@ -43,7 +43,7 @@ jobs:
       - run:
           name: Prepare Deb Generating
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-          command: wget -q -O - --no-check-certificate https://raw.githubusercontent.com/mh-cbon/latest/master/install.sh | GH=mh-cbon/go-bin-deb sh -xe && apt-get update -qq && apt-get install build-essential lintian -y -qq
+          command: apt-get update -qq && apt-get install -y -qq wget && wget -q -O - --no-check-certificate https://raw.githubusercontent.com/mh-cbon/latest/master/install.sh | GH=mh-cbon/go-bin-deb sh -xe && apt-get update -qq && apt-get install build-essential lintian -y -qq
       - run:
           name: Deb Generating
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
