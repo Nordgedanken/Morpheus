@@ -3,8 +3,6 @@ jobs:
   prepare:
     docker:
       - image: therecipe/qt:linux
-        environment:
-          DESKTOP: true
     steps:
       - run:
           name: Get Morpheus
@@ -22,8 +20,6 @@ jobs:
   build_linux:
     docker:
       - image: therecipe/qt:linux
-        environment:
-          DESKTOP: true
     steps:
       - attach_workspace:
           # Must be absolute path or relative path from working_directory
@@ -35,8 +31,6 @@ jobs:
   test_linux:
     docker:
       - image: therecipe/qt:linux
-        environment:
-          DESKTOP: true
     steps:
       - attach_workspace:
           # Must be absolute path or relative path from working_directory
@@ -50,8 +44,6 @@ jobs:
   build_win_static:
     docker:
       - image: therecipe/qt:windows_64_static
-        environment:
-          DESKTOP: true
     steps:
       - attach_workspace:
           # Must be absolute path or relative path from working_directory
@@ -63,8 +55,6 @@ jobs:
   test_win_static:
     docker:
       - image: therecipe/qt:windows_64_static
-        environment:
-          DESKTOP: true
     steps:
       - attach_workspace:
           # Must be absolute path or relative path from working_directory
