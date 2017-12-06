@@ -5,18 +5,25 @@ jobs:
       - image: therecipe/qt:linux
         environment:
           DESKTOP: true
-    working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
     steps:
       - run:
           name: Get Morpheus
           command: go get -u -v -d github.com/Nordgedanken/Morpheus/...
+      - persist_to_workspace:
+          # Must be an absolute path, or relative path from working_directory
+          root: /home/user/work/
+          # Must be relative path from root
+          paths:
+            - src/
   build_linux:
     docker:
       - image: therecipe/qt:linux
         environment:
           DESKTOP: true
-    working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
     steps:
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at: /home/user/work/src
       - run:
           name: Run Build
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
@@ -26,8 +33,10 @@ jobs:
       - image: therecipe/qt:linux
         environment:
           DESKTOP: true
-    working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
     steps:
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at: /home/user/work/src
       - run:
           name: Run Tests
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
@@ -37,8 +46,10 @@ jobs:
       - image: therecipe/qt:windows_64_static
         environment:
           DESKTOP: true
-    working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
     steps:
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at: /home/user/work/src
       - run:
           name: Run Build
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
@@ -48,8 +59,10 @@ jobs:
       - image: therecipe/qt:windows_64_static
         environment:
           DESKTOP: true
-    working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
     steps:
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at: /home/user/work/src
       - run:
           name: Run Tests
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
