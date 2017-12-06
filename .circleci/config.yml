@@ -13,7 +13,7 @@ jobs:
       - run:
           name: Get Go Dependencies
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-          command: go get -t -v -d -f ./...
+          command: go get -t -v -d ./...
       - run:
           name: Get Ginko CLI
           command: go get -u -v github.com/onsi/ginkgo/ginkgo && go get -u -v github.com/onsi/gomega
