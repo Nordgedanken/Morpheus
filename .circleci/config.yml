@@ -5,6 +5,9 @@ jobs:
       - image: therecipe/qt:linux
     steps:
       - run:
+          name: Get checkout script
+          command: wget https://github.com/Nordgedanken/Morpheus/blob/develop/.circleci/checkout.sh -O .circleci/checkout.sh && chmod +x .circleci/checkout.sh
+      - run:
           name: Checkout Morpheus
           command: bash .circleci/checkout.sh
       - run:
