@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/dgraph-io/badger"
-	. "github.com/onsi/ginkgo"
+	"github.com/onsi/ginkgo"
 
 	//. "github.com/onsi/gomega"
 	"github.com/shibukawa/configdir"
@@ -56,6 +56,11 @@ func OpenUserDBTest() (db *badger.DB, err error) {
 	db = expDB
 	return
 }
+
+var Describe = ginkgo.Describe
+var Context = ginkgo.Context
+var It = ginkgo.It
+var Fail = ginkgo.Fail
 
 var _ = Describe("UserDataDB", func() {
 	var db *badger.DB
