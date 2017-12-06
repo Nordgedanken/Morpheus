@@ -10,16 +10,16 @@ fi
 
 replace='https://github.com/'
 to_replace='git@github.com:'
-CIRCLE_REPOSITORY_URL="${CIRCLE_REPOSITORY_URL/$to_replace/$replace}"
+NEW_CIRCLE_REPOSITORY_URL="${CIRCLE_REPOSITORY_URL/$to_replace/$replace}"
 
 if [ -e /home/user/work/src/github.com/Nordgedanken/Morpheus/.git ]
 then
   cd /home/user/work/src/github.com/Nordgedanken/Morpheus/
-  git remote set-url origin "$CIRCLE_REPOSITORY_URL" || true
+  git remote set-url origin "$NEW_CIRCLE_REPOSITORY_URL" || true
 else
   mkdir -p /home/user/work/src/github.com/Nordgedanken/Morpheus/
   cd /home/user/work/src/github.com/Nordgedanken/Morpheus/
-  git clone "$CIRCLE_REPOSITORY_URL" .
+  git clone "$NEW_CIRCLE_REPOSITORY_URL" .
 fi
 
 if [ -n "$CIRCLE_TAG" ]
