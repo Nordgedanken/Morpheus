@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  prepare:
+  build_linux:
     docker:
       - image: therecipe/qt:linux
     steps:
@@ -10,20 +10,6 @@ jobs:
       - run:
           name: Get Ginko CLI
           command: go get -u -v github.com/onsi/ginkgo/ginkgo && go get -u -v github.com/onsi/gomega
-      - persist_to_workspace:
-          # Must be an absolute path, or relative path from working_directory
-          root: /home/user/work/
-          # Must be relative path from root
-          paths:
-            - src/
-            - bin/ginkgo
-  build_linux:
-    docker:
-      - image: therecipe/qt:linux
-    steps:
-      - attach_workspace:
-          # Must be absolute path or relative path from working_directory
-          at: /home/user/work/
       - run:
           name: Run Build
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
@@ -32,9 +18,12 @@ jobs:
     docker:
       - image: therecipe/qt:linux
     steps:
-      - attach_workspace:
-          # Must be absolute path or relative path from working_directory
-          at: /home/user/work/
+      - run:
+          name: Get Morpheus
+          command: go get -u -v -d github.com/Nordgedanken/Morpheus/...
+      - run:
+          name: Get Ginko CLI
+          command: go get -u -v github.com/onsi/ginkgo/ginkgo && go get -u -v github.com/onsi/gomega
       - run:
           name: Generate additional binding files
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
@@ -55,9 +44,12 @@ jobs:
     docker:
       - image: therecipe/qt:windows_64_static
     steps:
-      - attach_workspace:
-          # Must be absolute path or relative path from working_directory
-          at: /home/user/work/
+      - run:
+          name: Get Morpheus
+          command: go get -u -v -d github.com/Nordgedanken/Morpheus/...
+      - run:
+          name: Get Ginko CLI
+          command: go get -u -v github.com/onsi/ginkgo/ginkgo && go get -u -v github.com/onsi/gomega
       - run:
           name: Run Build
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
@@ -66,13 +58,6 @@ workflows:
   version: 2
   build-test:
     jobs:
-      - prepare
-      - build_linux:
-          requires:
-            - prepare
-      - build_win_static:
-          requires:
-            - prepare
-      - test:
-          requires:
-            - prepare
+      - build_linux
+      - build_win_static
+      - test
