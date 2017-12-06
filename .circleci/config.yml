@@ -5,6 +5,7 @@ jobs:
       - image: therecipe/qt:linux
         environment:
           DESKTOP: true
+    working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
     steps:
       - run:
           name: Get Morpheus
@@ -14,6 +15,7 @@ jobs:
       - image: therecipe/qt:linux
         environment:
           DESKTOP: true
+    working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
     steps:
       - run:
           name: Run Build
@@ -24,6 +26,7 @@ jobs:
       - image: therecipe/qt:linux
         environment:
           DESKTOP: true
+    working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
     steps:
       - run:
           name: Run Tests
@@ -34,6 +37,7 @@ jobs:
       - image: therecipe/qt:windows_64_static
         environment:
           DESKTOP: true
+    working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
     steps:
       - run:
           name: Run Build
@@ -44,6 +48,7 @@ jobs:
       - image: therecipe/qt:windows_64_static
         environment:
           DESKTOP: true
+    working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
     steps:
       - run:
           name: Run Tests
