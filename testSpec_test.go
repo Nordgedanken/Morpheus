@@ -2,6 +2,8 @@ package main_test
 
 import (
 	"fmt"
+
+	. "github.com/onsi/ginkgo"
 )
 
 var _ = Describe("TestSpec", func() {
