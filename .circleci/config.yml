@@ -11,6 +11,10 @@ jobs:
           name: Checkout Morpheus
           command: bash .circleci/checkout.sh
       - run:
+          name: Get Go Dependencies
+          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+          command: go get -t ./...
+      - run:
           name: Get Ginko CLI
           command: go get -u -v github.com/onsi/ginkgo/ginkgo && go get -u -v github.com/onsi/gomega
       - persist_to_workspace:
