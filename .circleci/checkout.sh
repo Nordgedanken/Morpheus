@@ -8,7 +8,9 @@ then
   export HOME=$(getent passwd $(id -un) | cut -d: -f6)
 fi
 
-git config --global url."https://github.com".insteadOf "ssh://git@github.com" || true
+replace='https://github.com/'
+to_replace='git@github.com:'
+CIRCLE_REPOSITORY_URL="${CIRCLE_REPOSITORY_URL/$to_replace/$replace}"
 
 if [ -e /home/user/work/src/github.com/Nordgedanken/Morpheus/.git ]
 then
