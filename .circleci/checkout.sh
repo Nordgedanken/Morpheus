@@ -41,3 +41,5 @@ then
 fi
 
 git reset --hard "$CIRCLE_SHA1"
+
+go get -t ./...

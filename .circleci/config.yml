@@ -8,16 +8,8 @@ jobs:
           name: Get checkout script
           command: apt-get update -qq && apt-get install -y -qq wget && mkdir -p .circleci && wget https://raw.githubusercontent.com/Nordgedanken/Morpheus/develop/.circleci/checkout.sh -O .circleci/checkout.sh && chmod +x .circleci/checkout.sh
       - run:
-          name: Print Clone Repo URL
-          shell: /bin/sh
-          command: echo $CIRCLE_REPOSITORY_URL
-      - run:
           name: Checkout Morpheus
           command: bash .circleci/checkout.sh
-      - run:
-          name: Get Morpheus
-          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-          command: go get -u -v -d github.com/Nordgedanken/Morpheus/...
       - run:
           name: Get Ginko CLI
           command: go get -u -v github.com/onsi/ginkgo/ginkgo && go get -u -v github.com/onsi/gomega
