@@ -9,12 +9,16 @@ jobs:
       - run:
           name: Get Morpheus
           command: go get -u -v -d github.com/Nordgedanken/Morpheus/...
+      - run:
+          name: Get Ginko CLI
+          command: go install github.com/onsi/ginkgo/ginkgo
       - persist_to_workspace:
           # Must be an absolute path, or relative path from working_directory
           root: /home/user/work/
           # Must be relative path from root
           paths:
             - src/
+            - bin/ginkgo
   build_linux:
     docker:
       - image: therecipe/qt:linux
@@ -40,7 +44,7 @@ jobs:
       - run:
           name: Run Tests
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-          command: $GOPATH/bin/qtdeploy test linux
+          command: $GOPATH/bin/ginkgo -r --randomizeAllSpecs --randomizeSuites --failOnPending --cover --trace --race --progress
       - store_test_results:
               path: /home/user/work/src/github.com/Nordgedanken/Morpheus/
   build_win_static:
@@ -68,7 +72,7 @@ jobs:
       - run:
           name: Run Tests
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-          command: $GOPATH/bin/qtdeploy test windows
+          command: $GOPATH/bin/ginkgo -r --randomizeAllSpecs --randomizeSuites --failOnPending --cover --trace --race --progress
     - store_test_results:
         path: /home/user/work/src/github.com/Nordgedanken/Morpheus/
 workflows:
