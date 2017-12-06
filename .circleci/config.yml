@@ -1,0 +1,19 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: therecipe/qt:linux
+        environment:
+          DESKTOP: true
+    steps:
+      - run:
+          name: Get Morpheus
+          command: go get -u -v -d github.com/Nordgedanken/Morpheus/...
+      - run:
+          name: Run Build
+          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+          command: $GOPATH/bin/qtdeploy build desktop
+      - run:
+          name: Run Tests
+          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+          command: $GOPATH/bin/qtdeploy test desktop
