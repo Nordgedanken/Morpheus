@@ -36,6 +36,10 @@ jobs:
           # Must be absolute path or relative path from working_directory
           at: /home/user/work/
       - run:
+          name: Generate additional binding files
+          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+          command: $GOPATH/bin/qtrcc desktop && $GOPATH/bin/qtmoc desktop
+      - run:
           name: Run Tests
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
           command: $GOPATH/bin/ginkgo -r --randomizeAllSpecs --randomizeSuites --failOnPending --cover --trace --race --progress
