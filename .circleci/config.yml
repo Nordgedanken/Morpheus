@@ -35,6 +35,11 @@ jobs:
           name: Run Build
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
           command: $GOPATH/bin/qtdeploy build linux
+      - run:
+          name: Debug Print directory
+          shell: /bin/sh
+          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+          command: ls -lah && echo "\n\n" && ls -lah deploy
   test:
     docker:
       - image: therecipe/qt:linux
@@ -56,8 +61,13 @@ jobs:
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
           command: $GOPATH/bin/ginkgo -r -p --randomizeAllSpecs --randomizeSuites --failOnPending --trace --race --progress /home/user/work/src/github.com/Nordgedanken/Morpheus/Morpheus.test
           no_output_timeout: 1200
+      - run:
+          name: Debug Print directory
+          shell: /bin/sh
+          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+          command: ls -lah
       - store_test_results:
-              path: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+              path: /home/user/work/src/github.com/Nordgedanken/Morpheus/junit.xml
   build_win_static:
     docker:
       - image: therecipe/qt:windows_64_static
@@ -69,6 +79,11 @@ jobs:
           name: Run Build
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
           command: $GOPATH/bin/qtdeploy build windows
+      - run:
+          name: Debug Print directory
+          shell: /bin/sh
+          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+          command: ls -lah && echo "\n\n" && ls -lah deploy
 workflows:
   version: 2
   build-test:
