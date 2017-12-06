@@ -20,7 +20,9 @@ jobs:
           command: $GOPATH/bin/qtsetup full desktop
       - run:
           name: Run Build
-          command: cd $GOPATH/src/github.com/Nordgedanken/Morpheus/ && $GOPATH/bin/qtdeploy build desktop
+          working_directory: $GOPATH/src/github.com/Nordgedanken/Morpheus/
+          command: $GOPATH/bin/qtdeploy build desktop
       - run:
           name: Run Tests
-          command: cd $GOPATH/src/github.com/Nordgedanken/Morpheus/ && $GOPATH/bin/qtdeploy test desktop
+          working_directory: $GOPATH/src/github.com/Nordgedanken/Morpheus/
+          command: $GOPATH/bin/qtdeploy test desktop
