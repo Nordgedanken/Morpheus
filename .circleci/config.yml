@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  prepare:
     docker:
       - image: therecipe/qt:linux
         environment:
@@ -9,11 +9,81 @@ jobs:
       - run:
           name: Get Morpheus
           command: go get -u -v -d github.com/Nordgedanken/Morpheus/...
+      - persist_to_workspace:
+          # Must be an absolute path, or relative path from working_directory
+          root: /home/user/work/
+          # Must be relative path from root
+          paths:
+            - src/
+  build_linux:
+    docker:
+      - image: therecipe/qt:linux
+        environment:
+          DESKTOP: true
+    steps:
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at: /home/user/work/
       - run:
           name: Run Build
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-          command: $GOPATH/bin/qtdeploy build desktop
+          command: $GOPATH/bin/qtdeploy build linux
+  test_linux:
+    docker:
+      - image: therecipe/qt:linux
+        environment:
+          DESKTOP: true
+    steps:
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at: /home/user/work/
       - run:
           name: Run Tests
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-          command: $GOPATH/bin/qtdeploy test desktop
+          command: $GOPATH/bin/qtdeploy test linux
+  build_win_static:
+    docker:
+      - image: therecipe/qt:windows_64_static
+        environment:
+          DESKTOP: true
+    steps:
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at: /home/user/work/
+      - run:
+          name: Run Build
+          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+          command: $GOPATH/bin/qtdeploy build windows
+  test_win_static:
+    docker:
+      - image: therecipe/qt:windows_64_static
+        environment:
+          DESKTOP: true
+    steps:
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at: /home/user/work/
+      - run:
+          name: Run Tests
+          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+          command: $GOPATH/bin/qtdeploy test windows
+workflows:
+  version: 2
+  build-test-linux:
+    jobs:
+      - prepare
+      - build_linux:
+          requires:
+            - prepare
+      - test_linux:
+          requires:
+            - prepare
+  build-test-win:
+      jobs:
+        - prepare
+        - build_win_static:
+            requires:
+              - prepare
+        - test_win_static:
+            requires:
+              - prepare

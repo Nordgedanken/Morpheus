@@ -1,8 +1,7 @@
 # Morpheus
-[![CircleCI branch](https://img.shields.io/circleci/project/github/Nordgedanken/Morpheus/master.svg)](https://circleci.com/gh/Nordgedanken/Morpheus)  [![Build status](https://ci.appveyor.com/api/projects/status/a0ke0029ely9w7hu?svg=true)](https://ci.appveyor.com/project/MTRNord/neo)
+[![CircleCI branch](https://img.shields.io/circleci/project/github/Nordgedanken/Morpheus/master.svg)](https://circleci.com/gh/Nordgedanken/Morpheus)
 
-_Appveyor CI is known to be broken_
-
+[![Github All Releases](https://img.shields.io/github/downloads/Nordgedanken/Morpheus/total.svg)]()
 ---
 
 A Matrix client written in Go-QT
