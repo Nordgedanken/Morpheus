@@ -9,7 +9,7 @@ jobs:
           command: go get -u -v -d github.com/Nordgedanken/Morpheus/...
       - run:
           name: Get Ginko CLI
-          command: go get -u -v github.com/onsi/ginkgo/ginkgo
+          command: go get -u -v github.com/onsi/ginkgo/ginkgo && go get -u -v github.com/onsi/gomega
       - persist_to_workspace:
           # Must be an absolute path, or relative path from working_directory
           root: /home/user/work/
