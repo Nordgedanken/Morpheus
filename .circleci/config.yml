@@ -47,7 +47,7 @@ jobs:
       - run:
           name: Deb Generating
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-          command: dpkg-deb --build debian Morpheus.deb
+          command: mkdir debian && go-bin-deb generate -o debian && dpkg-deb --build debian Morpheus.deb
       - store_artifacts:
           path: /home/user/work/src/github.com/Nordgedanken/Morpheus/Morpheus.deb
   test:
