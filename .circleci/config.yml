@@ -28,7 +28,7 @@ jobs:
           name: Run Build
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
           command: $GOPATH/bin/qtdeploy build linux
-  test_linux:
+  test:
     docker:
       - image: therecipe/qt:linux
     steps:
@@ -52,36 +52,17 @@ jobs:
           name: Run Build
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
           command: $GOPATH/bin/qtdeploy build windows
-  test_win_static:
-    docker:
-      - image: therecipe/qt:windows_64_static
-    steps:
-      - attach_workspace:
-          # Must be absolute path or relative path from working_directory
-          at: /home/user/work/
-      - run:
-          name: Run Tests
-          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-          command: $GOPATH/bin/ginkgo -r --randomizeAllSpecs --randomizeSuites --failOnPending --cover --trace --race --progress
-      - store_test_results:
-          path: /home/user/work/src/github.com/Nordgedanken/Morpheus/
 workflows:
   version: 2
-  build-test-linux:
+  build-test:
     jobs:
       - prepare
       - build_linux:
           requires:
             - prepare
-      - test_linux:
+      - build_win_static:
           requires:
             - prepare
-  build-test-win:
-      jobs:
-        - prepare
-        - build_win_static:
-            requires:
-              - prepare
-        - test_win_static:
-            requires:
-              - prepare
+      - test:
+          requires:
+            - prepare
