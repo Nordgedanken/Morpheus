@@ -18,4 +18,9 @@ jobs:
       - run:
           name: qt-binding setup
           command: $GOPATH/bin/qtsetup full desktop
-      - run: if [[ "$DESKTOP" == "true" ]]; then cd $GOPATH/src/github.com/Nordgedanken/Morpheus/ && $GOPATH/bin/qtdeploy test desktop; fi
+      - run:
+          name: Run Build
+          command: cd $GOPATH/src/github.com/Nordgedanken/Morpheus/ && $GOPATH/bin/qtdeploy build desktop
+      - run:
+          name: Run Tests
+          command: cd $GOPATH/src/github.com/Nordgedanken/Morpheus/ && $GOPATH/bin/qtdeploy test desktop
