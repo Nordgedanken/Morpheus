@@ -8,6 +8,8 @@ then
   export HOME=$(getent passwd $(id -un) | cut -d: -f6)
 fi
 
+git config --global url."https://github.com".insteadOf "ssh://git@github.com" || true
+
 if [ -e /home/user/work/src/github.com/Nordgedanken/Morpheus/.git ]
 then
   cd /home/user/work/src/github.com/Nordgedanken/Morpheus/
