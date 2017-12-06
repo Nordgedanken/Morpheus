@@ -23,7 +23,7 @@ jobs:
     steps:
       - attach_workspace:
           # Must be absolute path or relative path from working_directory
-          at: /home/user/work/src
+          at: /home/user/work/
       - run:
           name: Run Build
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
@@ -36,7 +36,7 @@ jobs:
     steps:
       - attach_workspace:
           # Must be absolute path or relative path from working_directory
-          at: /home/user/work/src
+          at: /home/user/work/
       - run:
           name: Run Tests
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
@@ -49,7 +49,7 @@ jobs:
     steps:
       - attach_workspace:
           # Must be absolute path or relative path from working_directory
-          at: /home/user/work/src
+          at: /home/user/work/
       - run:
           name: Run Build
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
@@ -62,7 +62,7 @@ jobs:
     steps:
       - attach_workspace:
           # Must be absolute path or relative path from working_directory
-          at: /home/user/work/src
+          at: /home/user/work/
       - run:
           name: Run Tests
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
