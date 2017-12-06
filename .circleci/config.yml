@@ -1,19 +1,71 @@
 version: 2
 jobs:
-  build:
+  prepare:
     docker:
-      - image: therecipe/qt:linux
-        environment:
-          DESKTOP: true
+          - image: therecipe/qt:linux
+            environment:
+              DESKTOP: true
     steps:
       - run:
           name: Get Morpheus
           command: go get -u -v -d github.com/Nordgedanken/Morpheus/...
-      - run:
-          name: Run Build
-          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-          command: $GOPATH/bin/qtdeploy build desktop
-      - run:
-          name: Run Tests
-          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-          command: $GOPATH/bin/qtdeploy test desktop
+  build_linux:
+    docker:
+      - image: therecipe/qt:linux
+        environment:
+          DESKTOP: true
+      steps:
+        - run:
+            name: Run Build
+            working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+            command: $GOPATH/bin/qtdeploy build linux
+  test_linux:
+    docker:
+      - image: therecipe/qt:linux
+        environment:
+          DESKTOP: true
+      steps:
+        - run:
+            name: Run Tests
+            working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+            command: $GOPATH/bin/qtdeploy test linux
+  build_win_static:
+    docker:
+      - image: therecipe/qt:windows_64_static
+        environment:
+          DESKTOP: true
+      steps:
+        - run:
+            name: Run Build
+            working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+            command: $GOPATH/bin/qtdeploy build windows
+  test_win_static:
+    docker:
+      - image: therecipe/qt:windows_64_static
+        environment:
+          DESKTOP: true
+      steps:
+        - run:
+            name: Run Tests
+            working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+            command: $GOPATH/bin/qtdeploy test windows
+workflows:
+  version: 2
+  build-test-linux:
+    jobs:
+      - prepare
+      - build_linux:
+          requires:
+            - prepare
+      - test_linux:
+          requires:
+            - prepare
+  build-test-win:
+      jobs:
+        - prepare
+        - build_win_static:
+            requires:
+              - prepare
+        - test_win_static:
+            requires:
+              - prepare
