@@ -36,11 +36,6 @@ jobs:
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
           command: $GOPATH/bin/qtdeploy build linux
       - run:
-          name: Debug Print directory
-          shell: /bin/sh
-          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-          command: ls -lah && echo "\n\n" && ls -lah deploy && echo "\n\n" && ls -lah deploy/linux
-      - run:
           name: Prepare Deb Generating
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
           command: apt-get update -qq && apt-get install -y -qq wget && wget -q -O - --no-check-certificate https://raw.githubusercontent.com/mh-cbon/latest/master/install.sh | GH=mh-cbon/go-bin-deb sh -xe && apt-get update -qq && apt-get install build-essential lintian -y -qq
@@ -48,6 +43,11 @@ jobs:
           name: Deb Generating
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
           command: mkdir debian && go-bin-deb generate -o debian && dpkg-deb --build debian Morpheus.deb
+      - run:
+          name: Debug Print directory
+          shell: /bin/sh
+          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+          command: ls -lah && echo "\n\n" && ls -lah deploy && echo "\n\n" && ls -lah deploy/linux && echo "\n\n" && ls -lah debian
       - store_artifacts:
           path: /home/user/work/src/github.com/Nordgedanken/Morpheus/Morpheus.deb
   test:
