@@ -10,15 +10,6 @@ jobs:
           name: Get Morpheus
           command: go get -u -v -d github.com/Nordgedanken/Morpheus/...
       - run:
-          name: qt-binding
-          command: go get -u -v github.com/therecipe/qt/cmd/...
-      #- run:
-      #    name: qt
-      #    command: if [[ "$OS" == "linux" ]]; then chmod +x ./.ci/linux.sh && ./.ci/linux.sh; fi
-      - run:
-          name: qt-binding setup
-          command: $GOPATH/bin/qtsetup full desktop
-      - run:
           name: Run Build
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
           command: $GOPATH/bin/qtdeploy build desktop
