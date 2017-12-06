@@ -2,9 +2,9 @@ version: 2
 jobs:
   prepare:
     docker:
-          - image: therecipe/qt:linux
-            environment:
-              DESKTOP: true
+      - image: therecipe/qt:linux
+        environment:
+          DESKTOP: true
     steps:
       - run:
           name: Get Morpheus
@@ -14,41 +14,41 @@ jobs:
       - image: therecipe/qt:linux
         environment:
           DESKTOP: true
-      steps:
-        - run:
-            name: Run Build
-            working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-            command: $GOPATH/bin/qtdeploy build linux
+    steps:
+      - run:
+          name: Run Build
+          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+          command: $GOPATH/bin/qtdeploy build linux
   test_linux:
     docker:
       - image: therecipe/qt:linux
         environment:
           DESKTOP: true
-      steps:
-        - run:
-            name: Run Tests
-            working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-            command: $GOPATH/bin/qtdeploy test linux
+    steps:
+      - run:
+          name: Run Tests
+          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+          command: $GOPATH/bin/qtdeploy test linux
   build_win_static:
     docker:
       - image: therecipe/qt:windows_64_static
         environment:
           DESKTOP: true
-      steps:
-        - run:
-            name: Run Build
-            working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-            command: $GOPATH/bin/qtdeploy build windows
+    steps:
+      - run:
+          name: Run Build
+          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+          command: $GOPATH/bin/qtdeploy build windows
   test_win_static:
     docker:
       - image: therecipe/qt:windows_64_static
         environment:
           DESKTOP: true
-      steps:
-        - run:
-            name: Run Tests
-            working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-            command: $GOPATH/bin/qtdeploy test windows
+    steps:
+      - run:
+          name: Run Tests
+          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+          command: $GOPATH/bin/qtdeploy test windows
 workflows:
   version: 2
   build-test-linux:
