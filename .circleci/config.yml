@@ -41,6 +41,8 @@ jobs:
           name: Run Tests
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
           command: $GOPATH/bin/qtdeploy test linux
+      - store_test_results:
+              path: /home/user/work/src/github.com/Nordgedanken/Morpheus/
   build_win_static:
     docker:
       - image: therecipe/qt:windows_64_static
@@ -67,6 +69,8 @@ jobs:
           name: Run Tests
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
           command: $GOPATH/bin/qtdeploy test windows
+    - store_test_results:
+        path: /home/user/work/src/github.com/Nordgedanken/Morpheus/
 workflows:
   version: 2
   build-test-linux:
