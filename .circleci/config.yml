@@ -6,7 +6,7 @@ jobs:
     steps:
       - run:
           name: Get checkout script
-          command: apt-get update && apt-get install wget && wget https://github.com/Nordgedanken/Morpheus/blob/develop/.circleci/checkout.sh -O .circleci/checkout.sh && chmod +x .circleci/checkout.sh
+          command: apt-get update && apt-get install wget && mkdir -p .circleci && wget https://github.com/Nordgedanken/Morpheus/blob/develop/.circleci/checkout.sh -O .circleci/checkout.sh && chmod +x .circleci/checkout.sh
       - run:
           name: Checkout Morpheus
           command: bash .circleci/checkout.sh
