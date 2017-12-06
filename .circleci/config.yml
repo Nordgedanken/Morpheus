@@ -4,7 +4,9 @@ jobs:
     docker:
       - image: therecipe/qt:linux
     steps:
-      - checkout
+      - run:
+          name: Checkout Morpheus
+          command: bash .circleci/checkout.sh
       - run:
           name: Get Morpheus
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
