@@ -107,6 +107,9 @@ func main() {
 	windowX := (screen.Width() - windowHeight) / 2
 	windowY := (screen.Height() - windowWidth) / 2
 
+	window.Resize2(windowWidth, windowHeight)
+	window.Show()
+
 	window.Move2(windowX, windowY)
 
 	var accessToken string
@@ -193,7 +196,6 @@ func main() {
 	}
 
 	window.Resize2(windowWidth, windowHeight)
-	window.Show()
 
 	//enter the main event loop
 	_ = widgets.QApplication_Exec()
