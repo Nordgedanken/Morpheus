@@ -2,7 +2,7 @@
   "name": "Morpheus",
   "maintainer": "MTRNord <info@nordgedanken.de>",
   "version": "0.0.1",
-  "arch": "arm64",
+  "arch": "amd64",
   "files": [
     {
       "from": ".circleci/Morpheus.sh",
