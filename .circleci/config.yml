@@ -53,6 +53,15 @@ jobs:
           shell: /bin/sh
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
           command: ls -lah && echo "\n\n" && ls -lah deploy && echo "\n\n" && ls -lah deploy/linux && echo "\n\n" && ls -lah debian
+      - run:
+          name: Deb Building
+          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+          command: dpkg-deb --build debian Morpheus.deb
+      - run:
+          name: Debug Print directory
+          shell: /bin/sh
+          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+          command: ls -lah && echo "\n\n" && ls -lah deploy && echo "\n\n" && ls -lah deploy/linux && echo "\n\n" && ls -lah debian
       - store_artifacts:
           path: /home/user/work/src/github.com/Nordgedanken/Morpheus/Morpheus.deb
   test:
