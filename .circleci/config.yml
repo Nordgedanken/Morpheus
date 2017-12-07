@@ -43,7 +43,7 @@ jobs:
           name: Debug Print directory
           shell: /bin/sh
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-          command: ls -lah && echo "\n\n" && ls -lah deploy && echo "\n\n" && ls -lah deploy/linux && echo "\n\n" && ls -lah debian
+          command: ls -lah && echo "\n\n" && ls -lah deploy && echo "\n\n" && ls -lah deploy/linux
       - run:
           name: Deb Generating
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
