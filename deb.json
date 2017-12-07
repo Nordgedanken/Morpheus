@@ -5,9 +5,9 @@
   "arch": "arm64",
   "files": [
     {
-      "from": "deploy/linux/Morpheus.sh",
+      "from": ".circleci/Morpheus.sh",
       "to": "/usr/bin",
-      "base": "deploy/linux",
+      "base": ".circleci",
       "fperm": "0755"
     },
     {
