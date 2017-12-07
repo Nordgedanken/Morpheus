@@ -43,6 +43,11 @@ jobs:
           name: Deb Generating
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
           command: mkdir debian && go-bin-deb generate -o debian
+      - run:
+          name: Debug Print directory
+          shell: /bin/sh
+          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+          command: ls -lah && echo "\n\n" && ls -lah deploy/linux
       - store_artifacts:
           path: /home/user/work/src/github.com/Nordgedanken/Morpheus/debian/
   test:
@@ -84,11 +89,8 @@ jobs:
           name: Run Build
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
           command: $GOPATH/bin/qtdeploy build windows
-      - run:
-          name: Debug Print directory
-          shell: /bin/sh
-          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-          command: ls -lah && echo "\n\n" && ls -lah deploy/windows
+      - store_artifacts:
+          path: /home/user/work/src/github.com/Nordgedanken/Morpheus/deploy/windows/Morpheus.exe
 workflows:
   version: 2
   build-test:
