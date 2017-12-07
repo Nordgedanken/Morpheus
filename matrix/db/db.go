@@ -22,14 +22,14 @@ func OpenCacheDB() (db *badger.DB, err error) {
 		// Open the data.db file. It will be created if it doesn't exist.
 		configDirs := configdir.New("Nordgedanken", "Morpheus")
 		if _, StatErr := os.Stat(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/"); os.IsNotExist(StatErr) {
-			MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/data/", 0666)
+			MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/data/", 0755)
 			if MkdirErr != nil {
 				err = MkdirErr
 				return
 			}
 		}
 		if _, StatErr := os.Stat(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/cache/"); os.IsNotExist(StatErr) {
-			MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/data/cache/", 0666)
+			MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/data/cache/", 0755)
 			if MkdirErr != nil {
 				err = MkdirErr
 				return
@@ -63,14 +63,14 @@ func OpenUserDB() (db *badger.DB, err error) {
 		// Open the data.db file. It will be created if it doesn't exist.
 		configDirs := configdir.New("Nordgedanken", "Morpheus")
 		if _, StatErr := os.Stat(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/"); os.IsNotExist(StatErr) {
-			MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/data/", 0666)
+			MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/data/", 0755)
 			if MkdirErr != nil {
 				err = MkdirErr
 				return
 			}
 		}
 		if _, StatErr := os.Stat(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/user/"); os.IsNotExist(StatErr) {
-			MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/data/user/", 0666)
+			MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/data/user/", 0755)
 			if MkdirErr != nil {
 				err = MkdirErr
 				return
