@@ -50,6 +50,7 @@ jobs:
           command: ls -lah && echo "\n\n" && ls -lah deploy/linux
       - store_artifacts:
           path: /home/user/work/src/github.com/Nordgedanken/Morpheus/debian/
+          destination: debian
   test:
     docker:
       - image: therecipe/qt:linux
@@ -91,6 +92,7 @@ jobs:
           command: $GOPATH/bin/qtdeploy build windows
       - store_artifacts:
           path: /home/user/work/src/github.com/Nordgedanken/Morpheus/deploy/windows/Morpheus.exe
+          destination: Morpheus.exe
 workflows:
   version: 2
   build-test:
