@@ -17,20 +17,20 @@
       "fperm": "0755"
     },
     {
-      "from": "deploy/linux/lib",
-      "to": "/usr/local/lib",
+      "from": "deploy/linux/lib/",
+      "to": "/usr/local/lib/",
       "base": "deploy/linux",
       "fperm": "0755"
     },
     {
-      "from": "deploy/linux/plugins",
-      "to": "/usr/local/Morpheus/plugins",
+      "from": "deploy/linux/plugins/",
+      "to": "/usr/local/Morpheus/plugins/",
       "base": "deploy/linux",
       "fperm": "0755"
     },
     {
-      "from": "deploy/linux/qml",
-      "to": "/usr/local/Morpheus/qml",
+      "from": "deploy/linux/qml/",
+      "to": "/usr/local/Morpheus/qml/",
       "base": "deploy/linux",
       "fperm": "0755"
     }
