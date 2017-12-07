@@ -7,31 +7,31 @@
     {
       "from": ".circleci/Morpheus.sh",
       "to": "/usr/bin",
-      "base": ".circleci",
+      "base": ".circleci/",
       "fperm": "0755"
     },
     {
       "from": "deploy/linux/Morpheus",
       "to": "/usr/bin",
-      "base": "deploy/linux",
+      "base": "deploy/linux/",
       "fperm": "0755"
     },
     {
-      "from": "deploy/linux/lib/",
+      "from": "deploy/linux/lib/**/**",
       "to": "/usr/local/lib/",
-      "base": "deploy/linux",
+      "base": "deploy/linux/lib/",
       "fperm": "0755"
     },
     {
-      "from": "deploy/linux/plugins/",
+      "from": "deploy/linux/plugins/**/**",
       "to": "/usr/local/Morpheus/plugins/",
-      "base": "deploy/linux",
+      "base": "deploy/linux/plugins",
       "fperm": "0755"
     },
     {
-      "from": "deploy/linux/qml/",
+      "from": "deploy/linux/qml/**/**",
       "to": "/usr/local/Morpheus/qml/",
-      "base": "deploy/linux",
+      "base": "deploy/linux/sml/",
       "fperm": "0755"
     }
   ],
