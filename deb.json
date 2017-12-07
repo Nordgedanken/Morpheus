@@ -5,8 +5,32 @@
   "arch": "arm64",
   "files": [
     {
+      "from": "deploy/linux/Morpheus.sh",
+      "to": "/usr/bin",
+      "base": "deploy/linux",
+      "fperm": "0755"
+    },
+    {
       "from": "deploy/linux/Morpheus",
       "to": "/usr/bin",
+      "base": "deploy/linux",
+      "fperm": "0755"
+    },
+    {
+      "from": "deploy/linux/lib",
+      "to": "/usr/local/lib",
+      "base": "deploy/linux",
+      "fperm": "0755"
+    },
+    {
+      "from": "deploy/linux/plugins",
+      "to": "/usr/local/Morpheus/plugins",
+      "base": "deploy/linux",
+      "fperm": "0755"
+    },
+    {
+      "from": "deploy/linux/qml",
+      "to": "/usr/local/Morpheus/qml",
       "base": "deploy/linux",
       "fperm": "0755"
     }
@@ -25,7 +49,7 @@
       "name":"Morpheus",
       "description":"A Matrix client written in Go-QT ",
       "generic-name":"Matrix Client",
-      "exec":"/usr/bin/Morpheus",
+      "exec":"/usr/bin/Morpheus.sh",
       "icon":"qml/resources/logos/MorpheusBig.png",
       "type":"Application",
       "keywords":"matrix;Morpheus",
