@@ -7,6 +7,8 @@ import (
 	"github.com/matrix-org/gomatrix"
 	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
+	"github.com/therecipe/qt/gui"
+	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
 )
 
@@ -40,60 +42,36 @@ func (l *LoginUI) GetWidget() (widget *widgets.QWidget) {
 
 // NewUI initializes a new login Screen
 func (l *LoginUI) NewUI() (err error) {
-	widget := widgets.NewQWidget(nil, 0)
-	widget.SetObjectName("LoginWrapper")
-	widget.SetStyleSheet("QWidget#LoginWrapper { border: 0px; };")
-	topLayout := widgets.NewQVBoxLayout()
+	l.widget = widgets.NewQWidget(nil, 0)
 
-	formWidget := widgets.NewQWidget(nil, 0)
-	formWrapper := widgets.NewQHBoxLayout()
+	var loader = uitools.NewQUiLoader(nil)
+	var file = core.NewQFile2(":/qml/ui/login.ui")
 
-	formLayout := widgets.NewQVBoxLayout()
-	formLayout.SetSpacing(20)
-	formLayout.SetContentsMargins(0, 0, 0, 30)
-	formWidget.SetLayout(formLayout)
-
-	formWrapper.AddStretch(1)
-	formWrapper.AddWidget(formWidget, 0, 0)
-	formWrapper.AddStretch(1)
+	file.Open(core.QIODevice__ReadOnly)
+	l.LoginWidget = loader.Load(file, l.widget)
+	file.Close()
 
 	// UsernameInput
-	usernameInput := widgets.NewQLineEdit(nil)
-	usernameInput.SetPlaceholderText("Insert MXID")
-
-	usernameLayout := widgets.NewQHBoxLayout()
-	usernameLayout.AddWidget(usernameInput, 0, core.Qt__AlignVCenter)
+	usernameInput := widgets.NewQLineEditFromPointer(l.widget.FindChild("UsernameInput", core.Qt__FindChildrenRecursively).Pointer())
 
 	// PasswordInput
-	passwordInput := widgets.NewQLineEdit(nil)
-	passwordInput.SetPlaceholderText("Insert password")
-	passwordInput.SetEchoMode(widgets.QLineEdit__Password)
-
-	passwordLayout := widgets.NewQHBoxLayout()
-	passwordLayout.AddWidget(passwordInput, 0, core.Qt__AlignVCenter)
-
-	formLayout.AddLayout(usernameLayout, 0)
-	formLayout.AddLayout(passwordLayout, 0)
+	passwordInput := widgets.NewQLineEditFromPointer(l.widget.FindChild("PasswordInput", core.Qt__FindChildrenRecursively).Pointer())
 
 	// loginButton
-	buttonLayout := widgets.NewQHBoxLayout()
-	buttonLayout.SetSpacing(0)
-	buttonLayout.SetContentsMargins(0, 0, 0, 30)
+	loginButton := widgets.NewQPushButtonFromPointer(l.widget.FindChild("LoginButton", core.Qt__FindChildrenRecursively).Pointer())
 
-	loginButton := widgets.NewQPushButton2("LOGIN", nil)
-	loginButton.SetMinimumSize2(350, 65)
+	var layout = widgets.NewQHBoxLayout()
+	l.window.SetLayout(layout)
+	layout.InsertWidget(0, l.LoginWidget, 0, core.Qt__AlignTop|core.Qt__AlignLeft)
+	layout.SetSpacing(0)
+	layout.SetContentsMargins(0, 0, 0, 0)
+	l.widget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
+	l.LoginWidget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 
-	buttonLayout.AddStretch(1)
-	buttonLayout.AddWidget(loginButton, 0, 0)
-	buttonLayout.AddStretch(1)
-
-	topLayout.AddStretch(1)
-	topLayout.AddLayout(formWrapper, 0)
-	topLayout.AddStretch(1)
-	topLayout.AddLayout(buttonLayout, 0)
-	topLayout.AddStretch(1)
-
-	widget.SetLayout(topLayout)
+	l.widget.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+		l.LoginWidget.Resize(event.Size())
+		event.Accept()
+	})
 
 	usernameInput.ConnectTextChanged(func(value string) {
 		l.username = value
@@ -111,9 +89,8 @@ func (l *LoginUI) NewUI() (err error) {
 		}
 	})
 
-	widget.SetWindowTitle("Morpheus - Login")
+	l.LoginWidget.SetWindowTitle("Morpheus - Login")
 
-	l.widget = widget
 	return
 }
 

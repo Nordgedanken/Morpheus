@@ -63,6 +63,7 @@ func (m *MainUI) SetCurrentRoom(RoomID string) {
 // LoginUI holds information about the LoginUI
 type LoginUI struct {
 	config
-	widget *widgets.QWidget
-	window *widgets.QMainWindow
+	LoginWidget *widgets.QWidget
+	widget      *widgets.QWidget
+	window      *widgets.QMainWindow
 }
