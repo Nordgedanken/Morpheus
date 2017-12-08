@@ -63,7 +63,8 @@
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: rgb(91, 103, 125);
+      <string notr="true">background-color: rgb(121, 194, 113)
+/* rgb(91, 103, 125);
 /* rgb(70, 79, 96);*/</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_6">
