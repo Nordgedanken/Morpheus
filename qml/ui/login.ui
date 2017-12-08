@@ -83,7 +83,7 @@
       <property name="spacing">
        <number>0</number>
       </property>
-      <item row="1" column="0">
+      <item row="0" column="0">
        <widget class="QWidget" name="buttonAreaLayout" native="true">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -117,35 +117,39 @@
            </property>
            <layout class="QVBoxLayout" name="verticalLayout">
             <property name="spacing">
-             <number>0</number>
+             <number>6</number>
             </property>
             <property name="leftMargin">
              <number>7</number>
             </property>
             <property name="topMargin">
-             <number>45</number>
+             <number>0</number>
             </property>
             <property name="rightMargin">
              <number>9</number>
             </property>
+            <property name="bottomMargin">
+             <number>9</number>
+            </property>
+            <item>
+             <spacer name="verticalSpacer">
+              <property name="orientation">
+               <enum>Qt::Vertical</enum>
+              </property>
+              <property name="sizeType">
+               <enum>QSizePolicy::Expanding</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>20</width>
+                <height>30</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
             <item>
              <widget class="QWidget" name="newRoomButtonLayout" native="true">
               <layout class="QHBoxLayout" name="horizontalLayout_4">
-               <property name="spacing">
-                <number>0</number>
-               </property>
-               <property name="leftMargin">
-                <number>9</number>
-               </property>
-               <property name="topMargin">
-                <number>0</number>
-               </property>
-               <property name="rightMargin">
-                <number>9</number>
-               </property>
-               <property name="bottomMargin">
-                <number>0</number>
-               </property>
                <item>
                 <widget class="QPushButton" name="newRoomButton">
                  <property name="sizePolicy">
@@ -178,8 +182,8 @@
                  </property>
                  <property name="iconSize">
                   <size>
-                   <width>30</width>
-                   <height>30</height>
+                   <width>35</width>
+                   <height>35</height>
                   </size>
                  </property>
                  <property name="flat">
@@ -197,13 +201,13 @@
                 <number>0</number>
                </property>
                <property name="leftMargin">
-                <number>9</number>
+                <number>0</number>
                </property>
                <property name="topMargin">
                 <number>0</number>
                </property>
                <property name="rightMargin">
-                <number>9</number>
+                <number>0</number>
                </property>
                <property name="bottomMargin">
                 <number>0</number>
@@ -243,8 +247,8 @@
                  </property>
                  <property name="iconSize">
                   <size>
-                   <width>25</width>
-                   <height>25</height>
+                   <width>30</width>
+                   <height>30</height>
                   </size>
                  </property>
                  <property name="flat">
@@ -258,24 +262,13 @@
            </layout>
            <zorder>settingsButtonLayout</zorder>
            <zorder>newRoomButtonLayout</zorder>
+           <zorder>verticalSpacer</zorder>
           </widget>
          </item>
         </layout>
        </widget>
       </item>
-      <item row="0" column="0">
-       <widget class="QWidget" name="userAvatarLayout" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
      </layout>
-     <zorder>buttonAreaLayout</zorder>
-     <zorder>userAvatarLayout</zorder>
     </widget>
    </item>
    <item row="0" column="1">
