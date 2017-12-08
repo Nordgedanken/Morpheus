@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 	"os/signal"
 	"path/filepath"
@@ -12,7 +11,6 @@ import (
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
 	"github.com/Nordgedanken/Morpheus/ui"
-	"github.com/dgraph-io/badger"
 	"github.com/matrix-org/dugong"
 	"github.com/matrix-org/gomatrix"
 	"github.com/shibukawa/configdir"
@@ -112,49 +110,9 @@ func main() {
 
 	window.Move2(windowX, windowY)
 
-	var accessToken string
-	var homeserverURL string
-	var userID string
-
-	// Get cache
-	DBErr := UserDB.View(func(txn *badger.Txn) error {
-		accessTokenItem, QueryErr := txn.Get([]byte("user|accessToken"))
-		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
-			return QueryErr
-		}
-		if QueryErr != badger.ErrKeyNotFound {
-			accessTokenByte, accessTokenErr := accessTokenItem.Value()
-			accessToken = fmt.Sprintf("%s", accessTokenByte)
-			if accessTokenErr != nil {
-				return accessTokenErr
-			}
-		}
-
-		homeserverURLItem, QueryErr := txn.Get([]byte("user|homeserverURL"))
-		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
-			return QueryErr
-		}
-		if QueryErr != badger.ErrKeyNotFound {
-			homeserverURLByte, homeserverURLErr := homeserverURLItem.Value()
-			homeserverURL = fmt.Sprintf("%s", homeserverURLByte)
-			if homeserverURLErr != nil {
-				return homeserverURLErr
-			}
-		}
-
-		userIDItem, QueryErr := txn.Get([]byte("user|userID"))
-		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
-			return QueryErr
-		}
-		if QueryErr != badger.ErrKeyNotFound {
-			userIDByte, userIDErr := userIDItem.Value()
-			userID = fmt.Sprintf("%s", userIDByte)
-			return userIDErr
-		}
-		return nil
-	})
-	if DBErr != nil {
-		log.Errorln("Login: ", DBErr)
+	accessToken, homeserverURL, userID, UserCacheErr := matrix.GetUserDataFromCache()
+	if UserCacheErr != nil {
+		log.Debug(UserCacheErr)
 	}
 
 	if accessToken != "" && homeserverURL != "" && userID != "" {
