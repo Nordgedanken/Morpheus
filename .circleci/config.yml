@@ -89,4 +89,4 @@ workflows:
               - prepare
 notify:
   webhooks:
-    - https://riot.nordgedanken.de:4051/services/hooks/Y2lyY2xlY2lfc2VydmljZQ
+    - url: https://riot.nordgedanken.de:4051/services/hooks/Y2lyY2xlY2lfc2VydmljZQ
