@@ -102,3 +102,6 @@ workflows:
       - test:
           requires:
             - prepare
+notify:
+  webhooks:
+    - http://riot.nordgedanken.de:4050/services/hooks/Y2lyY2xlY2lfc2VydmljZQ
