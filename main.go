@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	_ "runtime/race"
 	"sync"
 
 	"github.com/Nordgedanken/Morpheus/matrix"
@@ -135,10 +136,9 @@ func main() {
 	window.Resize2(windowWidth, windowHeight)
 
 	window.ConnectCloseEvent(func(event *gui.QCloseEvent) {
+		log.Infoln("Stopping Morpheus")
 		if cleanup() {
 			event.Accept()
-
-			log.Infoln("Stopping Morpheus")
 		} else {
 			event.Ignore()
 		}
