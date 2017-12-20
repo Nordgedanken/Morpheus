@@ -160,7 +160,6 @@ func main() {
 	UserDB.Close()
 	CacheDB.Close()
 	log.Infoln("Stopping Morpheus")
-	log.Exit(0)
 }
 
 func cleanup() {
