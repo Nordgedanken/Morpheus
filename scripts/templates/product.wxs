@@ -62,6 +62,25 @@
 
          {{if gt (.Shortcuts.Items | len) 0}}
          <Directory Id="ProgramMenuFolder">
+            <Directory Id="ApplicationProgramsFolder" Name="{{.Product}}">
+                <Component Id="ApplicationShortcut" Guid="6743f868-7229-4caa-9064-d05ee7fca371">
+                    {{range $i, $e := .Shortcuts.Items}}
+                        <Shortcut Id="ApplicationStartMenuShortcut"
+                                  Name="{{$e.Name}}"
+                                  Description="{{$e.Description}}"
+                                  Target="{{$e.Target}}"
+                                  WorkingDirectory="{{$e.WDir}}"
+                        >
+                            <Icon Id="Icon{{$i}}_Menu" SourceFile="{{$e.Icon}}" />
+                        </Shortcut>
+                        <RemoveFolder Id="ApplicationProgramsFolder" On="uninstall"/>
+                        <RegistryValue Root="HKCU"
+                                       Key="Software\{{$.Company}}\{{$.Product}}"
+                                       Name="installed{{$i}}"
+                                       Type="integer" Value="1" KeyPath="yes"/>
+                    {{end}}
+                </Component>
+            </Directory>
             <Directory Id="ProgramMenuSubfolder" Name="{{.Product}}">
                <Component Id="ApplicationShortcuts" Guid="{{.Shortcuts.GUID}}">
                {{range $i, $e := .Shortcuts.Items}}
@@ -122,6 +141,7 @@
          {{range $i, $e := .Directories}}
          <ComponentGroupRef Id="AppFiles{{$i}}" />
          {{end}}
+         <ComponentRef Id="ApplicationShortcut" />
       </Feature>
 
       <UI>

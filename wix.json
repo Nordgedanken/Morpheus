@@ -31,9 +31,14 @@
         "target": "[INSTALLDIR]\\Morpheus.exe",
         "wdir": "INSTALLDIR",
         "arguments": "",
-        "icon": ""
+        "icon": "morpheus.ico"
       }
     ]
   },
-  "choco": {}
+  "choco": {
+    "description": "A Matrix client written in Go-QT",
+    "project-url": "https://github.com/Nordgedanken/Morpheus",
+    "tags": "matrix chat go client",
+    "license-url": "https://github.com/Nordgedanken/Morpheus/blob/master/LICENSE"
+  }
 }
