@@ -1,7 +1,5 @@
 package main
 
-// +build race
-
 import (
 	"os"
 	"path/filepath"
