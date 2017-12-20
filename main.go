@@ -137,6 +137,8 @@ func main() {
 	window.ConnectCloseEvent(func(event *gui.QCloseEvent) {
 		if cleanup() {
 			event.Accept()
+
+			log.Infoln("Stopping Morpheus")
 		} else {
 			event.Ignore()
 		}
@@ -144,7 +146,6 @@ func main() {
 
 	//enter the main event loop
 	_ = widgets.QApplication_Exec()
-	log.Infoln("Stopping Morpheus")
 }
 
 func cleanup() bool {
