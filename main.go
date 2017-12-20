@@ -54,7 +54,7 @@ func main() {
 		<-c
 		cleanup()
 		close(c)
-		os.Exit(1)
+		defer log.Exit(1)
 	}()
 
 	UserDB, DBOpenErr := db.OpenUserDB()
@@ -159,6 +159,7 @@ func main() {
 	_ = widgets.QApplication_Exec()
 	defer UserDB.Close()
 	defer CacheDB.Close()
+	defer log.Exit(0)
 	log.Infoln("Stopping Morpheus")
 }
 
