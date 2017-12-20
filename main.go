@@ -157,10 +157,10 @@ func main() {
 
 	//enter the main event loop
 	_ = widgets.QApplication_Exec()
-	defer UserDB.Close()
-	defer CacheDB.Close()
-	defer log.Exit(0)
+	UserDB.Close()
+	CacheDB.Close()
 	log.Infoln("Stopping Morpheus")
+	log.Exit(0)
 }
 
 func cleanup() {
