@@ -1,0 +1,529 @@
+
+UNRELEASED
+
+  * Add Shortcuts to Windows installer and Icon
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Add possibility to build msi installer for windows
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Earlier window.show
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix deb file
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Add destination option
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * add Morpheus.exe as artifacts
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Update config.yml
+  * Fix task
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Split tasks
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Add version and arch field
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Add Deb Generating
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * use junit.xml
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Add test suite
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Use custom checkout script
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Workspace sharing/updating is inconsistent
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Remove all test suites and appveyor.yml
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Remove main tests to see if tests run or it did not fail in there
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Use correct package in DB Test
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Run ginkgo nodot script
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Tests on windows and linux are the same on CI
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Use Ginko CLI instead the go test way
+    (it maybe works maybe not)
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Merge remote-tracking branch 'origin/develop' into develop
+  * Add test result generation.
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Merge branch 'master' into develop
+  * Cleanup README.md
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Remove Appveyor badge as windows now gets crosscompiled on CircleCI
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Merge branch 'feature/Add_windows_to_CircleCI' into develop
+  * Try to get persist_to_workspace and at_workspace working
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Use persist_to_workspace and at_workspace
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Set always same working_directory
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix indentation
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Add windows to CI
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Add more shields and change ordering of them
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * CI Update and Doc update (#41)
+
+    * Update Readme.md
+    * Add ISSUE_TEMPLATE file
+    * Add Contributing.md
+    * Fix circleCI
+    * Cleanup
+    * Use shields.io to get build status
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Merge branch 'feature/Rework_Documentation' into develop
+  * Use shields.io to get build status
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Merge branch 'feature/CI_Changes' into develop
+  * Cleanup
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * We dont need to setup go-qt
+  * Use correct gopath
+  * Fix weird workdir
+  * Fix working dir
+  * Add Build test and remove if
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Point correctly to the bin folder of the gopath
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Cleanup repo and let go only download morpheus
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * circleCI is to stupid to check out github repos
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix docker build
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * fix docker tag name
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Use better approach
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Add magic docker
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * well just use the official docker...
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * install missing package
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Use official installer instead apt-get
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Remove package which isn't available
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix $USER being bugged
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Remove unneeded packages
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Change dep names
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Not update gcc
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Use official packages
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Change Key server
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Get needed PUB_KEY
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Add missing dependency
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix indentation
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Use CircleCIv2
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Remove -qq to have output (to prevent timeouts)
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Additional changes to get builds running
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Use PKG_CONFIG
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Link Contributing.md in README.md
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Try to fix circleCI
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Add Contributing.md
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Add ISSUE_TEMPLATE file
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix Sublist bulletpoint
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Update Readme.md
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * add basic linkify support
+  * Use new logger, use own storage for sync, use own syncer with custom filter, try QThreads
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Hopefully fix images from cache sometimes break
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix message CacheLoading fails and fix RoomAvatar Caching
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix message CacheLoading
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Switch DB to badger by dgraph-io \(^^)/
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Switch Suite File
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Prepare tests and move db too own package to not depend on the qt binding
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Load Cache on Start and Room Switch \(^^)/
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Deduplicate Code
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Make Codeclimate happy
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Update gitignore
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Don't commit moc files
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix Resize Bug and cleanup come more code
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Implement RoomSwitch \(^^)/
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Track CurrentRoom
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Generate RoomList
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Split Dbs close #17, set timestamp on messages
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Give the exe a icon
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Prevent having nil pointer issue with senderDisplayName, modify messageWidget design, add missing event.Accept(), Prepare code for framelessWindow
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Support more image types and add ability to select the text
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Preapre Room List, fix #26, fix avatar radius and avatar generating, make message background a bot darker, move some functions in the MainUI to another Method to keep it clean, add one more linter
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix mobile and desktop css
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Update Meta Tag
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Update morpheus.png
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Update morpheus.png
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Update Feature Texts
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Disable why in Nav
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * make nav fixed to top
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * make nav stick to top
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Cleanup divs and remove ads
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix device size
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix 2. device position
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix 1. device position
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix devices
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Update DeviceMockups min
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Update DeviceMockups
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Change some Texts
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Remove unnecessary cols
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix quote position
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix images
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix typo
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Try fixing download buttons (need rework anyway)
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix download buttons
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Add Container
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix other Navs
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix Nav2
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Try to fix Nav
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Migrate css
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Update Bootstrap
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Use bigger image to hopefully get a better looking preview
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Cleanup posts
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * adjust device Size and move syncer to struct
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Refactor UIs
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Add missing {{ site.baseurl }}
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Commit missing ico file
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Cleanup links with {{ site.baseurl }}
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Add ico file
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix blog.html and prepare ui package
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Remove Digital Ocean link
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Change screenshot
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Partial rebrand to Morpheus
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Remove paypal add my bitcoin address
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Switch to surface as desktop device
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Disable portfolio page
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Disable portfolio page as I don't want any money (currently)
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Disable /fund page as I don't want any money (currently)
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix more github.io {{ site.baseurl }} tags
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix github.io {{ site.baseurl }} tags
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix github.io page
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix github.io page
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix #21 and prepare github.io page
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix #21
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix #19
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Delint a lot of code and close #18
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix Scrollbar in timeline, fill all fields of a message, generate kind of generic avatars (not finished yet), add linter (lots to do), cleanup a bit of code
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * fix CI QT version
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * try to fix CI
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Add AppIcon, Fix typo in sending field, rework resizing on resizing, add messages to DB, add new message design (bug with ScrollArea still), rework on how messages get added
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Allow receiving messages (basic support not yet useable in any way.
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Setup Codeclimate Reports
+  * Update commonmark and make Avatar Round
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Prepare Message UI's and add Option to send (currently locked to the Morpheus Room as no Room selection exists)
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Add Translation files
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Minimal css change
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Multiple UI Changes
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Change Icons
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * More Work on the Main Design
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Add new Main Design and rebrand ro Morpheus
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Fix sync (only works with changes from https://github.com/matrix-org/gomatrix/pull/39 )
+
+    Signed-off-by: MTRNord <mtrnord1@gmail.com>
+  * Not working sync commit :(
+  * Add autologin on startup
+  * Add temporary Logout button
+  * Fix Label position
+  * Dynamic generate scroll views. (Needs tweaking! as Labels don't go to top)
+  * CLeanup MainWindow as it will be dynamicly generated in the future
+  * Save log and database to the correct systems config folders.
+  * Avoid crash on empty Username or Password
+  * Make Login UI look prettier again
+  * Prevent Login Window from freezing via running login inside goroutine.
+  * Add TODO
+  * Do Cache per User in this Particualr case
+  * Add Various typos.
+  * Use cache when getting Avatar and Displayname and add comments
+  * Add more Data to the localCache
+  * Move struct to correct place
+  * Rework custom matrix Commands and add Ctags (makes Atom happier)
+  * Prepare Cache/State DB
+  * Start reworking of the UI \(^^)/
+  * Prepare Avatar stuff
+  * Add missing Variable
+  * Try to fix CI 4
+  * Fix Appveyor 2
+  * Fix CircleCI
+  * Fix appveyor
+  * Fix CircleCI 2
+  * Try fixing CircleCI
+  * Try to fix CI 2
+  * Try to get CI running
+  * Add Ci Badges and fix builds
+  * Add CI
+  * Add Mokup Main Page and Remove Log
+  * Make password field hidden echo
+  * Make logging work better and fix Log to file
+  * Fix Logger Partially and fix Login
+  * Add missing localLog
+  * Add missing error Handler
+  * Implement Password Login and Add it to the login button
+  * Add Timestamp, add comments and Move UI functions in seperate Package
+  * Optimize Logger
+  * Fix logger function
+  * Add FileLog
+  * Add Basic Login Page
+  * Update README and gitignore
+  * Add basic Window
+  * Initial commit
+
+  - MTRNord <mtrnord1@gmail.com>
+  - Marcel <MTRNord@users.noreply.github.com>
+
+-- MTRNord <mtrnord1@gmail.com>; Wed, 20 Dec 2017 14:00:06 +0100
+
+
