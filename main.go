@@ -1,10 +1,11 @@
 package main
 
+// +build race
+
 import (
 	"os"
 	"path/filepath"
 	"runtime"
-	_ "runtime/race"
 	"sync"
 
 	"github.com/Nordgedanken/Morpheus/matrix"
