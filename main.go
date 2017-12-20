@@ -159,6 +159,7 @@ func main() {
 	_ = widgets.QApplication_Exec()
 	UserDB.Close()
 	CacheDB.Close()
+	close(c)
 	log.Infoln("Stopping Morpheus")
 }
 
