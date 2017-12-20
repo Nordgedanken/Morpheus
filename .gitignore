@@ -19,3 +19,5 @@ log/
 data/
 ui/moc*
 .idea/
+Morpheus.exe
+Morpheus.msi
