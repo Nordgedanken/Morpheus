@@ -2,11 +2,9 @@ package main
 
 import (
 	"os"
-	"os/signal"
 	"path/filepath"
 	"runtime"
 	"sync"
-	"syscall"
 
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
@@ -47,25 +45,6 @@ func main() {
 			DisableSorting:   false,
 		}, &dugong.DailyRotationSchedule{GZip: false},
 	))
-
-	c := make(chan os.Signal, 2)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	go func() {
-		<-c
-		cleanup()
-		close(c)
-		defer log.Exit(1)
-	}()
-
-	UserDB, DBOpenErr := db.OpenUserDB()
-	if DBOpenErr != nil {
-		log.Fatalln(DBOpenErr)
-	}
-
-	CacheDB, DBOpenErr := db.OpenCacheDB()
-	if DBOpenErr != nil {
-		log.Fatalln(DBOpenErr)
-	}
 
 	log.Infoln("Starting Morpheus")
 
@@ -155,26 +134,35 @@ func main() {
 
 	window.Resize2(windowWidth, windowHeight)
 
+	window.ConnectCloseEvent(func(event *gui.QCloseEvent) {
+		if cleanup() {
+			event.Accept()
+		} else {
+			event.Ignore()
+		}
+	})
+
 	//enter the main event loop
 	_ = widgets.QApplication_Exec()
-	UserDB.Close()
-	CacheDB.Close()
-	close(c)
 	log.Infoln("Stopping Morpheus")
 }
 
-func cleanup() {
+func cleanup() bool {
 	log.Infoln("cleanup")
 	UserDB, DBOpenErr := db.OpenUserDB()
 	if DBOpenErr != nil {
 		log.Errorln(DBOpenErr)
+		return false
 	}
 
 	CacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
 		log.Errorln(DBOpenErr)
+		return false
 	}
 
 	UserDB.Close()
 	CacheDB.Close()
+
+	return true
 }
