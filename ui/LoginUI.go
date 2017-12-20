@@ -74,18 +74,74 @@ func (l *LoginUI) NewUI() (err error) {
 	})
 
 	usernameInput.ConnectTextChanged(func(value string) {
+		if usernameInput.StyleSheet() == "border: 1px solid red" {
+			usernameInput.SetStyleSheet("")
+		}
 		l.username = value
 	})
 
 	passwordInput.ConnectTextChanged(func(value string) {
+		if passwordInput.StyleSheet() == "border: 1px solid red" {
+			passwordInput.SetStyleSheet("")
+		}
 		l.password = value
 	})
 
 	loginButton.ConnectClicked(func(_ bool) {
-		LoginErr := l.login()
-		if err != nil {
-			err = LoginErr
-			return
+		if l.username != "" {
+			if l.password != "" {
+				LoginErr := l.login()
+				if LoginErr != nil {
+					err = LoginErr
+					return
+				}
+			} else {
+				passwordInput.SetStyleSheet("border: 1px solid red")
+			}
+		} else {
+			usernameInput.SetStyleSheet("border: 1px solid red")
+		}
+	})
+
+	usernameInput.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
+		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
+			if l.password != "" {
+				LoginErr := l.login()
+				if LoginErr != nil {
+					err = LoginErr
+					return
+				}
+
+				usernameInput.Clear()
+				ev.Accept()
+			} else {
+				passwordInput.SetStyleSheet("border: 1px solid red")
+				ev.Ignore()
+			}
+		} else {
+			usernameInput.KeyPressEventDefault(ev)
+			ev.Ignore()
+		}
+	})
+
+	passwordInput.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
+		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
+			if l.username != "" {
+				LoginErr := l.login()
+				if LoginErr != nil {
+					err = LoginErr
+					return
+				}
+
+				passwordInput.Clear()
+				ev.Accept()
+			} else {
+				usernameInput.SetStyleSheet("border: 1px solid red")
+				ev.Ignore()
+			}
+		} else {
+			passwordInput.KeyPressEventDefault(ev)
+			ev.Ignore()
 		}
 	})
 
