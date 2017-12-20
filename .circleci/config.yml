@@ -14,9 +14,6 @@ jobs:
           name: Set PATH to correct value
           command: echo 'export PATH=/usr/local/go/bin:/usr/local/go_workspace/bin:~/.go_workspace/bin:/home/user/work/bin:$GOBIN:$PATH' >> $BASH_ENV
       - run:
-          name: Print PATH
-          command: echo $PATH
-      - run:
           name: Get Glide
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
           command: curl https://glide.sh/get | sh
