@@ -11,7 +11,7 @@ type OpenIDTokenResponse struct {
 
 func GetOpenIDToken(cli *gomatrix.Client) (resp *OpenIDTokenResponse, err error) {
 	urlPath := cli.BuildURL("user", cli.UserID, "openid", "request_token")
-	_, err = cli.MakeRequest("POST", urlPath, nil, &resp)
+	_, err = MakeRequest(cli, "POST", urlPath, "{}", &resp)
 	return
 }
 
