@@ -5,7 +5,6 @@ import (
 	"github.com/Nordgedanken/Morpheus/matrix/db"
 	"github.com/Nordgedanken/Morpheus/matrix/syncer"
 	"github.com/matrix-org/gomatrix"
-	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/widgets"
 )
 
@@ -39,15 +38,13 @@ func (d *databases) SetCacheDB(db db.Storer) {
 type MainUI struct {
 	config
 
-	widget                  *widgets.QWidget
-	widgetThread            *core.QThread
-	RoomAvatar              *widgets.QLabel
-	RoomTitle               *widgets.QLabel
-	RoomTopic               *widgets.QLabel
-	MainWidget              *widgets.QWidget
-	MessageListLayout       *QVBoxLayoutWithTriggerSlot
-	messageScrollArea       *widgets.QScrollArea
-	messageScrollAreaThread *core.QThread
+	widget            *widgets.QWidget
+	RoomAvatar        *widgets.QLabel
+	RoomTitle         *widgets.QLabel
+	RoomTopic         *widgets.QLabel
+	MainWidget        *widgets.QWidget
+	MessageListLayout *QVBoxLayoutWithTriggerSlot
+	messageScrollArea *widgets.QScrollArea
 
 	window      *widgets.QMainWindow
 	storage     *syncer.MorpheusStore
