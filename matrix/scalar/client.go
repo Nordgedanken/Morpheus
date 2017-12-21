@@ -20,7 +20,7 @@ type ScalarRegisterResp struct {
 }
 
 func GetScalarToken(cli *gomatrix.Client, openIDToken *OpenIDTokenResponse) (resp *ScalarRegisterResp, err error) {
-	urlPath := "https://scalar.vector.im/api/v1/scalar/register"
+	urlPath := "https://scalar.vector.im/api/register"
 	_, err = cli.MakeRequest("POST", urlPath, openIDToken, &resp)
 	return
 }
