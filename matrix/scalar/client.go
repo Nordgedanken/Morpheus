@@ -82,3 +82,46 @@ func ReqAndSaveScalarToken(cli *gomatrix.Client) (err error) {
 
 	return
 }
+
+func GetScalarURL(cli *gomatrix.Client) (err error, urlPath string) {
+	cacheDB, DBOpenErr := db.OpenCacheDB()
+	if DBOpenErr != nil {
+		log.Fatalln(DBOpenErr)
+	}
+
+	var integToken string
+
+	// Get cache
+	DBErr := cacheDB.View(func(txn *badger.Txn) error {
+		roomAvatarDataItem, QueryErr := txn.Get([]byte("user|" + cli.UserID + "|integToken"))
+		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
+			return QueryErr
+		}
+		if QueryErr != badger.ErrKeyNotFound {
+			integToken = roomAvatarDataItem.ToString()
+			return nil
+		}
+		return nil
+	})
+	if DBErr != nil {
+		err = DBErr
+		return
+	}
+
+	urlPath = "https://scalar.vector.im/?access_token=" + integToken
+
+	return
+}
+
+// How to listen for Scalar events:
+/*
+webframe := webkit.NewQWebView(nil)
+webframe.Load(core.NewQUrl3(GetScalarURL(cli), core.QUrl__TolerantMode))
+webframe.ConnectLoadFinished(func(ok bool) {
+	javascript := "window.addEventListener(\"message\", qtJS-onMessage, false);"
+
+	mainFrame := webframe.Page().MainFrame()
+// Replace second argument with actual QObject
+	mainFrame.AddToJavaScriptWindowObject("qtJS", nil, webkit.QWebFrame__AutoOwnership)
+	mainFrame.EvaluateJavaScript(javascript)
+})*/
