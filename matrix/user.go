@@ -2,6 +2,7 @@ package matrix
 
 import (
 	"bytes"
+	"fmt"
 	"image"
 	"image/color"
 	"image/draw"
@@ -193,5 +194,52 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 
 	avatar.LoadFromData(string(str[:]), uint(len(str)), "PNG", 0)
 	avatarResp = avatar
+	return
+}
+
+func GetUserDataFromCache() (accessToken, homeserverURL, userID string, err error) {
+	UserDB, err := db.OpenUserDB()
+
+	// Get cache
+	DBErr := UserDB.View(func(txn *badger.Txn) error {
+		accessTokenItem, QueryErr := txn.Get([]byte("user|accessToken"))
+		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
+			return QueryErr
+		}
+		if QueryErr != badger.ErrKeyNotFound {
+			accessTokenByte, accessTokenErr := accessTokenItem.Value()
+			accessToken = fmt.Sprintf("%s", accessTokenByte)
+			if accessTokenErr != nil {
+				return accessTokenErr
+			}
+		}
+
+		homeserverURLItem, QueryErr := txn.Get([]byte("user|homeserverURL"))
+		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
+			return QueryErr
+		}
+		if QueryErr != badger.ErrKeyNotFound {
+			homeserverURLByte, homeserverURLErr := homeserverURLItem.Value()
+			homeserverURL = fmt.Sprintf("%s", homeserverURLByte)
+			if homeserverURLErr != nil {
+				return homeserverURLErr
+			}
+		}
+
+		userIDItem, QueryErr := txn.Get([]byte("user|userID"))
+		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
+			return QueryErr
+		}
+		if QueryErr != badger.ErrKeyNotFound {
+			userIDByte, userIDErr := userIDItem.Value()
+			userID = fmt.Sprintf("%s", userIDByte)
+			return userIDErr
+		}
+		return nil
+	})
+	if DBErr != nil {
+		err = DBErr
+	}
+
 	return
 }

@@ -7,6 +7,8 @@ import (
 	"github.com/matrix-org/gomatrix"
 	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
+	"github.com/therecipe/qt/gui"
+	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
 )
 
@@ -40,80 +42,111 @@ func (l *LoginUI) GetWidget() (widget *widgets.QWidget) {
 
 // NewUI initializes a new login Screen
 func (l *LoginUI) NewUI() (err error) {
-	widget := widgets.NewQWidget(nil, 0)
-	widget.SetObjectName("LoginWrapper")
-	widget.SetStyleSheet("QWidget#LoginWrapper { border: 0px; };")
-	topLayout := widgets.NewQVBoxLayout()
+	l.widget = widgets.NewQWidget(nil, 0)
 
-	formWidget := widgets.NewQWidget(nil, 0)
-	formWrapper := widgets.NewQHBoxLayout()
+	var loader = uitools.NewQUiLoader(nil)
+	var file = core.NewQFile2(":/qml/ui/login.ui")
 
-	formLayout := widgets.NewQVBoxLayout()
-	formLayout.SetSpacing(20)
-	formLayout.SetContentsMargins(0, 0, 0, 30)
-	formWidget.SetLayout(formLayout)
-
-	formWrapper.AddStretch(1)
-	formWrapper.AddWidget(formWidget, 0, 0)
-	formWrapper.AddStretch(1)
+	file.Open(core.QIODevice__ReadOnly)
+	l.LoginWidget = loader.Load(file, l.widget)
+	file.Close()
 
 	// UsernameInput
-	usernameInput := widgets.NewQLineEdit(nil)
-	usernameInput.SetPlaceholderText("Insert MXID")
-
-	usernameLayout := widgets.NewQHBoxLayout()
-	usernameLayout.AddWidget(usernameInput, 0, core.Qt__AlignVCenter)
+	usernameInput := widgets.NewQLineEditFromPointer(l.widget.FindChild("UsernameInput", core.Qt__FindChildrenRecursively).Pointer())
 
 	// PasswordInput
-	passwordInput := widgets.NewQLineEdit(nil)
-	passwordInput.SetPlaceholderText("Insert password")
-	passwordInput.SetEchoMode(widgets.QLineEdit__Password)
-
-	passwordLayout := widgets.NewQHBoxLayout()
-	passwordLayout.AddWidget(passwordInput, 0, core.Qt__AlignVCenter)
-
-	formLayout.AddLayout(usernameLayout, 0)
-	formLayout.AddLayout(passwordLayout, 0)
+	passwordInput := widgets.NewQLineEditFromPointer(l.widget.FindChild("PasswordInput", core.Qt__FindChildrenRecursively).Pointer())
 
 	// loginButton
-	buttonLayout := widgets.NewQHBoxLayout()
-	buttonLayout.SetSpacing(0)
-	buttonLayout.SetContentsMargins(0, 0, 0, 30)
+	loginButton := widgets.NewQPushButtonFromPointer(l.widget.FindChild("LoginButton", core.Qt__FindChildrenRecursively).Pointer())
 
-	loginButton := widgets.NewQPushButton2("LOGIN", nil)
-	loginButton.SetMinimumSize2(350, 65)
+	var layout = widgets.NewQHBoxLayout()
+	l.window.SetLayout(layout)
+	layout.InsertWidget(0, l.LoginWidget, 0, core.Qt__AlignTop|core.Qt__AlignLeft)
+	layout.SetSpacing(0)
+	layout.SetContentsMargins(0, 0, 0, 0)
+	l.widget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
+	l.LoginWidget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 
-	buttonLayout.AddStretch(1)
-	buttonLayout.AddWidget(loginButton, 0, 0)
-	buttonLayout.AddStretch(1)
-
-	topLayout.AddStretch(1)
-	topLayout.AddLayout(formWrapper, 0)
-	topLayout.AddStretch(1)
-	topLayout.AddLayout(buttonLayout, 0)
-	topLayout.AddStretch(1)
-
-	widget.SetLayout(topLayout)
+	l.widget.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+		l.LoginWidget.Resize(event.Size())
+		event.Accept()
+	})
 
 	usernameInput.ConnectTextChanged(func(value string) {
+		if usernameInput.StyleSheet() == "border: 1px solid red" {
+			usernameInput.SetStyleSheet("")
+		}
 		l.username = value
 	})
 
 	passwordInput.ConnectTextChanged(func(value string) {
+		if passwordInput.StyleSheet() == "border: 1px solid red" {
+			passwordInput.SetStyleSheet("")
+		}
 		l.password = value
 	})
 
 	loginButton.ConnectClicked(func(_ bool) {
-		LoginErr := l.login()
-		if err != nil {
-			err = LoginErr
-			return
+		if l.username != "" {
+			if l.password != "" {
+				LoginErr := l.login()
+				if LoginErr != nil {
+					err = LoginErr
+					return
+				}
+			} else {
+				passwordInput.SetStyleSheet("border: 1px solid red")
+			}
+		} else {
+			usernameInput.SetStyleSheet("border: 1px solid red")
 		}
 	})
 
-	widget.SetWindowTitle("Morpheus - Login")
+	usernameInput.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
+		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
+			if l.password != "" {
+				LoginErr := l.login()
+				if LoginErr != nil {
+					err = LoginErr
+					return
+				}
 
-	l.widget = widget
+				usernameInput.Clear()
+				ev.Accept()
+			} else {
+				passwordInput.SetStyleSheet("border: 1px solid red")
+				ev.Ignore()
+			}
+		} else {
+			usernameInput.KeyPressEventDefault(ev)
+			ev.Ignore()
+		}
+	})
+
+	passwordInput.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
+		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
+			if l.username != "" {
+				LoginErr := l.login()
+				if LoginErr != nil {
+					err = LoginErr
+					return
+				}
+
+				passwordInput.Clear()
+				ev.Accept()
+			} else {
+				usernameInput.SetStyleSheet("border: 1px solid red")
+				ev.Ignore()
+			}
+		} else {
+			passwordInput.KeyPressEventDefault(ev)
+			ev.Ignore()
+		}
+	})
+
+	l.LoginWidget.SetWindowTitle("Morpheus - Login")
+
 	return
 }
 
