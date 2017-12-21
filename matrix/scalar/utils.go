@@ -9,6 +9,7 @@ import (
 	"github.com/matrix-org/gomatrix"
 )
 
+//MakeRequest does the same as cli.MakeRequest but with a string as body instead of a struct
 func MakeRequest(cli *gomatrix.Client, method string, httpURL string, reqBody string, resBody interface{}) ([]byte, error) {
 	var req *http.Request
 	var err error
