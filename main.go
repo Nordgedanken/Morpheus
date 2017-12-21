@@ -11,6 +11,7 @@ import (
 
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
+	"github.com/Nordgedanken/Morpheus/matrix/scalar"
 	"github.com/Nordgedanken/Morpheus/ui"
 	"github.com/dgraph-io/badger"
 	"github.com/matrix-org/dugong"
@@ -191,6 +192,19 @@ func main() {
 			log.Errorln("Login Err: ", loginUIErr)
 			return
 		}
+
+		//scalarTokenTest
+		openIdToken, OpenIDerr := scalar.GetOpenIDToken(LoginUIStruct.GetCli())
+		if OpenIDerr != nil {
+			log.Warnln(OpenIDerr)
+		}
+		scalarToken, ScalarRegisterErr := scalar.GetScalarToken(LoginUIStruct.GetCli(), openIdToken)
+		if ScalarRegisterErr != nil {
+			log.Warnln(ScalarRegisterErr)
+		}
+
+		log.Infoln(scalarToken)
+
 		LoginUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
 		window.SetCentralWidget(LoginUIStruct.GetWidget())
 	}

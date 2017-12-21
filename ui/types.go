@@ -4,6 +4,7 @@ import (
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
 	"github.com/Nordgedanken/Morpheus/matrix/syncer"
+	"github.com/constabulary/gb/testdata/src/d.v1"
 	"github.com/matrix-org/gomatrix"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/widgets"
@@ -24,6 +25,11 @@ type matrixClient struct {
 	databases
 	cli    *gomatrix.Client
 	syncer *syncer.MorpheusSyncer
+}
+
+// GetCli returns the Matrix Client
+func (mc *matrixClient) GetCli() *gomatrix.Client{
+	return mc.cli
 }
 
 type databases struct {
