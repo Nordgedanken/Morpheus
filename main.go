@@ -1,19 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"os"
-	"os/signal"
 	"path/filepath"
 	"runtime"
 	"sync"
-	"syscall"
 
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
 	"github.com/Nordgedanken/Morpheus/matrix/scalar"
 	"github.com/Nordgedanken/Morpheus/ui"
-	"github.com/dgraph-io/badger"
 	"github.com/Nordgedanken/dugong"
 	"github.com/matrix-org/gomatrix"
 	"github.com/shibukawa/configdir"
@@ -50,25 +46,6 @@ func main() {
 			DisableSorting:   false,
 		}, &dugong.DailyRotationSchedule{GZip: false},
 	))
-
-	c := make(chan os.Signal, 2)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	go func() {
-		<-c
-		cleanup()
-		close(c)
-		os.Exit(1)
-	}()
-
-	UserDB, DBOpenErr := db.OpenUserDB()
-	if DBOpenErr != nil {
-		log.Fatalln(DBOpenErr)
-	}
-
-	CacheDB, DBOpenErr := db.OpenCacheDB()
-	if DBOpenErr != nil {
-		log.Fatalln(DBOpenErr)
-	}
 
 	log.Infoln("Starting Morpheus")
 
@@ -113,49 +90,9 @@ func main() {
 
 	window.Move2(windowX, windowY)
 
-	var accessToken string
-	var homeserverURL string
-	var userID string
-
-	// Get cache
-	DBErr := UserDB.View(func(txn *badger.Txn) error {
-		accessTokenItem, QueryErr := txn.Get([]byte("user|accessToken"))
-		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
-			return QueryErr
-		}
-		if QueryErr != badger.ErrKeyNotFound {
-			accessTokenByte, accessTokenErr := accessTokenItem.Value()
-			accessToken = fmt.Sprintf("%s", accessTokenByte)
-			if accessTokenErr != nil {
-				return accessTokenErr
-			}
-		}
-
-		homeserverURLItem, QueryErr := txn.Get([]byte("user|homeserverURL"))
-		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
-			return QueryErr
-		}
-		if QueryErr != badger.ErrKeyNotFound {
-			homeserverURLByte, homeserverURLErr := homeserverURLItem.Value()
-			homeserverURL = fmt.Sprintf("%s", homeserverURLByte)
-			if homeserverURLErr != nil {
-				return homeserverURLErr
-			}
-		}
-
-		userIDItem, QueryErr := txn.Get([]byte("user|userID"))
-		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
-			return QueryErr
-		}
-		if QueryErr != badger.ErrKeyNotFound {
-			userIDByte, userIDErr := userIDItem.Value()
-			userID = fmt.Sprintf("%s", userIDByte)
-			return userIDErr
-		}
-		return nil
-	})
-	if DBErr != nil {
-		log.Errorln("Login: ", DBErr)
+	accessToken, homeserverURL, userID, UserCacheErr := matrix.GetUserDataFromCache()
+	if UserCacheErr != nil {
+		log.Debug(UserCacheErr)
 	}
 
 	if accessToken != "" && homeserverURL != "" && userID != "" {
@@ -212,25 +149,35 @@ func main() {
 
 	window.Resize2(windowWidth, windowHeight)
 
+	window.ConnectCloseEvent(func(event *gui.QCloseEvent) {
+		log.Infoln("Stopping Morpheus")
+		if cleanup() {
+			event.Accept()
+		} else {
+			event.Ignore()
+		}
+	})
+
 	//enter the main event loop
 	_ = widgets.QApplication_Exec()
-	defer UserDB.Close()
-	defer CacheDB.Close()
-	log.Infoln("Stopping Morpheus")
 }
 
-func cleanup() {
+func cleanup() bool {
 	log.Infoln("cleanup")
 	UserDB, DBOpenErr := db.OpenUserDB()
 	if DBOpenErr != nil {
 		log.Errorln(DBOpenErr)
+		return false
 	}
 
 	CacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
 		log.Errorln(DBOpenErr)
+		return false
 	}
 
 	UserDB.Close()
 	CacheDB.Close()
+
+	return true
 }

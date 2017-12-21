@@ -59,9 +59,6 @@ func (m *MainUI) GetWidget() (widget *widgets.QWidget) {
 // NewUI initializes a new Main Screen
 func (m *MainUI) NewUI() (err error) {
 	m.widget = widgets.NewQWidget(nil, 0)
-	m.widgetThread = core.NewQThread(nil)
-	m.widget.MoveToThread(m.widgetThread)
-	m.widgetThread.Start()
 
 	var loader = uitools.NewQUiLoader(nil)
 	var file = core.NewQFile2(":/qml/ui/chat.ui")
@@ -71,9 +68,6 @@ func (m *MainUI) NewUI() (err error) {
 	file.Close()
 
 	m.messageScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
-	m.messageScrollAreaThread = core.NewQThread(nil)
-	m.messageScrollArea.MoveToThread(m.messageScrollAreaThread)
-	m.messageScrollAreaThread.Start()
 	messagesScrollAreaContent := widgets.NewQWidgetFromPointer(m.widget.FindChild("messagesScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
 	roomScrollArea := widgets.NewQScrollAreaFromPointer(m.widget.FindChild("roomScroll", core.Qt__FindChildrenRecursively).Pointer())
 	roomScrollAreaContent := widgets.NewQWidgetFromPointer(m.widget.FindChild("roomScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
