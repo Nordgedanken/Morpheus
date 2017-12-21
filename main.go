@@ -8,7 +8,6 @@ import (
 
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
-	"github.com/Nordgedanken/Morpheus/matrix/scalar"
 	"github.com/Nordgedanken/Morpheus/ui"
 	"github.com/Nordgedanken/dugong"
 	"github.com/matrix-org/gomatrix"
@@ -117,16 +116,6 @@ func main() {
 			if mainUIErr != nil {
 				log.Errorln("mainUI: ", mainUIErr)
 				return
-			}
-
-			//scalarTokenTest
-			openIdToken, OpenIDerr := scalar.GetOpenIDToken(MainUIStruct.GetCli())
-			if OpenIDerr != nil {
-				log.Warnln(OpenIDerr)
-			}
-			scalarToken, ScalarRegisterErr := scalar.GetScalarToken(MainUIStruct.GetCli(), openIdToken)
-			if ScalarRegisterErr != nil {
-				log.Warnln(ScalarRegisterErr)
 			}
 
 			log.Infoln(scalarToken)
