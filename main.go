@@ -119,17 +119,7 @@ func main() {
 				return
 			}
 
-			//scalarTokenTest
-			openIdToken, OpenIDerr := scalar.GetOpenIDToken(MainUIStruct.GetCli())
-			if OpenIDerr != nil {
-				log.Warnln(OpenIDerr)
-			}
-			scalarToken, ScalarRegisterErr := scalar.GetScalarToken(MainUIStruct.GetCli(), openIdToken)
-			if ScalarRegisterErr != nil {
-				log.Warnln(ScalarRegisterErr)
-			}
-
-			log.Infoln(scalarToken)
+			scalar.ReqAndSaveScalarToken(MainUIStruct.GetCli())
 
 			MainUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
 			window.SetCentralWidget(MainUIStruct.GetWidget())
