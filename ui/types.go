@@ -25,6 +25,11 @@ type matrixClient struct {
 	syncer *syncer.MorpheusSyncer
 }
 
+// GetCli returns the Matrix Client
+func (mc *matrixClient) GetCli() *gomatrix.Client{
+	return mc.cli
+}
+
 type databases struct {
 	cacheDB db.Storer
 }
