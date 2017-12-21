@@ -118,8 +118,6 @@ func main() {
 				return
 			}
 
-			log.Infoln(scalarToken)
-
 			MainUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
 			window.SetCentralWidget(MainUIStruct.GetWidget())
 		}
