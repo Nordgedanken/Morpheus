@@ -181,6 +181,19 @@ func main() {
 				log.Errorln("mainUI: ", mainUIErr)
 				return
 			}
+
+			//scalarTokenTest
+			openIdToken, OpenIDerr := scalar.GetOpenIDToken(MainUIStruct.GetCli())
+			if OpenIDerr != nil {
+				log.Warnln(OpenIDerr)
+			}
+			scalarToken, ScalarRegisterErr := scalar.GetScalarToken(MainUIStruct.GetCli(), openIdToken)
+			if ScalarRegisterErr != nil {
+				log.Warnln(ScalarRegisterErr)
+			}
+
+			log.Infoln(scalarToken)
+
 			MainUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
 			window.SetCentralWidget(MainUIStruct.GetWidget())
 		}
@@ -192,18 +205,6 @@ func main() {
 			log.Errorln("Login Err: ", loginUIErr)
 			return
 		}
-
-		//scalarTokenTest
-		openIdToken, OpenIDerr := scalar.GetOpenIDToken(LoginUIStruct.GetCli())
-		if OpenIDerr != nil {
-			log.Warnln(OpenIDerr)
-		}
-		scalarToken, ScalarRegisterErr := scalar.GetScalarToken(LoginUIStruct.GetCli(), openIdToken)
-		if ScalarRegisterErr != nil {
-			log.Warnln(ScalarRegisterErr)
-		}
-
-		log.Infoln(scalarToken)
 
 		LoginUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
 		window.SetCentralWidget(LoginUIStruct.GetWidget())
