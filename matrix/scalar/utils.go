@@ -7,7 +7,6 @@ import (
 	"net/http"
 
 	"github.com/matrix-org/gomatrix"
-	log "github.com/sirupsen/logrus"
 )
 
 func MakeRequest(cli *gomatrix.Client, method string, httpURL string, reqBody string, resBody interface{}) ([]byte, error) {
@@ -23,8 +22,6 @@ func MakeRequest(cli *gomatrix.Client, method string, httpURL string, reqBody st
 	if err != nil {
 		return nil, err
 	}
-	ReqContents, _ := ioutil.ReadAll(req.Body)
-	log.Infoln(ReqContents)
 	req.Header.Set("Content-Type", "application/json")
 	res, err := cli.Client.Do(req)
 	if res != nil {
