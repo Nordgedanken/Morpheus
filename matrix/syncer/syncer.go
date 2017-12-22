@@ -9,6 +9,7 @@ import (
 	"github.com/matrix-org/gomatrix"
 )
 
+//MorpheusSyncer holds the UserID, the used Storer and the listener
 type MorpheusSyncer struct {
 	UserID    string
 	Store     gomatrix.Storer

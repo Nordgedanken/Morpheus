@@ -197,6 +197,7 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 	return
 }
 
+//GetUserDataFromCache gets the last User from the cache
 func GetUserDataFromCache() (accessToken, homeserverURL, userID string, err error) {
 	UserDB, err := db.OpenUserDB()
 

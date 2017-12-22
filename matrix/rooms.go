@@ -26,10 +26,12 @@ type Room struct {
 	RoomTopic     string
 }
 
+//SetID allows to set the RoomID
 func (r *Room) SetID(roomID string) {
 	r.RoomID = roomID
 }
 
+//SetCLI allows to set the Cli
 func (r *Room) SetCLI(cli *gomatrix.Client) {
 	r.cli = cli
 }

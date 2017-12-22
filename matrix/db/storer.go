@@ -10,6 +10,7 @@ type Storer interface {
 	LoadNextBatch(userID string) (nextBatch string, err error)
 }
 
+// MorpheusStorage is the StorageInterface which needs to be conformed to in order to persist Go-NEB data
 type MorpheusStorage struct {
 	Database *badger.DB
 }

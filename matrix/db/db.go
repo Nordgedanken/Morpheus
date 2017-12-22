@@ -11,8 +11,8 @@ import (
 	"github.com/shibukawa/configdir"
 )
 
-var UserDB *badger.DB
-var CacheDB *badger.DB
+var userDB *badger.DB
+var cacheDB *badger.DB
 var onceCache sync.Once
 var onceUser sync.Once
 
@@ -45,15 +45,15 @@ func OpenCacheDB() (db *badger.DB, err error) {
 			err = DBErr
 			return
 		}
-		CacheDB = expDB
+		userDB = expDB
 	})
 
-	if CacheDB == nil {
+	if userDB == nil {
 		err = errors.New("missing CacheDB")
 		return
 	}
 
-	db = CacheDB
+	db = userDB
 	return
 }
 
@@ -87,15 +87,15 @@ func OpenUserDB() (db *badger.DB, err error) {
 			return
 		}
 
-		UserDB = expDB
+		cacheDB = expDB
 	})
 
-	if UserDB == nil {
+	if cacheDB == nil {
 		err = errors.New("missing UserDB")
 		return
 	}
 
-	db = UserDB
+	db = cacheDB
 	return
 }
 
