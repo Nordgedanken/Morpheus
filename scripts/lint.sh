@@ -26,7 +26,7 @@ fi
 
 echo "Installing lint search engine..."
 go get -u -v github.com/alecthomas/gometalinter/
-gometalinter --config=linter.json ./... --install
+$GOPATH/bin/gometalinter --config=linter.json ./... --install
 
 echo "Looking for lint..."
-gometalinter ./... ${args} --skip=vendor --exclude "vendor"
+$GOPATH/bin/gometalinter ./... ${args} --skip=vendor --exclude "vendor"
