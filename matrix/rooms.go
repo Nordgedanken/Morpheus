@@ -12,11 +12,13 @@ import (
 	"github.com/matrix-org/gomatrix"
 	"github.com/rhinoman/go-commonmark"
 	log "github.com/sirupsen/logrus"
+	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 )
 
 // Room saves the information of a Room
 type Room struct {
+	core.QObject
 	cli           *gomatrix.Client
 	RoomID        string
 	RoomName      string

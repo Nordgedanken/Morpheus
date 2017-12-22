@@ -18,6 +18,7 @@ debug*
 log/
 data/
 ui/moc*
+matrix/moc*
 .idea/
 Morpheus.exe
 Morpheus.msi
