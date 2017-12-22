@@ -26,17 +26,17 @@ import (
 type QVBoxLayoutWithTriggerSlot struct {
 	widgets.QVBoxLayout
 
-	_ func(messageBody, sender string, timestamp int64) `slot:"TriggerMessage"`
+	_ func(messageBody, sender string, timestamp int64) `signal:"TriggerMessage"`
 }
 
 // NewMessageList generates a new QVBoxLayoutWithTriggerSlot and adds it to the message scrollArea
-func NewMessageList(scrollArea *widgets.QScrollArea, messageView *widgets.QWidget) (messageViewLayout *QVBoxLayoutWithTriggerSlot) {
-	messageViewLayout = NewQVBoxLayoutWithTriggerSlot2(messageView)
+func NewMessageList(scrollArea *widgets.QScrollArea) (messageViewLayout *QVBoxLayoutWithTriggerSlot) {
+	messageViewLayout = NewQVBoxLayoutWithTriggerSlot2(scrollArea.Widget())
 
 	messageViewLayout.SetSpacing(0)
-	messageViewLayout.SetContentsMargins(0, 0, 0, 0)
-	messageView.SetContentsMargins(0, 0, 0, 0)
-	scrollArea.SetWidget(messageView)
+	messageViewLayout.AddStretch(1)
+	messageViewLayout.SetContentsMargins(15, 0, 15, 15)
+	scrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
 	scrollArea.SetAlignment(core.Qt__AlignLeading | core.Qt__AlignLeft | core.Qt__AlignVCenter)
 	scrollArea.Widget().SetLayout(messageViewLayout)
 

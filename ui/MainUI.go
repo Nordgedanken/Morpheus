@@ -68,7 +68,6 @@ func (m *MainUI) NewUI() (err error) {
 	file.Close()
 
 	m.messageScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
-	messagesScrollAreaContent := widgets.NewQWidgetFromPointer(m.widget.FindChild("messagesScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
 	roomScrollArea := widgets.NewQScrollAreaFromPointer(m.widget.FindChild("roomScroll", core.Qt__FindChildrenRecursively).Pointer())
 	roomScrollAreaContent := widgets.NewQWidgetFromPointer(m.widget.FindChild("roomScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
 
@@ -107,7 +106,7 @@ func (m *MainUI) NewUI() (err error) {
 	})
 
 	// Init Message View
-	m.MessageListLayout = NewMessageList(m.messageScrollArea, messagesScrollAreaContent)
+	m.MessageListLayout = NewMessageList(m.messageScrollArea)
 
 	// Init Room View
 	roomListLayout := NewRoomList(roomScrollArea, roomScrollAreaContent)
