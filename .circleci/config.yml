@@ -81,6 +81,20 @@ jobs:
           command: ls -lah
       - store_test_results:
               path: /home/user/work/src/github.com/Nordgedanken/Morpheus/junit.xml
+  lint:
+    docker:
+      - image: therecipe/qt:linux
+    steps:
+      - attach_workspace:
+          # Must be absolute path or relative path from working_directory
+          at: /home/user/work/
+      - run:
+          name: Run Lint
+          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+          command: chmod +x scripts/lint.sh && scripts/lint.sh
+          no_output_timeout: 1200
+      - store_test_results:
+              path: /home/user/work/src/github.com/Nordgedanken/Morpheus/junit.xml
   build_win_static:
     docker:
       - image: therecipe/qt:windows_64_static
@@ -107,6 +121,9 @@ workflows:
           requires:
             - prepare
       - test:
+          requires:
+            - prepare
+      - lint:
           requires:
             - prepare
 notify:
