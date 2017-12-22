@@ -58,33 +58,7 @@ func (m *MainUI) GetWidget() (widget *widgets.QWidget) {
 
 // NewUI initializes a new Main Screen
 func (m *MainUI) NewUI() (err error) {
-	m.widget = widgets.NewQWidget(nil, 0)
-
-	var loader = uitools.NewQUiLoader(nil)
-	var file = core.NewQFile2(":/qml/ui/chat.ui")
-
-	file.Open(core.QIODevice__ReadOnly)
-	m.MainWidget = loader.Load(file, m.widget)
-	file.Close()
-
-	m.messageScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
-	roomScrollArea := widgets.NewQScrollAreaFromPointer(m.widget.FindChild("roomScroll", core.Qt__FindChildrenRecursively).Pointer())
-	roomScrollAreaContent := widgets.NewQWidgetFromPointer(m.widget.FindChild("roomScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
-
-	m.RoomAvatar = widgets.NewQLabelFromPointer(m.widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
-	m.RoomTitle = widgets.NewQLabelFromPointer(m.widget.FindChild("RoomTitle", core.Qt__FindChildrenRecursively).Pointer())
-	m.RoomTopic = widgets.NewQLabelFromPointer(m.widget.FindChild("Topic", core.Qt__FindChildrenRecursively).Pointer())
-
-	var layout = widgets.NewQHBoxLayout()
-	m.window.SetLayout(layout)
-	layout.InsertWidget(0, m.MainWidget, 0, core.Qt__AlignTop|core.Qt__AlignLeft)
-	layout.SetSpacing(0)
-	layout.SetContentsMargins(0, 0, 0, 0)
-
-	m.widget.ConnectResizeEvent(func(event *gui.QResizeEvent) {
-		m.MainWidget.Resize(event.Size())
-		event.Accept()
-	})
+	m.loadChatUIDefaults()
 
 	//Set Avatar
 	avatarLogo := widgets.NewQLabelFromPointer(m.widget.FindChild("UserAvatar", core.Qt__FindChildrenRecursively).Pointer())
@@ -105,21 +79,7 @@ func (m *MainUI) NewUI() (err error) {
 		}
 	})
 
-	// Init Message View
-	m.MessageListLayout = NewMessageList(m.messageScrollArea)
-
-	// Init Room View
-	roomListLayout := NewRoomList(roomScrollArea, roomScrollAreaContent)
-
-	m.messageScrollArea.SetWidgetResizable(true)
-	m.messageScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
-	m.messageScrollArea.SetContentsMargins(0, 0, 0, 0)
-	//messageScrollArea.SetSizeAdjustPolicy(widgets.QAbstractScrollArea__AdjustToContents)
-
-	roomScrollArea.SetWidgetResizable(true)
-	roomScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
-	roomScrollArea.SetContentsMargins(0, 0, 0, 0)
-	roomScrollArea.SetSizeAdjustPolicy(widgets.QAbstractScrollArea__AdjustToContents)
+	m.initScrolls()
 
 	m.MessageListLayout.ConnectTriggerMessage(func(messageBody, sender string, timestamp int64) {
 		var own bool
@@ -162,17 +122,17 @@ func (m *MainUI) NewUI() (err error) {
 	m.widget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 	m.MainWidget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 
-	roomListLayout.ConnectTriggerRoom(func(roomID string) {
+	m.RoomListLayout.ConnectTriggerRoom(func(roomID string) {
 		room := m.rooms[roomID]
 
-		NewRoomErr := roomListLayout.NewRoom(room, roomScrollArea, m)
+		NewRoomErr := m.RoomListLayout.NewRoom(room, m.roomScrollArea, m)
 		if NewRoomErr != nil {
 			err = NewRoomErr
 			return
 		}
 	})
 
-	m.initRoomList(roomListLayout, roomScrollArea)
+	m.initRoomList(m.RoomListLayout, m.roomScrollArea)
 
 	go m.loadCache()
 
@@ -211,7 +171,7 @@ func (m *MainUI) NewUI() (err error) {
 		}
 	})
 
-	roomListLayout.ConnectChangeRoom(func(roomID string) {
+	m.RoomListLayout.ConnectChangeRoom(func(roomID string) {
 		room := m.rooms[roomID]
 		roomAvatar, roomAvatarErr := room.GetRoomAvatar()
 		if roomAvatarErr != nil {
@@ -238,6 +198,53 @@ func (m *MainUI) NewUI() (err error) {
 	})
 
 	return
+}
+
+func (m *MainUI) initScrolls() {
+	// Init Message View
+	m.MessageListLayout = NewMessageList(m.messageScrollArea)
+
+	// Init Room View
+	m.RoomListLayout = NewRoomList(m.roomScrollArea)
+
+	m.messageScrollArea.SetWidgetResizable(true)
+	m.messageScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
+	m.messageScrollArea.SetContentsMargins(0, 0, 0, 0)
+	//messageScrollArea.SetSizeAdjustPolicy(widgets.QAbstractScrollArea__AdjustToContents)
+
+	m.roomScrollArea.SetWidgetResizable(true)
+	m.roomScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
+	m.roomScrollArea.SetContentsMargins(0, 0, 0, 0)
+	m.roomScrollArea.SetSizeAdjustPolicy(widgets.QAbstractScrollArea__AdjustToContents)
+}
+
+func (m *MainUI) loadChatUIDefaults() {
+	m.widget = widgets.NewQWidget(nil, 0)
+
+	var loader = uitools.NewQUiLoader(nil)
+	var file = core.NewQFile2(":/qml/ui/chat.ui")
+
+	file.Open(core.QIODevice__ReadOnly)
+	m.MainWidget = loader.Load(file, m.widget)
+	file.Close()
+
+	m.messageScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
+	m.roomScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("roomScroll", core.Qt__FindChildrenRecursively).Pointer())
+
+	m.RoomAvatar = widgets.NewQLabelFromPointer(m.widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
+	m.RoomTitle = widgets.NewQLabelFromPointer(m.widget.FindChild("RoomTitle", core.Qt__FindChildrenRecursively).Pointer())
+	m.RoomTopic = widgets.NewQLabelFromPointer(m.widget.FindChild("Topic", core.Qt__FindChildrenRecursively).Pointer())
+
+	var layout = widgets.NewQHBoxLayout()
+	m.window.SetLayout(layout)
+	layout.InsertWidget(0, m.MainWidget, 0, core.Qt__AlignTop|core.Qt__AlignLeft)
+	layout.SetSpacing(0)
+	layout.SetContentsMargins(0, 0, 0, 0)
+
+	m.widget.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+		m.MainWidget.Resize(event.Size())
+		event.Accept()
+	})
 }
 
 func (m *MainUI) sendMessage(message string) (err error) {

@@ -28,13 +28,12 @@ type QRoomVBoxLayoutWithTriggerSlot struct {
 }
 
 // NewRoomList generates a new QRoomVBoxLayoutWithTriggerSlot and adds it to the room scrollArea
-func NewRoomList(scrollArea *widgets.QScrollArea, roomView *widgets.QWidget) (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) {
-	roomViewLayout = NewQRoomVBoxLayoutWithTriggerSlot2(roomView)
+func NewRoomList(scrollArea *widgets.QScrollArea) (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) {
+	roomViewLayout = NewQRoomVBoxLayoutWithTriggerSlot2(scrollArea.Widget())
 
 	roomViewLayout.SetSpacing(0)
 	roomViewLayout.SetContentsMargins(0, 0, 0, 0)
-	roomView.SetContentsMargins(0, 0, 0, 0)
-	scrollArea.SetWidget(roomView)
+	scrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
 	scrollArea.Widget().SetLayout(roomViewLayout)
 
 	return

@@ -26,7 +26,7 @@ type matrixClient struct {
 }
 
 // GetCli returns the Matrix Client
-func (mc *matrixClient) GetCli() *gomatrix.Client{
+func (mc *matrixClient) GetCli() *gomatrix.Client {
 	return mc.cli
 }
 
@@ -49,7 +49,9 @@ type MainUI struct {
 	RoomTopic         *widgets.QLabel
 	MainWidget        *widgets.QWidget
 	MessageListLayout *QVBoxLayoutWithTriggerSlot
+	RoomListLayout    *QRoomVBoxLayoutWithTriggerSlot
 	messageScrollArea *widgets.QScrollArea
+	roomScrollArea    *widgets.QScrollArea
 
 	window      *widgets.QMainWindow
 	storage     *syncer.MorpheusStore
