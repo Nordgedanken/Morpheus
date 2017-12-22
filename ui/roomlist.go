@@ -23,7 +23,8 @@ import (
 type QRoomVBoxLayoutWithTriggerSlot struct {
 	widgets.QVBoxLayout
 
-	_ func(roomID string) `signal:"TriggerRoom"`
+	_ func(roomID string)     `signal:"TriggerRoom"`
+	_ func(room *matrix.Room) `signal:"ChangeRoom"`
 }
 
 // NewRoomList generates a new QRoomVBoxLayoutWithTriggerSlot and adds it to the room scrollArea
@@ -78,24 +79,7 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room,
 			var mouseEvent = gui.NewQMouseEventFromPointer(event.Pointer())
 
 			if mouseEvent.Button() == core.Qt__LeftButton {
-				if mainUIStruct.currentRoom != room.RoomID {
-					mainUIStruct.SetCurrentRoom(room.RoomID)
-					mainUIStruct.MainWidget.SetWindowTitle("Morpheus - " + room.GetRoomTopic())
-
-					mainUIStruct.RoomAvatar.SetPixmap(roomAvatar)
-
-					mainUIStruct.RoomTitle.SetText(room.GetRoomName())
-
-					mainUIStruct.RoomTopic.SetText(room.GetRoomTopic())
-					count := mainUIStruct.MessageListLayout.Count()
-					for i := 0; i < count; i++ {
-						widgetScroll := mainUIStruct.MessageListLayout.ItemAt(i).Widget()
-						widgetScroll.DeleteLater()
-					}
-
-					go mainUIStruct.loadCache()
-				}
-
+				go roomViewLayout.ChangeRoom(room)
 				return true
 			}
 

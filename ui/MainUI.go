@@ -211,6 +211,31 @@ func (m *MainUI) NewUI() (err error) {
 		}
 	})
 
+	roomListLayout.ConnectChangeRoom(func(room *matrix.Room) {
+		roomAvatar, roomAvatarErr := room.GetRoomAvatar()
+		if roomAvatarErr != nil {
+			err = roomAvatarErr
+			return
+		}
+		if m.currentRoom != room.RoomID {
+			m.SetCurrentRoom(room.RoomID)
+			m.MainWidget.SetWindowTitle("Morpheus - " + room.GetRoomTopic())
+
+			m.RoomAvatar.SetPixmap(roomAvatar)
+
+			m.RoomTitle.SetText(room.GetRoomName())
+
+			m.RoomTopic.SetText(room.GetRoomTopic())
+			count := m.MessageListLayout.Count()
+			for i := 0; i < count; i++ {
+				widgetScroll := m.MessageListLayout.ItemAt(i).Widget()
+				widgetScroll.DeleteLater()
+			}
+
+			go m.loadCache()
+		}
+	})
+
 	return
 }
 
