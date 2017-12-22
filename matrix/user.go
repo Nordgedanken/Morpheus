@@ -60,8 +60,7 @@ func (c *circle) At(x, y int) color.Color {
 	return color.Alpha{A: 0}
 }
 
-func generateGenericImages(displayname string, size int) (imgData []byte, err error) {
-	identifier := displayname
+func generateGenericImages(identifier string, size int) (imgData []byte, err error) {
 	if (identifier[0] == '#' || identifier[0] == '!' || identifier[0] == '@') && len(identifier) > 1 {
 		identifier = identifier[1:]
 	}
