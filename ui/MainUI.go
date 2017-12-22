@@ -397,7 +397,9 @@ func (m *MainUI) initRoomList(roomListLayout *QRoomVBoxLayoutWithTriggerSlot, ro
 			m.currentRoom = roomID
 		}
 		x++
-		m.rooms[roomID] = matrix.NewRoom(roomID, m.cli)
+		m.rooms[roomID] = matrix.NewRoom(nil)
+		m.rooms[roomID].SetID(roomID)
+		m.rooms[roomID].SetCLI(m.cli)
 		roomListLayout.TriggerRoom(roomID)
 	}
 

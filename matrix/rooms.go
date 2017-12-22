@@ -26,6 +26,14 @@ type Room struct {
 	RoomTopic     string
 }
 
+func (r *Room) SetID(roomID string) {
+	r.RoomID = roomID
+}
+
+func (r *Room) SetCLI(cli *gomatrix.Client) {
+	r.cli = cli
+}
+
 func (r *Room) crawlRoomAvatarURL() {
 	roomAvatar := struct {
 		URL string `json:"url"`
