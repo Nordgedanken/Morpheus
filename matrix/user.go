@@ -53,7 +53,7 @@ func (c *circle) Bounds() image.Rectangle {
 }
 
 func (c *circle) At(x, y int) color.Color {
-	xx, yy, rr := float64(x-c.p.X)+0.5, float64(y-c.p.Y)+0.5, float64(c.r)
+	xx, yy, rr := float64(x-c.p.X)+0.01, float64(y-c.p.Y)+0.501, float64(c.r)
 	if xx*xx+yy*yy < rr*rr {
 		return color.Alpha{A: 255}
 	}
