@@ -58,14 +58,13 @@ func (r *Room) GetRoomTopic() (topic string) {
 
 	mardownMessage := commonmark.Md2Html(r.RoomTopic, 0)
 
+	topic = r.RoomTopic
 	if mardownMessage == r.RoomTopic {
 		topic = r.RoomTopic
-		return
 	} else {
 		r.RoomTopic = mardownMessage
-		topic = r.RoomTopic
-		return
 	}
+	return
 }
 
 // GetRoomAvatar generates the Avatar Image for a Room
