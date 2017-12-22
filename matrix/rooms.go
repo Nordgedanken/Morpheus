@@ -26,12 +26,6 @@ type Room struct {
 	RoomTopic     string
 }
 
-// NewRoom Inits a new Room struct
-func NewRoom(roomID string, cli *gomatrix.Client) (room *Room) {
-	room = &Room{RoomID: roomID, cli: cli}
-	return
-}
-
 func (r *Room) crawlRoomAvatarURL() {
 	roomAvatar := struct {
 		URL string `json:"url"`
