@@ -23,8 +23,7 @@ import (
 type QRoomVBoxLayoutWithTriggerSlot struct {
 	widgets.QVBoxLayout
 
-	_ func(roomID string) `slot:"TriggerRoom"`
-	_ func(url *core.QUrl) `slot:"ChangeRoom"`
+	_ func(roomID string) `signal:"TriggerRoom"`
 }
 
 // NewRoomList generates a new QRoomVBoxLayoutWithTriggerSlot and adds it to the room scrollArea
@@ -95,7 +94,7 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room,
 					}
 
 					go mainUIStruct.loadCache()
-			}
+				}
 
 				return true
 			}
