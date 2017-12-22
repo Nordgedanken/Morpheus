@@ -211,7 +211,8 @@ func (m *MainUI) NewUI() (err error) {
 		}
 	})
 
-	roomListLayout.ConnectChangeRoom(func(room *matrix.Room) {
+	roomListLayout.ConnectChangeRoom(func(roomID string) {
+		room := m.rooms[roomID]
 		roomAvatar, roomAvatarErr := room.GetRoomAvatar()
 		if roomAvatarErr != nil {
 			err = roomAvatarErr
@@ -397,9 +398,7 @@ func (m *MainUI) initRoomList(roomListLayout *QRoomVBoxLayoutWithTriggerSlot, ro
 			m.currentRoom = roomID
 		}
 		x++
-		m.rooms[roomID] = matrix.NewRoom(nil)
-		m.rooms[roomID].SetID(roomID)
-		m.rooms[roomID].SetCLI(m.cli)
+		m.rooms[roomID] = matrix.NewRoom(roomID, m.cli)
 		roomListLayout.TriggerRoom(roomID)
 	}
 

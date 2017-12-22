@@ -23,8 +23,8 @@ import (
 type QRoomVBoxLayoutWithTriggerSlot struct {
 	widgets.QVBoxLayout
 
-	_ func(roomID string)     `signal:"TriggerRoom"`
-	_ func(room *matrix.Room) `signal:"ChangeRoom"`
+	_ func(roomID string) `signal:"TriggerRoom"`
+	_ func(roomID string) `signal:"ChangeRoom"`
 }
 
 // NewRoomList generates a new QRoomVBoxLayoutWithTriggerSlot and adds it to the room scrollArea
@@ -79,7 +79,7 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room,
 			var mouseEvent = gui.NewQMouseEventFromPointer(event.Pointer())
 
 			if mouseEvent.Button() == core.Qt__LeftButton {
-				go roomViewLayout.ChangeRoom(room)
+				go roomViewLayout.ChangeRoom(room.RoomID)
 				return true
 			}
 

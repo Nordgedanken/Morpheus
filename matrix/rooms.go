@@ -12,13 +12,11 @@ import (
 	"github.com/matrix-org/gomatrix"
 	"github.com/rhinoman/go-commonmark"
 	log "github.com/sirupsen/logrus"
-	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 )
 
 // Room saves the information of a Room
 type Room struct {
-	core.QObject
 	cli           *gomatrix.Client
 	RoomID        string
 	RoomName      string
@@ -26,14 +24,10 @@ type Room struct {
 	RoomTopic     string
 }
 
-//SetID allows to set the RoomID
-func (r *Room) SetID(roomID string) {
-	r.RoomID = roomID
-}
-
-//SetCLI allows to set the Cli
-func (r *Room) SetCLI(cli *gomatrix.Client) {
-	r.cli = cli
+// NewRoom Inits a new Room struct
+func NewRoom(roomID string, cli *gomatrix.Client) (room *Room) {
+	room = &Room{RoomID: roomID, cli: cli}
+	return
 }
 
 func (r *Room) crawlRoomAvatarURL() {
