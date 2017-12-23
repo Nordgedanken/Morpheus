@@ -129,7 +129,7 @@
          <string notr="true">border: 0;</string>
         </property>
         <property name="text">
-         <string>Test</string>
+         <string/>
         </property>
         <property name="scaledContents">
          <bool>false</bool>
