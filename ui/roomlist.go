@@ -63,13 +63,7 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room,
 	roomAvatarQLabel.SetPixmap(roomAvatar)
 	roomName.SetText(room.GetRoomName())
 
-	/*
-		messageContent.SetText(markdownMessage)
-
-		messageContent.SetMinimumWidth(messageContent.LineWidth())
-
-		roomWidget.SetMinimumWidth(messageContent.LineWidth() + 100)
-	*/
+	wrapperWidget.Resize2(scrollArea.Size().Width(), wrapperWidget.Size().Height())
 	widget.Resize(wrapperWidget.Size())
 
 	var filterObject = core.NewQObject(nil)
