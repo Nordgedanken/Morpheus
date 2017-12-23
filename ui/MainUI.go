@@ -386,15 +386,14 @@ func (m *MainUI) initRoomList(roomListLayout *QRoomVBoxLayoutWithTriggerSlot, ro
 
 	x := 0
 	for _, roomID := range rooms.JoinedRooms {
-		if x == 0 {
-			m.currentRoom = roomID
-		}
-		x++
 		m.rooms[roomID] = matrix.NewRoom(roomID, m.cli)
 		roomListLayout.TriggerRoom(roomID)
+		if x == 0 {
+			m.currentRoom = roomID
+			go m.RoomListLayout.ChangeRoom(m.currentRoom)
+		}
+		x++
 	}
-
-	go m.RoomListLayout.ChangeRoom(m.currentRoom)
 
 	return
 }
