@@ -151,12 +151,9 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 		err = DecodeErr
 	}
 
-	// Convert avatarimage to QPixmap for usage in QT
-	canvas := image.NewRGBA(srcIMG.Bounds())
-
 	avatar := gui.NewQPixmap()
 	buf := new(bytes.Buffer)
-	ConvErr := png.Encode(buf, canvas)
+	ConvErr := png.Encode(buf, srcIMG)
 	if ConvErr != nil {
 		err = ConvErr
 	}
