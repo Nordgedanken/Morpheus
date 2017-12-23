@@ -132,22 +132,9 @@ func (m *MainUI) NewUI() (err error) {
 		}
 	})
 
-	m.initRoomList(m.RoomListLayout, m.roomScrollArea)
+	go m.initRoomList(m.RoomListLayout, m.roomScrollArea)
 
-	go m.loadCache()
-
-	m.MainWidget.SetWindowTitle("Morpheus - " + m.rooms[m.currentRoom].GetRoomTopic())
-
-	avatar, roomAvatarErr := m.rooms[m.currentRoom].GetRoomAvatar()
-	if roomAvatarErr != nil {
-		err = roomAvatarErr
-		return
-	}
-	m.RoomAvatar.SetPixmap(avatar)
-
-	m.RoomTitle.SetText(m.rooms[m.currentRoom].GetRoomName())
-
-	m.RoomTopic.SetText(m.rooms[m.currentRoom].GetRoomTopic())
+	go m.RoomListLayout.ChangeRoom(m.currentRoom)
 
 	var message string
 	messageInput := widgets.NewQLineEditFromPointer(m.widget.FindChild("MessageInput", core.Qt__FindChildrenRecursively).Pointer())
