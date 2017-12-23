@@ -3,62 +3,19 @@ package matrix
 import (
 	"bytes"
 	"fmt"
-	"image"
-	"image/color"
-	"image/draw"
-	// image/gif needed to load gif images
-	_ "image/gif"
-	// image/jpeg needed to load jpeg images
-	_ "image/jpeg"
 	"image/png"
-	// image/png needed to load png images
-	_ "image/png"
 	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/Nordgedanken/Morpheus/matrix/db"
+	"github.com/dgraph-io/badger"
 	"github.com/disintegration/letteravatar"
 	"github.com/matrix-org/gomatrix"
+	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/gui"
-
-	"github.com/dgraph-io/badger"
-	// golang.org/x/image/webp needed to load webp images
-	_ "golang.org/x/image/webp"
-
-	// golang.org/x/image/bmp needed to load bmp images
-	_ "golang.org/x/image/bmp"
-
-	// golang.org/x/image/riff needed to load riff images
-	_ "golang.org/x/image/riff"
-
-	// golang.org/x/image/tiff needed to load tiff images
-	_ "golang.org/x/image/tiff"
 )
-
-type circle struct {
-	p image.Point
-	r int
-}
-
-func (c *circle) ColorModel() color.Model {
-	return color.AlphaModel
-}
-
-func (c *circle) Bounds() image.Rectangle {
-	return image.Rect(c.p.X-c.r, c.p.Y-c.r, c.p.X+c.r, c.p.Y+c.r)
-}
-
-func (c *circle) At(x, y int) color.Color {
-	xx, yy, rr := float64(x-c.p.X)+0.5, float64(y-c.p.Y)+0.5, float64(c.r)
-	if xx*xx+yy*yy <= rr*rr {
-		return color.Alpha{A: 255}
-	}
-	return color.Alpha{A: 0}
-}
 
 func generateGenericImages(identifier string, size int) (imgData []byte, err error) {
 	if (identifier[0] == '#' || identifier[0] == '!' || identifier[0] == '@') && len(identifier) > 1 {
@@ -170,28 +127,11 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 		IMGdata = avatarData
 	}
 
-	r := bytes.NewReader(IMGdata)
-	srcIMG, _, DecodeErr := image.Decode(r)
-	if DecodeErr != nil {
-		err = DecodeErr
-	}
-
-	// Convert avatarimage to QPixmap for usage in QT
-	canvas := image.NewRGBA(srcIMG.Bounds())
-	cx := srcIMG.Bounds().Min.X + srcIMG.Bounds().Dx()/2
-	cy := srcIMG.Bounds().Min.Y + srcIMG.Bounds().Dy()/2
-	draw.DrawMask(canvas, canvas.Bounds(), srcIMG, image.ZP, &circle{image.Point{cx, cy}, cx}, image.ZP, draw.Over)
-
 	avatar := gui.NewQPixmap()
-	buf := new(bytes.Buffer)
-	ConvErr := png.Encode(buf, canvas)
-	if ConvErr != nil {
-		err = ConvErr
-	}
 
-	str := buf.Bytes()
+	str := string(IMGdata[:])
 
-	avatar.LoadFromData(string(str[:]), uint(len(str)), "PNG", 0)
+	avatar.LoadFromData(string(str[:]), uint(len(str)), "", 0)
 	avatarResp = avatar
 	return
 }

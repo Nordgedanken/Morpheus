@@ -7,6 +7,7 @@ import (
 	"github.com/matrix-org/gomatrix"
 	"github.com/rhinoman/go-commonmark"
 	"github.com/therecipe/qt/core"
+	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
 )
@@ -94,6 +95,21 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 	}
 	senderContent.SetText(senderDisplayName)
 	timestampContent.SetText(timestampString)
+	avatarLogo.ConnectPaintEvent(func(event *gui.QPaintEvent) {
+		painter := gui.NewQPainter2(avatarLogo)
+		painter.SetRenderHint(gui.QPainter__Antialiasing, true)
+		hs := 61.0 / 2.0
+
+		aWidth := float64(avatarLogo.Width())/2.0 - hs
+		aHeight := float64(avatarLogo.Height())/2.0 - hs
+
+		ppath := gui.NewQPainterPath()
+		ppath.AddEllipse2(aWidth, aHeight, 61.0, 61.0)
+		painter.SetClipPath(ppath, core.Qt__ReplaceClip)
+		painter.DrawPixmap10(core.NewQRect4(avatarLogo.Width()/2-(84/2), avatarLogo.Height()/2-(61/2), 61.0, 61.0), avatar)
+		//avatarLogo.Update()
+	})
+
 	avatarLogo.SetPixmap(avatar)
 
 	var lineLength int
