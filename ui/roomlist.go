@@ -63,8 +63,7 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room,
 	roomAvatarQLabel.SetPixmap(roomAvatar)
 	roomName.SetText(room.GetRoomName())
 
-	wrapperWidget.Resize2(scrollArea.Size().Width(), wrapperWidget.Size().Height())
-	widget.Resize(wrapperWidget.Size())
+	widget.Resize2(scrollArea.Size().Width(), wrapperWidget.Size().Height())
 
 	var filterObject = core.NewQObject(nil)
 	filterObject.ConnectEventFilter(func(watched *core.QObject, event *core.QEvent) bool {

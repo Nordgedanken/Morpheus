@@ -195,12 +195,10 @@ func (m *MainUI) initScrolls() {
 	m.messageScrollArea.SetWidgetResizable(true)
 	m.messageScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
 	m.messageScrollArea.SetContentsMargins(0, 0, 0, 0)
-	//messageScrollArea.SetSizeAdjustPolicy(widgets.QAbstractScrollArea__AdjustToContents)
 
 	m.roomScrollArea.SetWidgetResizable(true)
 	m.roomScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
 	m.roomScrollArea.SetContentsMargins(0, 0, 0, 0)
-	//m.roomScrollArea.SetSizeAdjustPolicy(widgets.QAbstractScrollArea__AdjustToContents)
 }
 
 func (m *MainUI) loadChatUIDefaults() {
