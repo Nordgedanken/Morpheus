@@ -3,7 +3,6 @@ package matrix
 import (
 	"bytes"
 	"image"
-	"image/draw"
 	"image/png"
 	"strings"
 
@@ -154,9 +153,6 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 
 	// Convert avatarimage to QPixmap for usage in QT
 	canvas := image.NewRGBA(srcIMG.Bounds())
-	cx := srcIMG.Bounds().Min.X + srcIMG.Bounds().Dx()/2
-	cy := srcIMG.Bounds().Min.Y + srcIMG.Bounds().Dy()/2
-	draw.DrawMask(canvas, canvas.Bounds(), srcIMG, image.ZP, &circle{image.Point{cx, cy}, cx}, image.ZP, draw.Over)
 
 	avatar := gui.NewQPixmap()
 	buf := new(bytes.Buffer)
