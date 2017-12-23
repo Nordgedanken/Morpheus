@@ -61,18 +61,17 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room,
 	/*lastMessageContent := widgets.NewQLabelFromPointer(widget.FindChild("lastMessage", core.Qt__FindChildrenRecursively).Pointer())*/
 
 	roomAvatarQLabel.ConnectPaintEvent(func(event *gui.QPaintEvent) {
-		painter := gui.NewQPainter()
+		painter := gui.NewQPainter2(roomAvatarQLabel)
 		painter.SetRenderHint(gui.QPainter__Antialiasing, true)
-		r := event.Rect()
-		hs := 84 / 2
+		hs := 84.0 / 2.0
 
-		brush := gui.NewQBrush()
-		brush.SetStyle(core.Qt__SolidPattern)
-		brush.SetColor(gui.NewQColor6("white"))
+		aWidth := float64(roomAvatarQLabel.Width())/2.0 - hs
+		aHeight := float64(roomAvatarQLabel.Height())/2.0 - hs
 
-		painter.SetPen3(core.Qt__NoPen)
-		painter.SetBrush(brush)
-		painter.DrawEllipse5(r.Center(), hs, hs)
+		ppath := gui.NewQPainterPath()
+		ppath.AddEllipse2(aWidth, aHeight, 84.0, 84.0)
+		painter.SetClipPath(ppath, core.Qt__ReplaceClip)
+		painter.DrawEllipse(core.NewQRectF4(aWidth, aHeight, 84.0, 84.0))
 	})
 	roomAvatarQLabel.SetPixmap(roomAvatar)
 	roomName.SetText(room.GetRoomName())
