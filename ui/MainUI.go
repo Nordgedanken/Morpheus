@@ -118,7 +118,7 @@ func (m *MainUI) NewUI() (err error) {
 		}
 	})
 
-	m.startSync()
+	go m.startSync()
 	m.widget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 	m.MainWidget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 
@@ -133,8 +133,6 @@ func (m *MainUI) NewUI() (err error) {
 	})
 
 	go m.initRoomList(m.RoomListLayout, m.roomScrollArea)
-
-	go m.RoomListLayout.ChangeRoom(m.currentRoom)
 
 	var message string
 	messageInput := widgets.NewQLineEditFromPointer(m.widget.FindChild("MessageInput", core.Qt__FindChildrenRecursively).Pointer())
@@ -395,6 +393,8 @@ func (m *MainUI) initRoomList(roomListLayout *QRoomVBoxLayoutWithTriggerSlot, ro
 		m.rooms[roomID] = matrix.NewRoom(roomID, m.cli)
 		roomListLayout.TriggerRoom(roomID)
 	}
+
+	go m.RoomListLayout.ChangeRoom(m.currentRoom)
 
 	return
 }
