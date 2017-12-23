@@ -1,9 +1,6 @@
 package matrix
 
 import (
-	"bytes"
-	"image"
-	"image/png"
 	"strings"
 
 	"github.com/Nordgedanken/Morpheus/matrix/db"
@@ -145,20 +142,9 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 		IMGdata = roomAvatarData
 	}
 
-	reader := bytes.NewReader(IMGdata)
-	srcIMG, _, DecodeErr := image.Decode(reader)
-	if DecodeErr != nil {
-		err = DecodeErr
-	}
-
 	avatar := gui.NewQPixmap()
-	buf := new(bytes.Buffer)
-	ConvErr := png.Encode(buf, srcIMG)
-	if ConvErr != nil {
-		err = ConvErr
-	}
 
-	str := buf.String()
+	str := string(IMGdata[:])
 	avatar.LoadFromData(str, uint(len(str)), "", 0)
 	avatarResp = avatar
 	return
