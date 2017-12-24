@@ -6,6 +6,7 @@ import (
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/matrix-org/gomatrix"
 	"github.com/rhinoman/go-commonmark"
+	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/uitools"
@@ -95,17 +96,19 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 	}
 	senderContent.SetText(senderDisplayName)
 	timestampContent.SetText(timestampString)
+
+	avatarNew := gui.NewQPixmap()
 	avatarLogo.ConnectPaintEvent(func(event *gui.QPaintEvent) {
+		log.Println("PaintEventAvatar")
 		painter := gui.NewQPainter2(avatarLogo)
 
-		aWidth := 61.0 / 2.0
-		aHeight := 61.0 / 2.0
+		aWidth := 61 / 2
+		aHeight := 61 / 2
 
-		ppath := gui.NewQPainterPath()
-		ppath.AddEllipse2(aWidth, aHeight, 61.0, 61.0)
-		painter.SetClipPath(ppath, core.Qt__ReplaceClip)
-		painter.DrawPixmap10(core.NewQRect4(avatarLogo.Width()/2, avatarLogo.Height()/2, 61.0, 61.0), avatar)
+		painter.DrawEllipse3(aWidth, aHeight, 61.0, 61.0)
+		painter.DrawPixmap2(avatarLogo.Rect(), avatarNew, avatar.Rect())
 		//avatarLogo.Update()
+		avatarLogo.SetPixmap(avatarNew)
 	})
 
 	avatarLogo.SetPixmap(avatar)

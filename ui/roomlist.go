@@ -2,6 +2,7 @@ package ui
 
 import (
 	"github.com/Nordgedanken/Morpheus/matrix"
+	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/uitools"
@@ -60,19 +61,20 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room,
 	roomName := widgets.NewQLabelFromPointer(widget.FindChild("roomName", core.Qt__FindChildrenRecursively).Pointer())
 	/*lastMessageContent := widgets.NewQLabelFromPointer(widget.FindChild("lastMessage", core.Qt__FindChildrenRecursively).Pointer())*/
 
+	roomAvatarNew := gui.NewQPixmap()
 	roomAvatarQLabel.ConnectPaintEvent(func(event *gui.QPaintEvent) {
-		painter := gui.NewQPainter2(roomAvatarQLabel)
-		painter.SetRenderHint(gui.QPainter__Antialiasing, true)
+		log.Println("PaintEventRoomAvatar")
+		painter := gui.NewQPainter2(roomAvatar)
 
-		aWidth := 84.0 / 2.0
-		aHeight := 84.0 / 2.0
+		aWidth := 61 / 2
+		aHeight := 61 / 2
 
-		ppath := gui.NewQPainterPath()
-		ppath.AddEllipse2(aWidth, aHeight, 84.0, 84.0)
-		painter.SetClipPath(ppath, core.Qt__ReplaceClip)
-		painter.DrawPixmap10(core.NewQRect4(roomAvatarQLabel.Width()/2, roomAvatarQLabel.Height()/2, 84.0, 84.0), roomAvatar)
-		//roomAvatarQLabel.Update()
+		painter.DrawEllipse3(aWidth, aHeight, 61.0, 61.0)
+		painter.DrawPixmap2(roomAvatarQLabel.Rect(), roomAvatarNew, roomAvatar.Rect())
+		//avatarLogo.Update()
+		roomAvatarQLabel.SetPixmap(roomAvatarNew)
 	})
+
 	roomAvatarQLabel.SetPixmap(roomAvatar)
 	roomName.SetText(room.GetRoomName())
 
