@@ -71,7 +71,7 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room,
 		ppath.AddEllipse2(aWidth, aHeight, 84.0, 84.0)
 		painter.SetClipPath(ppath, core.Qt__ReplaceClip)
 		painter.DrawPixmap10(core.NewQRect4(roomAvatarQLabel.Width()/2-(84/2), roomAvatarQLabel.Height()/2-(84/2), 84.0, 84.0), roomAvatar)
-		//roomAvatarQLabel.Update()
+		roomAvatarQLabel.Update()
 	})
 	roomAvatarQLabel.SetPixmap(roomAvatar)
 	roomName.SetText(room.GetRoomName())

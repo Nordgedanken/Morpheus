@@ -105,7 +105,7 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 		ppath.AddEllipse2(aWidth, aHeight, 61.0, 61.0)
 		painter.SetClipPath(ppath, core.Qt__ReplaceClip)
 		painter.DrawPixmap10(core.NewQRect4(avatarLogo.Width()/2-(84/2), avatarLogo.Height()/2-(61/2), 61.0, 61.0), avatar)
-		//avatarLogo.Update()
+		avatarLogo.Update()
 	})
 
 	avatarLogo.SetPixmap(avatar)
