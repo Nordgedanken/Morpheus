@@ -63,10 +63,9 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room,
 	roomAvatarQLabel.ConnectPaintEvent(func(event *gui.QPaintEvent) {
 		painter := gui.NewQPainter2(roomAvatarQLabel)
 		painter.SetRenderHint(gui.QPainter__Antialiasing, true)
-		hs := 84.0 / 2.0
 
-		aWidth := float64(roomAvatarQLabel.Width())/2.0 - hs
-		aHeight := float64(roomAvatarQLabel.Height())/2.0 - hs
+		aWidth := 84.0 / 2.0
+		aHeight := 84.0 / 2.0
 
 		ppath := gui.NewQPainterPath()
 		ppath.AddEllipse2(aWidth, aHeight, 84.0, 84.0)

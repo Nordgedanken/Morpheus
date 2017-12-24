@@ -97,11 +97,9 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 	timestampContent.SetText(timestampString)
 	avatarLogo.ConnectPaintEvent(func(event *gui.QPaintEvent) {
 		painter := gui.NewQPainter2(avatarLogo)
-		painter.SetRenderHint(gui.QPainter__Antialiasing, true)
-		hs := 61.0 / 2.0
 
-		aWidth := float64(avatarLogo.Width())/2.0 - hs
-		aHeight := float64(avatarLogo.Height())/2.0 - hs
+		aWidth := 61.0 / 2.0
+		aHeight := 61.0 / 2.0
 
 		ppath := gui.NewQPainterPath()
 		ppath.AddEllipse2(aWidth, aHeight, 61.0, 61.0)
