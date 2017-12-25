@@ -66,14 +66,17 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room,
 
 		roomAvatar.Scaled2(roomAvatarQLabel.Width(), roomAvatarQLabel.Height(), 0, 0)
 
-		painter := gui.NewQPainter2(roomAvatar)
+		newPixmap := gui.NewQPixmap3(2*roomAvatarQLabel.Width(), 2*roomAvatarQLabel.Height())
+		newPixmap.Fill(nil)
+
+		painter := gui.NewQPainter2(newPixmap)
 
 		r := gui.NewQRegion2(roomAvatarQLabel.Width()/2, roomAvatarQLabel.Height()/2, roomAvatarQLabel.Width(), roomAvatarQLabel.Height(), gui.QRegion__Ellipse)
 
 		painter.SetClipRegion(r, 0)
 
 		painter.DrawPixmap10(roomAvatarQLabel.Rect(), roomAvatar)
-		roomAvatarQLabel.Update()
+		roomAvatarQLabel.SetPixmap(newPixmap)
 	})
 
 	roomAvatarQLabel.SetPixmap(roomAvatar)
