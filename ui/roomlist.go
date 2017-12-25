@@ -61,10 +61,10 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room,
 	roomName := widgets.NewQLabelFromPointer(widget.FindChild("roomName", core.Qt__FindChildrenRecursively).Pointer())
 	/*lastMessageContent := widgets.NewQLabelFromPointer(widget.FindChild("lastMessage", core.Qt__FindChildrenRecursively).Pointer())*/
 
-	roomAvatarQLabel.ConnectPaintEvent(func(event *gui.QPaintEvent) {
-		log.Println("PaintEventRoomAvatar")
+	roomAvatarQLabel.ConnectSetPixmap(func(vqp *gui.QPixmap) {
+		log.Println("SetPixmapEventRoomAvatar")
 
-		roomAvatar.Scaled2(roomAvatarQLabel.Width(), roomAvatarQLabel.Height(), 0, 0)
+		vqp.Scaled2(roomAvatarQLabel.Width(), roomAvatarQLabel.Height(), 0, 0)
 
 		newPixmap := gui.NewQPixmap3(2*roomAvatarQLabel.Width(), 2*roomAvatarQLabel.Height())
 		newPixmap.Fill(nil)
@@ -75,8 +75,9 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room,
 
 		painter.SetClipRegion(r, 0)
 
-		painter.DrawPixmap10(roomAvatarQLabel.Rect(), roomAvatar)
-		roomAvatarQLabel.SetPixmap(newPixmap)
+		painter.DrawPixmap10(roomAvatarQLabel.Rect(), vqp)
+		newImage := newPixmap.ToImage()
+		vqp.FromImage(newImage, 0)
 	})
 
 	roomAvatarQLabel.SetPixmap(roomAvatar)
