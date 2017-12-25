@@ -73,8 +73,7 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room,
 		painter.SetClipRegion(r, 0)
 
 		painter.DrawPixmap10(roomAvatarQLabel.Rect(), roomAvatar)
-		//avatarLogo.Update()
-		//roomAvatarQLabel.SetPixmap(roomAvatarNew)
+		roomAvatarQLabel.Update()
 	})
 
 	roomAvatarQLabel.SetPixmap(roomAvatar)
