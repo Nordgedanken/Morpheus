@@ -41,7 +41,7 @@ jobs:
       - run:
           name: Update Build Deps
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-          command: apt-get update -y -qq && apt-get install apt -y -qq && add-apt-repository ppa:ubuntu-toolchain-r/test -y -qq && apt-get update -y -qq && apt-get -y -qq install gcc-5 g++-5 && rm -f /usr/bin/gcc && ln -s /usr/bin/gcc-5 /usr/bin/gcc && rm -f /usr/bin/g++ && ln -s /usr/bin/g++-5 /usr/bin/g++
+          command: apt-get update -y -qq && apt-get install apt -y -qq && add-apt-repository ppa:ubuntu-toolchain-r/test -y && apt-get update -y -qq && apt-get -y -qq install gcc-5 g++-5 && rm -f /usr/bin/gcc && ln -s /usr/bin/gcc-5 /usr/bin/gcc && rm -f /usr/bin/g++ && ln -s /usr/bin/g++-5 /usr/bin/g++
       - run:
           name: Run Build
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
