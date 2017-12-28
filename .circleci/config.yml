@@ -46,7 +46,7 @@ jobs:
       - run:
           name: Run Build
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-          command: $GOPATH/bin/qtdeploy build linux
+          command: $GOPATH/bin/qtdeploy -debug build linux
       - run:
           name: Prepare Deb Generating
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
