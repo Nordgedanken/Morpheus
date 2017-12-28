@@ -74,16 +74,16 @@ func (l *LoginUI) NewUI() (err error) {
 	})
 
 	usernameInput.ConnectTextChanged(func(value string) {
-		/*		if usernameInput.StyleSheet() == "border: 1px solid red" {
-				usernameInput.SetStyleSheet("")
-			}*/
+		if usernameInput.StyleSheet() == "border: 1px solid red" {
+			usernameInput.SetStyleSheet("")
+		}
 		l.username = value
 	})
 
 	passwordInput.ConnectTextChanged(func(value string) {
-		/*		if passwordInput.StyleSheet() == "border: 1px solid red" {
-				passwordInput.SetStyleSheet("")
-			}*/
+		if passwordInput.StyleSheet() == "border: 1px solid red" {
+			passwordInput.SetStyleSheet("")
+		}
 		l.password = value
 	})
 
