@@ -39,14 +39,9 @@ jobs:
           # Must be absolute path or relative path from working_directory
           at: /home/user/work/
       - run:
-          name: Debug Print directory
-          shell: /bin/sh
-          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/vendor/
-          command: ls -lah
-      - run:
-          name: Update deps
+          name: Remove breaking change
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus
-          command: apt-get update -qq && apt-get install -y -qq --only-upgrade binutils gcc g++
+          command: rm -Rf /opt/Qt/5.9.3/gcc_64/
       - run:
           name: Run Build
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
