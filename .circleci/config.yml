@@ -39,10 +39,6 @@ jobs:
           # Must be absolute path or relative path from working_directory
           at: /home/user/work/
       - run:
-          name: Remove breaking change
-          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus
-          command: rm -Rf /opt/Qt/5.9.3/gcc_64/
-      - run:
           name: Run Build
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
           command: $GOPATH/bin/qtdeploy build linux
