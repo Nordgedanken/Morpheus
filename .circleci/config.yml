@@ -41,7 +41,7 @@ jobs:
       - run:
           name: Debug Print directory
           shell: /bin/sh
-          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/vendor/
           command: ls -lah
       - run:
           name: Run Build
