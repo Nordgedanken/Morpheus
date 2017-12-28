@@ -39,10 +39,6 @@ jobs:
           # Must be absolute path or relative path from working_directory
           at: /home/user/work/
       - run:
-          name: Print out weird file (It will be horrible to look at)
-          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus
-          command: cat /opt/Qt/5.9.3/gcc_64/lib/libQt5UiTools.a
-      - run:
           name: Run Build
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
           command: $GOPATH/bin/qtdeploy build linux
