@@ -1,14 +1,14 @@
 package ui
 
 import (
-	"github.com/Nordgedanken/Morpheus/matrix"
+	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
 	"github.com/Nordgedanken/Morpheus/matrix/syncer"
 	"github.com/therecipe/qt/widgets"
 )
 
 // MainUI holds information about the MainUI
 type MainUI struct {
-	matrix.Config
+	globalTypes.Config
 
 	widget            *widgets.QWidget
 	RoomAvatar        *widgets.QLabel
@@ -29,7 +29,7 @@ func (m *MainUI) SetCurrentRoom(RoomID string) {
 
 // LoginUI holds information about the LoginUI
 type LoginUI struct {
-	matrix.Config
+	globalTypes.Config
 
 	LoginWidget *widgets.QWidget
 	widget      *widgets.QWidget

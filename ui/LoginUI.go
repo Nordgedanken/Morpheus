@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/Nordgedanken/Morpheus/matrix"
+	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
 	"github.com/matrix-org/gomatrix"
 	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
@@ -14,7 +15,7 @@ import (
 
 // NewLoginUIStruct gives you a LoginUI struct with prefilled data
 func NewLoginUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow) (loginUIStruct *LoginUI) {
-	configStruct := matrix.Config{
+	configStruct := globalTypes.Config{
 		WindowWidth:  windowWidth,
 		WindowHeight: windowHeight,
 	}
@@ -26,7 +27,7 @@ func NewLoginUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow
 }
 
 // NewLoginUIStructWithExistingConfig gives you a LoginUI struct with prefilled data and data from a previous Config
-func NewLoginUIStructWithExistingConfig(configStruct matrix.Config, window *widgets.QMainWindow) (loginUIStruct *LoginUI) {
+func NewLoginUIStructWithExistingConfig(configStruct globalTypes.Config, window *widgets.QMainWindow) (loginUIStruct *LoginUI) {
 	loginUIStruct = &LoginUI{
 		Config: configStruct,
 		window: window,

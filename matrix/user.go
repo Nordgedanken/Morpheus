@@ -17,7 +17,7 @@ import (
 	"github.com/therecipe/qt/gui"
 )
 
-func generateGenericImages(identifier string, size int) (imgData []byte, err error) {
+func GenerateGenericImages(identifier string, size int) (imgData []byte, err error) {
 	if (identifier[0] == '#' || identifier[0] == '!' || identifier[0] == '@') && len(identifier) > 1 {
 		identifier = identifier[1:]
 	}
@@ -103,7 +103,7 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 			DisplayNameResp, _ := cli.GetDisplayName(mxid)
 			DisplayName := DisplayNameResp.DisplayName
 			var GenerateImgErr error
-			IMGdata, GenerateImgErr = generateGenericImages(DisplayName, size)
+			IMGdata, GenerateImgErr = GenerateGenericImages(DisplayName, size)
 			if GenerateImgErr != nil {
 				err = GenerateImgErr
 				return

@@ -1,9 +1,10 @@
-package matrix
+package rooms
 
 import (
 	"fmt"
 	"strings"
 
+	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
 	"github.com/dgraph-io/badger"
 	"github.com/matrix-org/gomatrix"
@@ -164,7 +165,7 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 			if roomName == "" {
 				roomName = "#"
 			}
-			IMGdata, GenerateImgErr = generateGenericImages(roomName, 84)
+			IMGdata, GenerateImgErr = matrix.GenerateGenericImages(roomName, 84)
 			if GenerateImgErr != nil {
 				err = GenerateImgErr
 				return

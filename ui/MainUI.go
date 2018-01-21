@@ -8,6 +8,8 @@ import (
 
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
+	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
+	"github.com/Nordgedanken/Morpheus/matrix/rooms"
 	"github.com/Nordgedanken/Morpheus/matrix/syncer"
 	"github.com/Nordgedanken/Morpheus/ui/listLayouts"
 	"github.com/dgraph-io/badger"
@@ -24,10 +26,10 @@ import (
 
 // NewMainUIStruct gives you a MainUI struct with prefilled data
 func NewMainUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow) (mainUIStruct *MainUI) {
-	configStruct := matrix.Config{
+	configStruct := globalTypes.Config{
 		WindowWidth:  windowWidth,
 		WindowHeight: windowHeight,
-		Rooms:        make(map[string]*matrix.Room),
+		Rooms:        make(map[string]*rooms.Room),
 	}
 	mainUIStruct = &MainUI{
 		Config: configStruct,
@@ -37,8 +39,8 @@ func NewMainUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow)
 }
 
 // NewMainUIStructWithExistingConfig gives you a MainUI struct with prefilled data and data from a previous Config
-func NewMainUIStructWithExistingConfig(configStruct matrix.Config, window *widgets.QMainWindow) (mainUIStruct *MainUI) {
-	configStruct.Rooms = make(map[string]*matrix.Room)
+func NewMainUIStructWithExistingConfig(configStruct globalTypes.Config, window *widgets.QMainWindow) (mainUIStruct *MainUI) {
+	configStruct.Rooms = make(map[string]*rooms.Room)
 	mainUIStruct = &MainUI{
 		Config: configStruct,
 		window: window,
@@ -391,15 +393,15 @@ func (m *MainUI) startSync() (err error) {
 }
 
 func (m *MainUI) initRoomList() (err error) {
-	rooms, roomsErr := matrix.GetRooms(m.Cli)
+	roomsStruct, roomsErr := rooms.GetRooms(m.Cli)
 	if roomsErr != nil {
 		err = roomsErr
 		return
 	}
 
 	first := true
-	for _, roomID := range rooms {
-		m.Rooms[roomID] = matrix.NewRoom(roomID, m.Cli)
+	for _, roomID := range roomsStruct {
+		m.Rooms[roomID] = rooms.NewRoom(roomID, m.Cli)
 		m.RoomListLayout.TriggerRoom(roomID)
 		if first {
 			go m.RoomListLayout.ChangeRoom(roomID)

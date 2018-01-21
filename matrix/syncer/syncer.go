@@ -6,7 +6,8 @@ import (
 	"runtime/debug"
 	"time"
 
-	"github.com/Nordgedanken/Morpheus/matrix"
+	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
+	"github.com/Nordgedanken/Morpheus/matrix/rooms"
 	"github.com/matrix-org/gomatrix"
 )
 
@@ -15,7 +16,7 @@ type MorpheusSyncer struct {
 	UserID    string
 	Store     gomatrix.Storer
 	listeners map[string][]OnEventListener // event type to listeners array
-	config    *matrix.Config
+	config    *globalTypes.Config
 }
 
 // OnEventListener can be used with DefaultSyncer.OnEventType to be informed of incoming events.
@@ -128,7 +129,7 @@ func (s *MorpheusSyncer) getOrCreateRoom(roomID, state string) *gomatrix.Room {
 	// Add new Room to the List if new
 	_, present := s.config.Rooms[roomID]
 	if !present && state == "join" {
-		s.config.Rooms[roomID] = matrix.NewRoom(roomID, s.config.GetCli())
+		s.config.Rooms[roomID] = rooms.NewRoom(roomID, s.config.GetCli())
 		s.config.RoomListLayout.TriggerRoom(roomID)
 	}
 
