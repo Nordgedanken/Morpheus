@@ -435,7 +435,7 @@ func (m *MainUI) loadCache() (err error) {
 		MsgOpts := badger.DefaultIteratorOptions
 		MsgOpts.PrefetchSize = 10
 		MsgIt := txn.NewIterator(MsgOpts)
-		MsgPrefix := []byte("room|" + m.currentRoom + "|messages|")
+		MsgPrefix := []byte("room|" + m.currentRoom + "|messages|id")
 
 		var doneMsg []string
 
@@ -443,11 +443,6 @@ func (m *MainUI) loadCache() (err error) {
 			item := MsgIt.Item()
 			key := item.Key()
 			stringKey := fmt.Sprintf("%s", key)
-			stringKeySuffixSlice := strings.Split(stringKey, "|")
-			stringKeySuffix := stringKeySuffixSlice[len(stringKeySuffixSlice)-1]
-			if stringKeySuffix != "id" {
-				continue
-			}
 
 			value, ValueErr := item.Value()
 			if ValueErr != nil {
