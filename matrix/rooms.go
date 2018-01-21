@@ -166,11 +166,14 @@ func (r *Room) crawlRoomName() {
 			// Not returning as a Error NotFound is allowed
 		}
 		if roomCanoncialAlias.Alias == "" {
+			r.RoomNameEventType = "roomID"
 			r.RoomName = r.RoomID
 		} else {
+			r.RoomNameEventType = "m.room.canonical_alias"
 			r.RoomName = roomCanoncialAlias.Alias
 		}
 	} else {
+		r.RoomNameEventType = "m.room.name"
 		r.RoomName = roomName.Name
 	}
 
@@ -254,6 +257,7 @@ func (r *Room) getRoomNameFromDB() (err error) {
 // GetRoomName gives you the name of the current Room
 func (r *Room) GetRoomName() (name string) {
 	r.getRoomNameFromDB()
+	fmt.Println(r.RoomName)
 	if r.RoomName == "" {
 		r.crawlRoomName()
 		r.cacheRoomName()
