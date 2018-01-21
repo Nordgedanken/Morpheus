@@ -7,16 +7,15 @@ import (
 	"time"
 
 	"github.com/Nordgedanken/Morpheus/matrix"
-	"github.com/Nordgedanken/Morpheus/ui"
 	"github.com/matrix-org/gomatrix"
 )
 
 //MorpheusSyncer holds the UserID, the used Storer and the listener
 type MorpheusSyncer struct {
-	UserID       string
-	Store        gomatrix.Storer
-	listeners    map[string][]OnEventListener // event type to listeners array
-	mainUIStruct *ui.MainUI
+	UserID    string
+	Store     gomatrix.Storer
+	listeners map[string][]OnEventListener // event type to listeners array
+	config    *matrix.Config
 }
 
 // OnEventListener can be used with DefaultSyncer.OnEventType to be informed of incoming events.
@@ -127,10 +126,10 @@ func (s *MorpheusSyncer) shouldProcessResponse(resp *gomatrix.RespSync, since st
 // getOrCreateRoom must only be called by the Sync() goroutine which calls ProcessResponse()
 func (s *MorpheusSyncer) getOrCreateRoom(roomID, state string) *gomatrix.Room {
 	// Add new Room to the List if new
-	_, present := s.mainUIStruct.Rooms[roomID]
+	_, present := s.config.Rooms[roomID]
 	if !present && state == "join" {
-		s.mainUIStruct.Rooms[roomID] = matrix.NewRoom(roomID, s.mainUIStruct.GetCli())
-		s.mainUIStruct.RoomListLayout.TriggerRoom(roomID)
+		s.config.Rooms[roomID] = matrix.NewRoom(roomID, s.config.GetCli())
+		s.config.RoomListLayout.TriggerRoom(roomID)
 	}
 
 	room := s.Store.LoadRoom(roomID)

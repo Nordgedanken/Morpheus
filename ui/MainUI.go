@@ -9,6 +9,7 @@ import (
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
 	"github.com/Nordgedanken/Morpheus/matrix/syncer"
+	"github.com/Nordgedanken/Morpheus/ui/listLayouts"
 	"github.com/dgraph-io/badger"
 	"github.com/matrix-org/gomatrix"
 	"github.com/opennota/linkify"
@@ -23,31 +24,31 @@ import (
 
 // NewMainUIStruct gives you a MainUI struct with prefilled data
 func NewMainUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow) (mainUIStruct *MainUI) {
-	configStruct := config{
-		windowWidth:  windowWidth,
-		windowHeight: windowHeight,
+	configStruct := matrix.Config{
+		WindowWidth:  windowWidth,
+		WindowHeight: windowHeight,
+		Rooms:        make(map[string]*matrix.Room),
 	}
 	mainUIStruct = &MainUI{
-		config: configStruct,
+		Config: configStruct,
 		window: window,
-		Rooms:  make(map[string]*matrix.Room),
 	}
 	return
 }
 
 // NewMainUIStructWithExistingConfig gives you a MainUI struct with prefilled data and data from a previous Config
-func NewMainUIStructWithExistingConfig(configStruct config, window *widgets.QMainWindow) (mainUIStruct *MainUI) {
+func NewMainUIStructWithExistingConfig(configStruct matrix.Config, window *widgets.QMainWindow) (mainUIStruct *MainUI) {
+	configStruct.Rooms = make(map[string]*matrix.Room)
 	mainUIStruct = &MainUI{
-		config: configStruct,
+		Config: configStruct,
 		window: window,
-		Rooms:  make(map[string]*matrix.Room),
 	}
 	return
 }
 
 // SetCli allows you to add a gomatrix.Client to your MainUI struct
 func (m *MainUI) SetCli(cli *gomatrix.Client) {
-	m.cli = cli
+	m.Cli = cli
 }
 
 // GetWidget gives you the widget of the MainUI struct
@@ -62,7 +63,7 @@ func (m *MainUI) NewUI() (err error) {
 
 	//Set Avatar
 	avatarLogo := widgets.NewQLabelFromPointer(m.widget.FindChild("UserAvatar", core.Qt__FindChildrenRecursively).Pointer())
-	avatar, AvatarErr := matrix.GetOwnUserAvatar(m.cli)
+	avatar, AvatarErr := matrix.GetOwnUserAvatar(m.Cli)
 	if AvatarErr != nil {
 		err = AvatarErr
 		return
@@ -83,7 +84,7 @@ func (m *MainUI) NewUI() (err error) {
 
 	m.MessageListLayout.ConnectTriggerMessage(func(messageBody, sender string, timestamp int64) {
 		var own bool
-		if sender == m.cli.UserID {
+		if sender == m.Cli.UserID {
 			own = true
 		} else {
 			own = false
@@ -111,7 +112,7 @@ func (m *MainUI) NewUI() (err error) {
 				}
 			}
 		}
-		m.MessageListLayout.NewMessage(messageBody, m.cli, sender, timestamp, m.messageScrollArea, own, m)
+		m.MessageListLayout.NewMessage(messageBody, m.Cli, sender, timestamp, m.messageScrollArea, own, m)
 	})
 
 	go m.startSync()
@@ -156,7 +157,7 @@ func (m *MainUI) NewUI() (err error) {
 			err = roomAvatarErr
 			return
 		}
-		if m.currentRoom != room.RoomID {
+		if m.CurrentRoom != room.RoomID {
 			m.SetCurrentRoom(room.RoomID)
 			m.MainWidget.SetWindowTitle("Morpheus - " + room.GetRoomTopic())
 
@@ -180,10 +181,10 @@ func (m *MainUI) NewUI() (err error) {
 
 func (m *MainUI) initScrolls() {
 	// Init Message View
-	m.MessageListLayout = NewMessageList(m.messageScrollArea)
+	m.MessageListLayout = listLayouts.NewMessageList(m.messageScrollArea)
 
 	// Init Room View
-	m.RoomListLayout = NewRoomList(m.roomScrollArea)
+	m.RoomListLayout = listLayouts.NewRoomList(m.roomScrollArea)
 
 	m.messageScrollArea.SetWidgetResizable(true)
 	m.messageScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
@@ -233,13 +234,13 @@ func (m *MainUI) sendMessage(message string) (err error) {
 
 	mardownMessage := commonmark.Md2Html(message, 0)
 	if mardownMessage == message {
-		_, SendErr := m.cli.SendMessageEvent(m.currentRoom, "m.room.message", matrix.HTMLMessage{MsgType: "m.text", Body: messageOriginal, FormattedBody: message, Format: "org.matrix.custom.html"})
+		_, SendErr := m.Cli.SendMessageEvent(m.CurrentRoom, "m.room.message", matrix.HTMLMessage{MsgType: "m.text", Body: messageOriginal, FormattedBody: message, Format: "org.matrix.custom.html"})
 		if SendErr != nil {
 			err = SendErr
 			return
 		}
 	} else {
-		_, SendErr := m.cli.SendMessageEvent(m.currentRoom, "m.room.message", matrix.HTMLMessage{MsgType: "m.text", Body: message, FormattedBody: mardownMessage, Format: "org.matrix.custom.html"})
+		_, SendErr := m.Cli.SendMessageEvent(m.CurrentRoom, "m.room.message", matrix.HTMLMessage{MsgType: "m.text", Body: message, FormattedBody: mardownMessage, Format: "org.matrix.custom.html"})
 		if SendErr != nil {
 			err = SendErr
 			return
@@ -290,7 +291,7 @@ func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScr
 		} else {
 			results <- true
 		}
-	}(m.cli, results)
+	}(m.Cli, results)
 
 	go func() {
 		wg.Wait()      // wait for each execTask to return
@@ -305,7 +306,7 @@ func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScr
 			widget.DisconnectResizeEvent()
 			messageScrollArea.DisconnectResizeEvent()
 
-			LoginUIStruct := NewLoginUIStructWithExistingConfig(m.config, m.window)
+			LoginUIStruct := NewLoginUIStructWithExistingConfig(m.Config, m.window)
 			loginUIErr := LoginUIStruct.NewUI()
 			if loginUIErr != nil {
 				err = loginUIErr
@@ -329,16 +330,16 @@ func (m *MainUI) startSync() (err error) {
 	})
 	m.storage = &syncer.MorpheusStore{
 		InMemoryStore: *gomatrix.NewInMemoryStore(),
-		CacheDatabase: m.cacheDB,
+		CacheDatabase: m.CacheDB,
 	}
 
-	m.syncer = syncer.NewMorpheusSyncer(m.cli.UserID, m.storage)
+	m.Syncer = syncer.NewMorpheusSyncer(m.Cli.UserID, m.storage)
 
-	m.cli.Store = m.storage
-	m.cli.Syncer = m.syncer
-	m.syncer.Store = m.storage
+	m.Cli.Store = m.storage
+	m.Cli.Syncer = m.Syncer
+	m.Syncer.Store = m.storage
 
-	m.syncer.OnEventType("m.room.message", func(ev *gomatrix.Event) {
+	m.Syncer.OnEventType("m.room.message", func(ev *gomatrix.Event) {
 		formattedBody, _ := ev.Content["formatted_body"]
 		var msg string
 		msg, _ = formattedBody.(string)
@@ -350,12 +351,12 @@ func (m *MainUI) startSync() (err error) {
 		id := ev.ID
 		timestamp := ev.Timestamp
 		go db.CacheMessageEvents(id, sender, room, msg, timestamp)
-		if room == m.currentRoom {
+		if room == m.CurrentRoom {
 			go m.MessageListLayout.TriggerMessage(msg, sender, timestamp)
 		}
 	})
 
-	m.syncer.OnEventType("m.room.name", func(ev *gomatrix.Event) {
+	m.Syncer.OnEventType("m.room.name", func(ev *gomatrix.Event) {
 		roomNameRaw, _ := ev.Content["name"]
 		var roomName string
 		roomName, _ = roomNameRaw.(string)
@@ -364,7 +365,7 @@ func (m *MainUI) startSync() (err error) {
 		go m.Rooms[room].UpdateRoomNameByEvent(roomName, evType)
 	})
 
-	m.syncer.OnEventType("m.room.name", func(ev *gomatrix.Event) {
+	m.Syncer.OnEventType("m.room.name", func(ev *gomatrix.Event) {
 		roomNameRaw, _ := ev.Content["name"]
 		var roomName string
 		roomName, _ = roomNameRaw.(string)
@@ -377,7 +378,7 @@ func (m *MainUI) startSync() (err error) {
 	go func() {
 		log.Infoln("Start sync")
 		for {
-			e := m.cli.Sync()
+			e := m.Cli.Sync()
 			if e == nil {
 				break
 			}
@@ -390,7 +391,7 @@ func (m *MainUI) startSync() (err error) {
 }
 
 func (m *MainUI) initRoomList() (err error) {
-	rooms, roomsErr := matrix.GetRooms(m.cli)
+	rooms, roomsErr := matrix.GetRooms(m.Cli)
 	if roomsErr != nil {
 		err = roomsErr
 		return
@@ -398,7 +399,7 @@ func (m *MainUI) initRoomList() (err error) {
 
 	first := true
 	for _, roomID := range rooms {
-		m.Rooms[roomID] = matrix.NewRoom(roomID, m.cli)
+		m.Rooms[roomID] = matrix.NewRoom(roomID, m.Cli)
 		m.RoomListLayout.TriggerRoom(roomID)
 		if first {
 			go m.RoomListLayout.ChangeRoom(roomID)
@@ -435,7 +436,7 @@ func (m *MainUI) loadCache() (err error) {
 		MsgOpts := badger.DefaultIteratorOptions
 		MsgOpts.PrefetchSize = 10
 		MsgIt := txn.NewIterator(MsgOpts)
-		MsgPrefix := []byte("room|" + m.currentRoom + "|messages|id")
+		MsgPrefix := []byte("room|" + m.CurrentRoom + "|messages|id")
 
 		var doneMsg []string
 

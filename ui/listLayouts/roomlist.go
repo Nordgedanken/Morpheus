@@ -1,4 +1,4 @@
-package ui
+package listLayouts
 
 import (
 	"github.com/Nordgedanken/Morpheus/matrix"

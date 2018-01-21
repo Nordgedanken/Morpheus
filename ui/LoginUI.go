@@ -14,21 +14,21 @@ import (
 
 // NewLoginUIStruct gives you a LoginUI struct with prefilled data
 func NewLoginUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow) (loginUIStruct *LoginUI) {
-	configStruct := config{
-		windowWidth:  windowWidth,
-		windowHeight: windowHeight,
+	configStruct := matrix.Config{
+		WindowWidth:  windowWidth,
+		WindowHeight: windowHeight,
 	}
 	loginUIStruct = &LoginUI{
-		config: configStruct,
+		Config: configStruct,
 		window: window,
 	}
 	return
 }
 
 // NewLoginUIStructWithExistingConfig gives you a LoginUI struct with prefilled data and data from a previous Config
-func NewLoginUIStructWithExistingConfig(configStruct config, window *widgets.QMainWindow) (loginUIStruct *LoginUI) {
+func NewLoginUIStructWithExistingConfig(configStruct matrix.Config, window *widgets.QMainWindow) (loginUIStruct *LoginUI) {
 	loginUIStruct = &LoginUI{
-		config: configStruct,
+		Config: configStruct,
 		window: window,
 	}
 	return
@@ -77,18 +77,18 @@ func (l *LoginUI) NewUI() (err error) {
 		if usernameInput.StyleSheet() == "border: 1px solid red" {
 			usernameInput.SetStyleSheet("")
 		}
-		l.username = value
+		l.Username = value
 	})
 
 	passwordInput.ConnectTextChanged(func(value string) {
 		if passwordInput.StyleSheet() == "border: 1px solid red" {
 			passwordInput.SetStyleSheet("")
 		}
-		l.password = value
+		l.Password = value
 	})
 
 	loginButton.ConnectClicked(func(_ bool) {
-		if l.username != "" && l.password != "" {
+		if l.Username != "" && l.Password != "" {
 			LoginErr := l.login()
 			if LoginErr != nil {
 				err = LoginErr
@@ -101,7 +101,7 @@ func (l *LoginUI) NewUI() (err error) {
 
 	usernameInput.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
 		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
-			if l.password != "" {
+			if l.Password != "" {
 				LoginErr := l.login()
 				if LoginErr != nil {
 					err = LoginErr
@@ -122,7 +122,7 @@ func (l *LoginUI) NewUI() (err error) {
 
 	passwordInput.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
 		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
-			if l.username != "" {
+			if l.Username != "" {
 				LoginErr := l.login()
 				if LoginErr != nil {
 					err = LoginErr
@@ -151,12 +151,12 @@ func (l *LoginUI) login() (err error) {
 
 	var wg sync.WaitGroup
 
-	if l.username != "" && l.password != "" {
+	if l.Username != "" && l.Password != "" {
 		log.Infoln("Starting Login Sequenze in background")
 		results := make(chan *gomatrix.Client)
 
 		wg.Add(1)
-		go matrix.DoLogin(l.username, l.password, "", "", "", results, &wg)
+		go matrix.DoLogin(l.Username, l.Password, "", "", "", results, &wg)
 
 		go func() {
 			wg.Wait()      // wait for each execTask to return
@@ -165,8 +165,8 @@ func (l *LoginUI) login() (err error) {
 
 		//Show MainUI
 		for result := range results {
-			l.cli = result
-			MainUIStruct := NewMainUIStructWithExistingConfig(l.config, l.window)
+			l.Cli = result
+			MainUIStruct := NewMainUIStructWithExistingConfig(l.Config, l.window)
 			mainUIErr := MainUIStruct.NewUI()
 			if mainUIErr != nil {
 				err = mainUIErr
