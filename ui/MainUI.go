@@ -442,10 +442,12 @@ func (m *MainUI) loadCache() (err error) {
 		MsgOpts := badger.DefaultIteratorOptions
 		MsgOpts.PrefetchSize = 10
 		MsgIt := txn.NewIterator(MsgOpts)
+		log.Println(m.CurrentRoom)
 		MsgPrefix := []byte("room|" + m.CurrentRoom + "|messages|id")
 
 		var doneMsg []string
 
+		log.Println("before cache loop")
 		for MsgIt.Seek(MsgPrefix); MsgIt.ValidForPrefix(MsgPrefix); MsgIt.Next() {
 			log.Println("next Cache Item")
 			item := MsgIt.Item()
