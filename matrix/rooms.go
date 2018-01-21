@@ -12,6 +12,9 @@ import (
 	"github.com/therecipe/qt/gui"
 )
 
+const mRoomNameEv = "m.room.name"
+const mRoomCanonicalAliasEv = "m.room.canonical_alias"
+
 // Room saves the information of a Room
 type Room struct {
 	cli               *gomatrix.Client
@@ -156,12 +159,12 @@ func (r *Room) crawlRoomName() {
 		Alias string `json:"alias"`
 	}{}
 
-	if roomNameStateEventErr := r.cli.StateEvent(r.RoomID, "m.room.name", "", &roomName); roomNameStateEventErr != nil {
+	if roomNameStateEventErr := r.cli.StateEvent(r.RoomID, mRoomNameEv, "", &roomName); roomNameStateEventErr != nil {
 		log.Println(roomNameStateEventErr)
 		// Not returning as a Error NotFound is allowed
 	}
 	if roomName.Name == "" {
-		if roomCanonicalAliasStateEventErr := r.cli.StateEvent(r.RoomID, "m.room.canonical_alias", "", &roomCanonicalAlias); roomCanonicalAliasStateEventErr != nil {
+		if roomCanonicalAliasStateEventErr := r.cli.StateEvent(r.RoomID, mRoomCanonicalAliasEv, "", &roomCanonicalAlias); roomCanonicalAliasStateEventErr != nil {
 			log.Println(roomCanonicalAliasStateEventErr)
 			// Not returning as a Error NotFound is allowed
 		}
@@ -169,24 +172,25 @@ func (r *Room) crawlRoomName() {
 			r.RoomNameEventType = "roomID"
 			r.RoomName = r.RoomID
 		} else {
-			r.RoomNameEventType = "m.room.canonical_alias"
+			r.RoomNameEventType = mRoomCanonicalAliasEv
 			r.RoomName = roomCanonicalAlias.Alias
 		}
 	} else {
-		r.RoomNameEventType = "m.room.name"
+		r.RoomNameEventType = mRoomNameEv
 		r.RoomName = roomName.Name
 	}
 
 }
 
+// UpdateRoomNameByEvent used to Update the Room Name of a Room when a Room Change Event comes down the Sync
 func (r *Room) UpdateRoomNameByEvent(newName, evType string) {
 	if r.RoomNameEventType == "" {
 		r.getRoomNameEventTypeFromDB()
 	}
-	if r.RoomNameEventType == "m.room.name" && r.RoomNameEventType == evType {
+	if r.RoomNameEventType == mRoomNameEv && r.RoomNameEventType == evType {
 		r.RoomName = newName
 		r.cacheRoomName()
-	} else if r.RoomNameEventType != "m.room.name" {
+	} else if r.RoomNameEventType != mRoomNameEv {
 		r.RoomName = newName
 		r.cacheRoomName()
 	}
