@@ -335,13 +335,13 @@ func (m *MainUI) startSync() (err error) {
 		CacheDatabase: m.CacheDB,
 	}
 
-	m.Syncer = syncer.NewMorpheusSyncer(m.Cli.UserID, m.storage)
+	Syncer := syncer.NewMorpheusSyncer(m.Cli.UserID, m.storage)
 
 	m.Cli.Store = m.storage
-	m.Cli.Syncer = m.Syncer
-	m.Syncer.Store = m.storage
+	m.Cli.Syncer = Syncer
+	Syncer.Store = m.storage
 
-	m.Syncer.OnEventType("m.room.message", func(ev *gomatrix.Event) {
+	Syncer.OnEventType("m.room.message", func(ev *gomatrix.Event) {
 		formattedBody, _ := ev.Content["formatted_body"]
 		var msg string
 		msg, _ = formattedBody.(string)
@@ -358,7 +358,7 @@ func (m *MainUI) startSync() (err error) {
 		}
 	})
 
-	m.Syncer.OnEventType("m.room.name", func(ev *gomatrix.Event) {
+	Syncer.OnEventType("m.room.name", func(ev *gomatrix.Event) {
 		roomNameRaw, _ := ev.Content["name"]
 		var roomName string
 		roomName, _ = roomNameRaw.(string)
@@ -367,7 +367,7 @@ func (m *MainUI) startSync() (err error) {
 		go m.Rooms[room].UpdateRoomNameByEvent(roomName, evType)
 	})
 
-	m.Syncer.OnEventType("m.room.name", func(ev *gomatrix.Event) {
+	Syncer.OnEventType("m.room.name", func(ev *gomatrix.Event) {
 		roomNameRaw, _ := ev.Content["name"]
 		var roomName string
 		roomName, _ = roomNameRaw.(string)

@@ -3,7 +3,6 @@ package globalTypes
 import (
 	"github.com/Nordgedanken/Morpheus/matrix/db"
 	"github.com/Nordgedanken/Morpheus/matrix/rooms"
-	"github.com/Nordgedanken/Morpheus/matrix/syncer"
 	"github.com/Nordgedanken/Morpheus/ui/listLayouts"
 	"github.com/matrix-org/gomatrix"
 )
@@ -27,8 +26,7 @@ type Config struct {
 
 type matrixClient struct {
 	databases
-	Cli    *gomatrix.Client
-	Syncer *syncer.MorpheusSyncer
+	Cli *gomatrix.Client
 }
 
 // GetCli returns the Matrix Client
