@@ -137,6 +137,7 @@ func CacheMessageEvents(id, sender, roomID, message string, timestamp int64) (er
 	return
 }
 
+// Get dedpulicates all the Gets inside the Database to not repeat that much code.
 func Get(txn *badger.Txn, key []byte) (result []byte, err error) {
 	item, QueryErr := txn.Get(key)
 	if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
