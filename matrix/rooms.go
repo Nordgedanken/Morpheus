@@ -247,7 +247,6 @@ func (r *Room) getRoomNameFromDB() (err error) {
 		if QueryErr != nil {
 			return QueryErr
 		}
-		fmt.Println(roomNameResult)
 		r.RoomName = fmt.Sprintf("%s", roomNameResult)
 		return nil
 	})
@@ -258,7 +257,6 @@ func (r *Room) getRoomNameFromDB() (err error) {
 // GetRoomName gives you the name of the current Room
 func (r *Room) GetRoomName() (name string) {
 	r.getRoomNameFromDB()
-	fmt.Println(r.RoomName)
 	if r.RoomName == "" {
 		r.crawlRoomName()
 		r.cacheRoomName()
