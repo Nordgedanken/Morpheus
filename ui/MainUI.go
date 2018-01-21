@@ -425,7 +425,6 @@ func contains(slice []string, item string) bool {
 }
 
 func (m *MainUI) loadCache() (err error) {
-	log.Println("loadCache Start")
 	barAtBottom := false
 	bar := m.messageScrollArea.VerticalScrollBar()
 	if bar.Value() == bar.Maximum() {
@@ -442,17 +441,19 @@ func (m *MainUI) loadCache() (err error) {
 		MsgOpts := badger.DefaultIteratorOptions
 		MsgOpts.PrefetchSize = 10
 		MsgIt := txn.NewIterator(MsgOpts)
-		log.Println(m.CurrentRoom)
-		MsgPrefix := []byte("room|" + m.CurrentRoom + "|messages|id")
+		MsgPrefix := []byte("room|" + m.CurrentRoom + "|messages")
 
 		var doneMsg []string
 
-		log.Println("before cache loop")
 		for MsgIt.Seek(MsgPrefix); MsgIt.ValidForPrefix(MsgPrefix); MsgIt.Next() {
-			log.Println("next Cache Item")
 			item := MsgIt.Item()
 			key := item.Key()
 			stringKey := fmt.Sprintf("%s", key)
+			stringKeySlice := strings.Split(stringKey, "|")
+			stringKeyEnd := stringKeySlice[len(stringKeySlice)-1]
+			if stringKeyEnd != "id" {
+				continue
+			}
 
 			value, ValueErr := item.Value()
 			if ValueErr != nil {
@@ -461,7 +462,6 @@ func (m *MainUI) loadCache() (err error) {
 			idValue := fmt.Sprintf("%s", value)
 
 			if !contains(doneMsg, idValue) {
-				log.Println("newMessage cache")
 				// Remember we already added this message to the view
 				doneMsg = append(doneMsg, idValue)
 
