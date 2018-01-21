@@ -482,6 +482,7 @@ func (m *MainUI) loadCache() (err error) {
 					return errors.WithMessage(ConvErr, "Timestamp String: "+timestamp)
 				}
 
+				log.Println("next TriggerMessage")
 				go m.MessageListLayout.TriggerMessage(msg, sender, timestampInt)
 			}
 		}
