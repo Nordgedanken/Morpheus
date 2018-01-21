@@ -425,6 +425,7 @@ func contains(slice []string, item string) bool {
 }
 
 func (m *MainUI) loadCache() (err error) {
+	log.Println("loadCache Start")
 	barAtBottom := false
 	bar := m.messageScrollArea.VerticalScrollBar()
 	if bar.Value() == bar.Maximum() {
@@ -437,6 +438,7 @@ func (m *MainUI) loadCache() (err error) {
 	}
 
 	DBerr := cacheDB.View(func(txn *badger.Txn) error {
+		log.Println("loadCache DBView")
 		MsgOpts := badger.DefaultIteratorOptions
 		MsgOpts.PrefetchSize = 10
 		MsgIt := txn.NewIterator(MsgOpts)
@@ -456,6 +458,7 @@ func (m *MainUI) loadCache() (err error) {
 			idValue := fmt.Sprintf("%s", value)
 
 			if !contains(doneMsg, idValue) {
+				log.Println("newMessage cache")
 				// Remember we already added this message to the view
 				doneMsg = append(doneMsg, idValue)
 
