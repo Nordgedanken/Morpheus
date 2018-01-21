@@ -136,3 +136,20 @@ func CacheMessageEvents(id, sender, roomID, message string, timestamp int64) (er
 
 	return
 }
+
+func Get(txn *badger.Txn, key []byte) (result []byte, err error) {
+	item, QueryErr := txn.Get(key)
+	if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
+		err = QueryErr
+		return
+	}
+	if QueryErr != badger.ErrKeyNotFound {
+		valueByte, valueErr := item.Value()
+		result = valueByte
+		if valueErr != nil {
+			err = valueErr
+			return
+		}
+	}
+	return
+}

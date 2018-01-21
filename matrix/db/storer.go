@@ -1,6 +1,8 @@
 package db
 
 import (
+	"fmt"
+
 	"github.com/dgraph-io/badger"
 )
 
@@ -32,19 +34,9 @@ func (m *MorpheusStorage) UpdateNextBatch(userID, nextBatch string) (err error) 
 // LoadNextBatch loads the next_batch token for the given user.
 func (m *MorpheusStorage) LoadNextBatch(userID string) (nextBatch string, err error) {
 	DBerr := m.Database.View(func(txn *badger.Txn) error {
-
-		nextBatchItem, NextBatchErr := txn.Get([]byte("matrix|" + userID + "|nextBatch|"))
-		if NextBatchErr != nil {
-			return NextBatchErr
-		}
-
-		nextBatchByte, nextBatchByteErr := nextBatchItem.Value()
-		if nextBatchByteErr != nil {
-			return nextBatchByteErr
-		}
-
-		nextBatch = string(nextBatchByte)
-		return nil
+		nextBatchResult, QueryErr := Get(txn, []byte("user|accessToken"))
+		nextBatch = fmt.Sprintf("%s", nextBatchResult)
+		return QueryErr
 	})
 	if DBerr != nil {
 		err = DBerr

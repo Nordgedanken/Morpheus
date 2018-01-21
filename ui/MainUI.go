@@ -441,41 +441,27 @@ func (m *MainUI) loadCache() (err error) {
 					doneMsg = append(doneMsg, stringValue)
 
 					// Get all Data
-					senderItem, senderErr := txn.Get([]byte(strings.Replace(stringKey, "|id", "|sender", -1)))
-					if senderErr != nil {
-						return errors.WithMessage(senderErr, "Key: "+strings.Replace(stringKey, "|id", "|sender", -1))
+					senderResult, QueryErr := db.Get(txn, []byte(strings.Replace(stringKey, "|id", "|sender", -1)))
+					sender := fmt.Sprintf("%s", senderResult)
+					if QueryErr != nil {
+						return errors.WithMessage(QueryErr, "Key: "+strings.Replace(stringKey, "|id", "|sender", -1))
 					}
 
-					senderValue, senderValueErr := senderItem.Value()
-					if senderValueErr != nil {
-						return senderValueErr
-					}
-					sender := fmt.Sprintf("%s", senderValue)
-
-					messageItem, messageErr := txn.Get([]byte(strings.Replace(stringKey, "|id", "|messageString", -1)))
-					if messageErr != nil {
-						return errors.WithMessage(messageErr, "Key: "+strings.Replace(stringKey, "|id", "|messageString", -1))
+					msgResult, QueryErr := db.Get(txn, []byte(strings.Replace(stringKey, "|id", "|messageString", -1)))
+					msg := fmt.Sprintf("%s", msgResult)
+					if QueryErr != nil {
+						return errors.WithMessage(QueryErr, "Key: "+strings.Replace(stringKey, "|id", "|messageString", -1))
 					}
 
-					messageValue, messageValueErr := messageItem.Value()
-					if messageValueErr != nil {
-						return messageValueErr
-					}
-					msg := fmt.Sprintf("%s", messageValue)
-
-					timestampItem, timestampErr := txn.Get([]byte(strings.Replace(stringKey, "|id", "|timestamp", -1)))
-					if timestampErr != nil {
-						return errors.WithMessage(timestampErr, "Key: "+strings.Replace(stringKey, "|id", "|timestamp", -1))
+					timestampResult, QueryErr := db.Get(txn, []byte(strings.Replace(stringKey, "|id", "|timestamp", -1)))
+					timestamp := fmt.Sprintf("%s", timestampResult)
+					if QueryErr != nil {
+						return errors.WithMessage(QueryErr, "Key: "+strings.Replace(stringKey, "|id", "|timestamp", -1))
 					}
 
-					timestampValue, timestampValueErr := timestampItem.Value()
-					if timestampValueErr != nil {
-						return timestampValueErr
-					}
-					timestamp := fmt.Sprintf("%s", timestampValue)
 					timestampInt, ConvErr := strconv.ParseInt(timestamp, 10, 64)
 					if ConvErr != nil {
-						return ConvErr
+						return errors.WithMessage(ConvErr, "Timestamp String: "+timestamp)
 					}
 
 					m.MessageListLayout.TriggerMessage(msg, sender, timestampInt)
@@ -483,15 +469,11 @@ func (m *MainUI) loadCache() (err error) {
 			}
 
 			if strings.HasSuffix(stringKey, "|sender") {
-				idItem, idErr := txn.Get([]byte(strings.Replace(stringKey, "|sender", "|id", -1)))
-				if idErr != nil {
-					return errors.WithMessage(idErr, "Key: "+strings.Replace(stringKey, "|sender", "|id", -1))
+				idResult, QueryErr := db.Get(txn, []byte(strings.Replace(stringKey, "|sender", "|id", -1)))
+				id := fmt.Sprintf("%s", idResult)
+				if QueryErr != nil {
+					return errors.WithMessage(QueryErr, "Key: "+strings.Replace(stringKey, "|sender", "|id", -1))
 				}
-				idValue, idValueErr := idItem.Value()
-				if idValueErr != nil {
-					return idValueErr
-				}
-				id := fmt.Sprintf("%s", idValue)
 
 				if !contains(doneMsg, id) {
 					// Remember we already added this message to the view
@@ -500,27 +482,17 @@ func (m *MainUI) loadCache() (err error) {
 					// Get all Data
 					sender := stringValue
 
-					messageItem, messageErr := txn.Get([]byte(strings.Replace(stringKey, "|sender", "|messageString", -1)))
-					if messageErr != nil {
-						return errors.WithMessage(messageErr, "Key: "+strings.Replace(stringKey, "|sender", "|messageString", -1))
+					msgResult, QueryErr := db.Get(txn, []byte(strings.Replace(stringKey, "|sender", "|messageString", -1)))
+					msg := fmt.Sprintf("%s", msgResult)
+					if QueryErr != nil {
+						return errors.WithMessage(QueryErr, "Key: "+strings.Replace(stringKey, "|sender", "|messageString", -1))
 					}
 
-					messageValue, messageValueErr := messageItem.Value()
-					if messageValueErr != nil {
-						return messageValueErr
+					timestampResult, QueryErr := db.Get(txn, []byte(strings.Replace(stringKey, "|sender", "|timestamp", -1)))
+					timestamp := fmt.Sprintf("%s", timestampResult)
+					if QueryErr != nil {
+						return errors.WithMessage(QueryErr, "Key: "+strings.Replace(stringKey, "|sender", "|timestamp", -1))
 					}
-					msg := fmt.Sprintf("%s", messageValue)
-
-					timestampItem, timestampErr := txn.Get([]byte(strings.Replace(stringKey, "|sender", "|timestamp", -1)))
-					if timestampErr != nil {
-						return errors.WithMessage(timestampErr, "Key: "+strings.Replace(stringKey, "|sender", "|timestamp", -1))
-					}
-
-					timestampValue, timestampValueErr := timestampItem.Value()
-					if timestampValueErr != nil {
-						return timestampValueErr
-					}
-					timestamp := fmt.Sprintf("%s", timestampValue)
 
 					timestampInt, ConvErr := strconv.ParseInt(timestamp, 10, 64)
 					if ConvErr != nil {
@@ -532,45 +504,30 @@ func (m *MainUI) loadCache() (err error) {
 			}
 
 			if strings.HasSuffix(stringKey, "|messageString") {
-				idItem, idErr := txn.Get([]byte(strings.Replace(stringKey, "|messageString", "|id", -1)))
-				if idErr != nil {
-					return errors.WithMessage(idErr, "Key: "+strings.Replace(stringKey, "|messageString", "|id", -1))
+				idResult, QueryErr := db.Get(txn, []byte(strings.Replace(stringKey, "|messageString", "|id", -1)))
+				id := fmt.Sprintf("%s", idResult)
+				if QueryErr != nil {
+					return errors.WithMessage(QueryErr, "Key: "+strings.Replace(stringKey, "|messageString", "|id", -1))
 				}
-
-				idValue, idValueErr := idItem.Value()
-				if idValueErr != nil {
-					return idValueErr
-				}
-				id := fmt.Sprintf("%s", idValue)
 
 				if !contains(doneMsg, id) {
 					// Remember we already added this message to the view
 					doneMsg = append(doneMsg, id)
 
 					// Get all Data
-					senderItem, senderErr := txn.Get([]byte(strings.Replace(stringKey, "|messageString", "|sender", -1)))
-					if senderErr != nil {
-						return errors.WithMessage(senderErr, "Key: "+strings.Replace(stringKey, "|messageString", "|sender", -1))
+					senderResult, QueryErr := db.Get(txn, []byte(strings.Replace(stringKey, "|messageString", "|sender", -1)))
+					sender := fmt.Sprintf("%s", senderResult)
+					if QueryErr != nil {
+						return errors.WithMessage(QueryErr, "Key: "+strings.Replace(stringKey, "|messageString", "|sender", -1))
 					}
-
-					senderValue, senderValueErr := senderItem.Value()
-					if senderValueErr != nil {
-						return senderValueErr
-					}
-					sender := fmt.Sprintf("%s", senderValue)
 
 					msg := stringValue
 
-					timestampItem, timestampErr := txn.Get([]byte(strings.Replace(stringKey, "|messageString", "|timestamp", -1)))
-					if timestampErr != nil {
-						return errors.WithMessage(timestampErr, "Key: "+strings.Replace(stringKey, "|messageString", "|timestamp", -1))
+					timestampResult, QueryErr := db.Get(txn, []byte(strings.Replace(stringKey, "|messageString", "|timestamp", -1)))
+					timestamp := fmt.Sprintf("%s", timestampResult)
+					if QueryErr != nil {
+						return errors.WithMessage(QueryErr, "Key: "+strings.Replace(stringKey, "|messageString", "|timestamp", -1))
 					}
-
-					timestampValue, timestampValueErr := timestampItem.Value()
-					if timestampValueErr != nil {
-						return timestampValueErr
-					}
-					timestamp := fmt.Sprintf("%s", timestampValue)
 
 					timestampInt, ConvErr := strconv.ParseInt(timestamp, 10, 64)
 					if ConvErr != nil {
@@ -582,40 +539,28 @@ func (m *MainUI) loadCache() (err error) {
 			}
 
 			if strings.HasSuffix(stringKey, "|timestamp") {
-				idItem, idErr := txn.Get([]byte(strings.Replace(stringKey, "|timestamp", "|id", -1)))
-				if idErr != nil {
-					return errors.WithMessage(idErr, "Key: "+strings.Replace(stringKey, "|timestamp", "|id", -1))
+				idResult, QueryErr := db.Get(txn, []byte(strings.Replace(stringKey, "|timestamp", "|id", -1)))
+				id := fmt.Sprintf("%s", idResult)
+				if QueryErr != nil {
+					return errors.WithMessage(QueryErr, "Key: "+strings.Replace(stringKey, "|timestamp", "|id", -1))
 				}
-				idValue, idValueErr := idItem.Value()
-				if idValueErr != nil {
-					return idValueErr
-				}
-				id := fmt.Sprintf("%s", idValue)
 
 				if !contains(doneMsg, id) {
 					// Remember we already added this message to the view
 					doneMsg = append(doneMsg, id)
 
 					// Get all Data
-					senderItem, senderErr := txn.Get([]byte(strings.Replace(stringKey, "|timestamp", "|sender", -1)))
-					if senderErr != nil {
-						return errors.WithMessage(senderErr, "Key: "+strings.Replace(stringKey, "|timestamp", "|sender", -1))
+					senderResult, QueryErr := db.Get(txn, []byte(strings.Replace(stringKey, "|timestamp", "|sender", -1)))
+					sender := fmt.Sprintf("%s", senderResult)
+					if QueryErr != nil {
+						return errors.WithMessage(QueryErr, "Key: "+strings.Replace(stringKey, "|timestamp", "|sender", -1))
 					}
-					senderValue, senderValueErr := senderItem.Value()
-					if senderValueErr != nil {
-						return senderValueErr
-					}
-					sender := fmt.Sprintf("%s", senderValue)
 
-					messageItem, messageErr := txn.Get([]byte(strings.Replace(stringKey, "|timestamp", "|messageString", -1)))
-					if messageErr != nil {
-						return errors.WithMessage(messageErr, "Key: "+strings.Replace(stringKey, "|timestamp", "|messageString", -1))
+					msgResult, QueryErr := db.Get(txn, []byte(strings.Replace(stringKey, "|timestamp", "|messageString", -1)))
+					msg := fmt.Sprintf("%s", msgResult)
+					if QueryErr != nil {
+						return errors.WithMessage(QueryErr, "Key: "+strings.Replace(stringKey, "|timestamp", "|messageString", -1))
 					}
-					messageValue, messageValueErr := messageItem.Value()
-					if messageValueErr != nil {
-						return messageValueErr
-					}
-					msg := fmt.Sprintf("%s", messageValue)
 
 					timestamp := stringValue
 

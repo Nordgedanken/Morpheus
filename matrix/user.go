@@ -59,16 +59,9 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 
 	// Get cache
 	DBErr := cacheDB.View(func(txn *badger.Txn) error {
-		roomAvatarDataItem, QueryErr := txn.Get([]byte("user|" + mxid + "|avatarData" + strconv.Itoa(size) + "x" + strconv.Itoa(size)))
-		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
-			return QueryErr
-		}
-		if QueryErr != badger.ErrKeyNotFound {
-			avatarDataBytes, avatarDataErr := roomAvatarDataItem.Value()
-			avatarData = avatarDataBytes
-			return avatarDataErr
-		}
-		return nil
+		avatarDataResult, QueryErr := db.Get(txn, []byte("user|"+mxid+"|avatarData"+strconv.Itoa(size)+"x"+strconv.Itoa(size)))
+		avatarData = avatarDataResult
+		return QueryErr
 	})
 	if DBErr != nil {
 		err = DBErr
@@ -142,40 +135,21 @@ func GetUserDataFromCache() (accessToken, homeserverURL, userID string, err erro
 
 	// Get cache
 	DBErr := UserDB.View(func(txn *badger.Txn) error {
-		accessTokenItem, QueryErr := txn.Get([]byte("user|accessToken"))
-		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
+		accessTokenResult, QueryErr := db.Get(txn, []byte("user|accessToken"))
+		accessToken = fmt.Sprintf("%s", accessTokenResult)
+		if QueryErr != nil {
 			return QueryErr
-		}
-		if QueryErr != badger.ErrKeyNotFound {
-			accessTokenByte, accessTokenErr := accessTokenItem.Value()
-			accessToken = fmt.Sprintf("%s", accessTokenByte)
-			if accessTokenErr != nil {
-				return accessTokenErr
-			}
 		}
 
-		homeserverURLItem, QueryErr := txn.Get([]byte("user|homeserverURL"))
-		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
+		homeserverURLResult, QueryErr := db.Get(txn, []byte("user|accessToken"))
+		homeserverURL = fmt.Sprintf("%s", homeserverURLResult)
+		if QueryErr != nil {
 			return QueryErr
-		}
-		if QueryErr != badger.ErrKeyNotFound {
-			homeserverURLByte, homeserverURLErr := homeserverURLItem.Value()
-			homeserverURL = fmt.Sprintf("%s", homeserverURLByte)
-			if homeserverURLErr != nil {
-				return homeserverURLErr
-			}
 		}
 
-		userIDItem, QueryErr := txn.Get([]byte("user|userID"))
-		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
-			return QueryErr
-		}
-		if QueryErr != badger.ErrKeyNotFound {
-			userIDByte, userIDErr := userIDItem.Value()
-			userID = fmt.Sprintf("%s", userIDByte)
-			return userIDErr
-		}
-		return nil
+		userIDResult, QueryErr := db.Get(txn, []byte("user|accessToken"))
+		userID = fmt.Sprintf("%s", userIDResult)
+		return QueryErr
 	})
 	if DBErr != nil {
 		err = DBErr
