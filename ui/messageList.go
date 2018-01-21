@@ -1,7 +1,6 @@
 package ui
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/Nordgedanken/Morpheus/matrix"
@@ -48,7 +47,6 @@ func NewMessageList(scrollArea *widgets.QScrollArea) (messageViewLayout *QVBoxLa
 
 // NewMessage adds a new message object to the view
 func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli *gomatrix.Client, sender string, timestamp int64, scrollArea *widgets.QScrollArea, own bool, mainUIStruct *MainUI) (err error) {
-	fmt.Println("start NewMessage")
 	barAtBottom := false
 	bar := scrollArea.VerticalScrollBar()
 	if bar.Value() == bar.Maximum() {
@@ -134,8 +132,6 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 	if barAtBottom {
 		bar.SetValue(bar.Maximum())
 	}
-
-	fmt.Println("end NewMessage")
 
 	return
 }
