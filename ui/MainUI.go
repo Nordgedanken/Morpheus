@@ -111,9 +111,18 @@ func (m *MainUI) NewUI() (err error) {
 				}
 			}
 		}
-		NewMessageErr := m.MessageListLayout.NewMessage(messageBody, m.cli, sender, timestamp, m.messageScrollArea, own, m)
-		if NewMessageErr != nil {
-			err = NewMessageErr
+		errChan := make(chan error, 1)
+		go func() {
+			newMessageErr := m.MessageListLayout.NewMessage(messageBody, m.cli, sender, timestamp, m.messageScrollArea, own, m)
+			if newMessageErr != nil {
+				errChan <- newMessageErr
+				return
+			}
+			close(errChan)
+		}()
+		if newMessageErr, open := <-errChan; open {
+			err = newMessageErr
+			close(errChan)
 			return
 		}
 	})
@@ -142,9 +151,18 @@ func (m *MainUI) NewUI() (err error) {
 
 	m.window.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
 		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
-			MessageErr := m.sendMessage(message)
-			if MessageErr != nil {
-				err = MessageErr
+			errChan := make(chan error, 1)
+			go func() {
+				messageErr := m.sendMessage(message)
+				if messageErr != nil {
+					errChan <- messageErr
+					return
+				}
+				close(errChan)
+			}()
+			if messageErr, open := <-errChan; open {
+				err = messageErr
+				close(errChan)
 				return
 			}
 
@@ -256,7 +274,6 @@ func (m *MainUI) sendMessage(message string) (err error) {
 }
 
 func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScrollArea) (err error) {
-	//TODO register enter and show loader or so
 	log.Infoln("Starting Logout Sequence in background")
 	var wg sync.WaitGroup
 	results := make(chan bool)
@@ -264,6 +281,7 @@ func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScr
 	wg.Add(1)
 	go func(cli *gomatrix.Client, results chan<- bool) {
 		defer wg.Done()
+		cli.StopSync()
 		_, LogoutErr := cli.Logout()
 		if LogoutErr != nil {
 			log.Errorln(LogoutErr)
@@ -385,14 +403,14 @@ func (m *MainUI) initRoomList(roomListLayout *QRoomVBoxLayoutWithTriggerSlot, ro
 		return
 	}
 
-	x := 0
+	first := true
 	for _, roomID := range rooms.JoinedRooms {
 		m.rooms[roomID] = matrix.NewRoom(roomID, m.cli)
 		roomListLayout.TriggerRoom(roomID)
-		if x == 0 {
+		if first {
 			go m.RoomListLayout.ChangeRoom(roomID)
 		}
-		x++
+		first = false
 	}
 
 	return
