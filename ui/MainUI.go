@@ -447,6 +447,7 @@ func (m *MainUI) loadCache() (err error) {
 		var doneMsg []string
 
 		for MsgIt.Seek(MsgPrefix); MsgIt.ValidForPrefix(MsgPrefix); MsgIt.Next() {
+			log.Println("next Cache Item")
 			item := MsgIt.Item()
 			key := item.Key()
 			stringKey := fmt.Sprintf("%s", key)
