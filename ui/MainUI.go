@@ -30,7 +30,7 @@ func NewMainUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow)
 	mainUIStruct = &MainUI{
 		config: configStruct,
 		window: window,
-		rooms:  make(map[string]*matrix.Room),
+		Rooms:  make(map[string]*matrix.Room),
 	}
 	return
 }
@@ -40,7 +40,7 @@ func NewMainUIStructWithExistingConfig(configStruct config, window *widgets.QMai
 	mainUIStruct = &MainUI{
 		config: configStruct,
 		window: window,
-		rooms:  make(map[string]*matrix.Room),
+		Rooms:  make(map[string]*matrix.Room),
 	}
 	return
 }
@@ -119,7 +119,7 @@ func (m *MainUI) NewUI() (err error) {
 	m.MainWidget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 
 	m.RoomListLayout.ConnectTriggerRoom(func(roomID string) {
-		room := m.rooms[roomID]
+		room := m.Rooms[roomID]
 
 		NewRoomErr := m.RoomListLayout.NewRoom(room, m.roomScrollArea, m)
 		if NewRoomErr != nil {
@@ -128,7 +128,7 @@ func (m *MainUI) NewUI() (err error) {
 		}
 	})
 
-	go m.initRoomList(m.RoomListLayout, m.roomScrollArea)
+	go m.initRoomList()
 
 	var message string
 	messageInput := widgets.NewQLineEditFromPointer(m.widget.FindChild("MessageInput", core.Qt__FindChildrenRecursively).Pointer())
@@ -150,7 +150,7 @@ func (m *MainUI) NewUI() (err error) {
 	})
 
 	m.RoomListLayout.ConnectChangeRoom(func(roomID string) {
-		room := m.rooms[roomID]
+		room := m.Rooms[roomID]
 		roomAvatar, roomAvatarErr := room.GetRoomAvatar()
 		if roomAvatarErr != nil {
 			err = roomAvatarErr
@@ -361,7 +361,7 @@ func (m *MainUI) startSync() (err error) {
 		roomName, _ = roomNameRaw.(string)
 		evType := ev.Type
 		room := ev.RoomID
-		go m.rooms[room].UpdateRoomNameByEvent(roomName, evType)
+		go m.Rooms[room].UpdateRoomNameByEvent(roomName, evType)
 	})
 
 	m.syncer.OnEventType("m.room.name", func(ev *gomatrix.Event) {
@@ -370,7 +370,7 @@ func (m *MainUI) startSync() (err error) {
 		roomName, _ = roomNameRaw.(string)
 		evType := ev.Type
 		room := ev.RoomID
-		go m.rooms[room].UpdateRoomNameByEvent(roomName, evType)
+		go m.Rooms[room].UpdateRoomNameByEvent(roomName, evType)
 	})
 
 	// Start Non-blocking sync
@@ -389,7 +389,7 @@ func (m *MainUI) startSync() (err error) {
 	return
 }
 
-func (m *MainUI) initRoomList(roomListLayout *QRoomVBoxLayoutWithTriggerSlot, roomScrollArea *widgets.QScrollArea) (err error) {
+func (m *MainUI) initRoomList() (err error) {
 	rooms, roomsErr := matrix.GetRooms(m.cli)
 	if roomsErr != nil {
 		err = roomsErr
@@ -398,8 +398,8 @@ func (m *MainUI) initRoomList(roomListLayout *QRoomVBoxLayoutWithTriggerSlot, ro
 
 	first := true
 	for _, roomID := range rooms {
-		m.rooms[roomID] = matrix.NewRoom(roomID, m.cli)
-		roomListLayout.TriggerRoom(roomID)
+		m.Rooms[roomID] = matrix.NewRoom(roomID, m.cli)
+		m.RoomListLayout.TriggerRoom(roomID)
 		if first {
 			go m.RoomListLayout.ChangeRoom(roomID)
 		}

@@ -6,14 +6,17 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/Nordgedanken/Morpheus/matrix"
+	"github.com/Nordgedanken/Morpheus/ui"
 	"github.com/matrix-org/gomatrix"
 )
 
 //MorpheusSyncer holds the UserID, the used Storer and the listener
 type MorpheusSyncer struct {
-	UserID    string
-	Store     gomatrix.Storer
-	listeners map[string][]OnEventListener // event type to listeners array
+	UserID       string
+	Store        gomatrix.Storer
+	listeners    map[string][]OnEventListener // event type to listeners array
+	mainUIStruct *ui.MainUI
 }
 
 // OnEventListener can be used with DefaultSyncer.OnEventType to be informed of incoming events.
@@ -42,7 +45,7 @@ func (s *MorpheusSyncer) ProcessResponse(res *gomatrix.RespSync, since string) (
 	}()
 
 	for roomID, roomData := range res.Rooms.Join {
-		room := s.getOrCreateRoom(roomID)
+		room := s.getOrCreateRoom(roomID, "join")
 		for _, event := range roomData.State.Events {
 			event.RoomID = roomID
 			room.UpdateState(&event)
@@ -54,7 +57,7 @@ func (s *MorpheusSyncer) ProcessResponse(res *gomatrix.RespSync, since string) (
 		}
 	}
 	for roomID, roomData := range res.Rooms.Invite {
-		room := s.getOrCreateRoom(roomID)
+		room := s.getOrCreateRoom(roomID, "invite")
 		for _, event := range roomData.State.Events {
 			event.RoomID = roomID
 			room.UpdateState(&event)
@@ -62,7 +65,7 @@ func (s *MorpheusSyncer) ProcessResponse(res *gomatrix.RespSync, since string) (
 		}
 	}
 	for roomID, roomData := range res.Rooms.Leave {
-		room := s.getOrCreateRoom(roomID)
+		room := s.getOrCreateRoom(roomID, "leave")
 		for _, event := range roomData.Timeline.Events {
 			if event.StateKey != nil {
 				event.RoomID = roomID
@@ -122,7 +125,14 @@ func (s *MorpheusSyncer) shouldProcessResponse(resp *gomatrix.RespSync, since st
 }
 
 // getOrCreateRoom must only be called by the Sync() goroutine which calls ProcessResponse()
-func (s *MorpheusSyncer) getOrCreateRoom(roomID string) *gomatrix.Room {
+func (s *MorpheusSyncer) getOrCreateRoom(roomID, state string) *gomatrix.Room {
+	// Add new Room to the List if new
+	_, present := s.mainUIStruct.Rooms[roomID]
+	if !present && state == "join" {
+		s.mainUIStruct.Rooms[roomID] = matrix.NewRoom(roomID, s.mainUIStruct.GetCli())
+		s.mainUIStruct.RoomListLayout.TriggerRoom(roomID)
+	}
+
 	room := s.Store.LoadRoom(roomID)
 	if room == nil { // create a new Room
 		room = gomatrix.NewRoom(roomID)

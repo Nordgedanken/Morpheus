@@ -55,7 +55,7 @@ type MainUI struct {
 
 	window      *widgets.QMainWindow
 	storage     *syncer.MorpheusStore
-	rooms       map[string]*matrix.Room
+	Rooms       map[string]*matrix.Room
 	currentRoom string
 }
 
