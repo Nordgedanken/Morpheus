@@ -390,14 +390,14 @@ func (m *MainUI) startSync() (err error) {
 }
 
 func (m *MainUI) initRoomList(roomListLayout *QRoomVBoxLayoutWithTriggerSlot, roomScrollArea *widgets.QScrollArea) (err error) {
-	rooms, ReqErr := m.cli.JoinedRooms()
-	if ReqErr != nil {
-		err = ReqErr
+	rooms, roomsErr := matrix.GetRooms(m.cli)
+	if roomsErr != nil {
+		err = roomsErr
 		return
 	}
 
 	first := true
-	for _, roomID := range rooms.JoinedRooms {
+	for _, roomID := range rooms {
 		m.rooms[roomID] = matrix.NewRoom(roomID, m.cli)
 		roomListLayout.TriggerRoom(roomID)
 		if first {

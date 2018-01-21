@@ -25,6 +25,48 @@ type Room struct {
 	RoomTopic         string
 }
 
+func GetRooms(cli *gomatrix.Client) (rooms []string, err error) {
+	// Get Cache
+	cacheDB, DBOpenErr := db.OpenCacheDB()
+	if DBOpenErr != nil {
+		log.Fatalln(DBOpenErr)
+	}
+
+	var roomsString string
+	DBErr := cacheDB.View(func(txn *badger.Txn) error {
+		roomsResult, QueryErr := db.Get(txn, []byte("rooms"))
+		if QueryErr != nil {
+			return QueryErr
+		}
+		roomsString = fmt.Sprintf("%s", roomsResult)
+		return nil
+	})
+	if DBErr != nil {
+		err = DBErr
+		return
+	}
+
+	if roomsString == "" {
+		roomsResp, ReqErr := cli.JoinedRooms()
+		if ReqErr != nil {
+			err = ReqErr
+			return
+		}
+		rooms = roomsResp.JoinedRooms
+		DBSetErr := cacheDB.Update(func(txn *badger.Txn) error {
+			DBSetErr := txn.Set([]byte("rooms"), []byte(strings.Join(rooms, ",")))
+			return DBSetErr
+		})
+		if DBSetErr != nil {
+			err = DBSetErr
+			return
+		}
+	} else {
+		rooms = strings.Split(roomsString, ",")
+	}
+	return
+}
+
 // NewRoom Inits a new Room struct
 func NewRoom(roomID string, cli *gomatrix.Client) (room *Room) {
 	room = &Room{RoomID: roomID, cli: cli}
