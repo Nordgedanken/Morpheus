@@ -112,7 +112,7 @@ func (m *MainUI) NewUI() (err error) {
 			}
 		}
 		fmt.Println("done until here")
-		go m.MessageListLayout.NewMessage(messageBody, m.cli, sender, timestamp, m.messageScrollArea, own, m)
+		m.MessageListLayout.NewMessage(messageBody, m.cli, sender, timestamp, m.messageScrollArea, own, m)
 	})
 
 	go m.startSync()
