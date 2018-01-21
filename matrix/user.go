@@ -17,6 +17,7 @@ import (
 	"github.com/therecipe/qt/gui"
 )
 
+// GenerateGenericImages generates a byte slice containing a Image with the starting char as symbol and a colored background
 func GenerateGenericImages(identifier string, size int) (imgData []byte, err error) {
 	if (identifier[0] == '#' || identifier[0] == '!' || identifier[0] == '@') && len(identifier) > 1 {
 		identifier = identifier[1:]

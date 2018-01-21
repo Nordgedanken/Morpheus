@@ -26,6 +26,7 @@ type Room struct {
 	RoomTopic         string
 }
 
+// GetRooms either returns the joinedRoomsList from the Server or the cachedList
 func GetRooms(cli *gomatrix.Client) (rooms []string, err error) {
 	// Get Cache
 	cacheDB, DBOpenErr := db.OpenCacheDB()
