@@ -155,12 +155,14 @@ func cleanup() bool {
 
 	if mainUIStruct != nil {
 		if mainUIStruct.GetCli() != nil {
+			log.Infoln("Stop Sync")
 			mainUIStruct.GetCli().StopSync()
 		}
 	}
 
 	if loginUIStruct != nil {
 		if loginUIStruct.GetCli() != nil {
+			log.Infoln("Stop Sync")
 			loginUIStruct.GetCli().StopSync()
 		}
 	}
