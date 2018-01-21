@@ -29,4 +29,4 @@ go get -u -v github.com/alecthomas/gometalinter/
 $GOPATH/bin/gometalinter --config=linter.json ./... --install
 
 echo "Looking for lint..."
-$GOPATH/bin/gometalinter ./... ${args} --skip=vendor --exclude "vendor" --exclude "moc"
+$GOPATH/bin/gometalinter ./... ${args} --skip=vendor --exclude "vendor" --exclude "moc" --exclude "qt"
