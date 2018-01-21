@@ -1,7 +1,7 @@
 package listLayouts
 
 import (
-	"github.com/Nordgedanken/Morpheus/matrix"
+	"github.com/Nordgedanken/Morpheus/matrix/rooms"
 	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
@@ -41,7 +41,7 @@ func NewRoomList(scrollArea *widgets.QScrollArea) (roomViewLayout *QRoomVBoxLayo
 }
 
 // NewRoom adds a new room object to the view
-func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room, scrollArea *widgets.QScrollArea, mainUIStruct *MainUI) (err error) {
+func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (err error) {
 	roomAvatar, roomAvatarErr := room.GetRoomAvatar()
 	if roomAvatarErr != nil {
 		err = roomAvatarErr

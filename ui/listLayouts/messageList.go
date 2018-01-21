@@ -46,7 +46,7 @@ func NewMessageList(scrollArea *widgets.QScrollArea) (messageViewLayout *QVBoxLa
 }
 
 // NewMessage adds a new message object to the view
-func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli *gomatrix.Client, sender string, timestamp int64, scrollArea *widgets.QScrollArea, own bool, mainUIStruct *MainUI) (err error) {
+func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli *gomatrix.Client, sender string, timestamp int64, scrollArea *widgets.QScrollArea, own bool) (err error) {
 	barAtBottom := false
 	bar := scrollArea.VerticalScrollBar()
 	if bar.Value() == bar.Maximum() {
