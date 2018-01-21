@@ -175,6 +175,7 @@ func (m *MainUI) NewUI() (err error) {
 				widgetScroll.DeleteLater()
 			}
 
+			log.Println("next loadCache")
 			go m.loadCache()
 		}
 	})
