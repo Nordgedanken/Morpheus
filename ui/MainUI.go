@@ -366,8 +366,11 @@ func (m *MainUI) startSync() (err error) {
 	go func() {
 		log.Infoln("Start sync")
 		for {
-
-			if e := m.cli.Sync(); e != nil {
+			e := m.cli.Sync()
+			if e == nil {
+				break
+			}
+			if e != nil {
 				err = e
 			}
 		}
