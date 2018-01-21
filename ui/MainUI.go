@@ -111,20 +111,7 @@ func (m *MainUI) NewUI() (err error) {
 				}
 			}
 		}
-		errChan := make(chan error, 1)
-		go func() {
-			newMessageErr := m.MessageListLayout.NewMessage(messageBody, m.cli, sender, timestamp, m.messageScrollArea, own, m)
-			if newMessageErr != nil {
-				errChan <- newMessageErr
-				return
-			}
-			close(errChan)
-		}()
-		if newMessageErr, open := <-errChan; open {
-			err = newMessageErr
-			close(errChan)
-			return
-		}
+		go m.MessageListLayout.NewMessage(messageBody, m.cli, sender, timestamp, m.messageScrollArea, own, m)
 	})
 
 	go m.startSync()
@@ -151,20 +138,7 @@ func (m *MainUI) NewUI() (err error) {
 
 	m.window.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
 		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
-			errChan := make(chan error, 1)
-			go func() {
-				messageErr := m.sendMessage(message)
-				if messageErr != nil {
-					errChan <- messageErr
-					return
-				}
-				close(errChan)
-			}()
-			if messageErr, open := <-errChan; open {
-				err = messageErr
-				close(errChan)
-				return
-			}
+			go m.sendMessage(message)
 
 			messageInput.Clear()
 			ev.Accept()
@@ -172,6 +146,7 @@ func (m *MainUI) NewUI() (err error) {
 			messageInput.KeyPressEventDefault(ev)
 			ev.Ignore()
 		}
+		return
 	})
 
 	m.RoomListLayout.ConnectChangeRoom(func(roomID string) {
