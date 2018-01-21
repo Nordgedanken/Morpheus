@@ -85,6 +85,7 @@ func (m *MainUI) NewUI() (err error) {
 	m.initScrolls()
 
 	m.MessageListLayout.ConnectTriggerMessage(func(messageBody, sender string, timestamp int64) {
+		log.Println("triggered Message")
 		var own bool
 		if sender == m.Cli.UserID {
 			own = true
@@ -481,7 +482,7 @@ func (m *MainUI) loadCache() (err error) {
 					return errors.WithMessage(ConvErr, "Timestamp String: "+timestamp)
 				}
 
-				m.MessageListLayout.TriggerMessage(msg, sender, timestampInt)
+				go m.MessageListLayout.TriggerMessage(msg, sender, timestampInt)
 			}
 		}
 
