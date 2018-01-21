@@ -88,18 +88,14 @@ func (l *LoginUI) NewUI() (err error) {
 	})
 
 	loginButton.ConnectClicked(func(_ bool) {
-		if l.username != "" {
-			if l.password != "" {
-				LoginErr := l.login()
-				if LoginErr != nil {
-					err = LoginErr
-					return
-				}
-			} else {
-				passwordInput.SetStyleSheet("border: 1px solid red")
+		if l.username != "" && l.password != "" {
+			LoginErr := l.login()
+			if LoginErr != nil {
+				err = LoginErr
+				return
 			}
 		} else {
-			usernameInput.SetStyleSheet("border: 1px solid red")
+			passwordInput.SetStyleSheet("border: 1px solid red")
 		}
 	})
 
