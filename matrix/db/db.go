@@ -21,15 +21,17 @@ func OpenCacheDB() (db *badger.DB, err error) {
 	onceCache.Do(func() {
 		// Open the data.db file. It will be created if it doesn't exist.
 		configDirs := configdir.New("Nordgedanken", "Morpheus")
-		if _, StatErr := os.Stat(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/"); os.IsNotExist(StatErr) {
-			MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/data/", 0700)
+		filePath := filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)
+
+		if _, StatErr := os.Stat(filePath + "/data/"); os.IsNotExist(StatErr) {
+			MkdirErr := os.MkdirAll(filePath+"/data/", 0700)
 			if MkdirErr != nil {
 				err = MkdirErr
 				return
 			}
 		}
-		if _, StatErr := os.Stat(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/cache/"); os.IsNotExist(StatErr) {
-			MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/data/cache/", 0700)
+		if _, StatErr := os.Stat(filePath + "/data/cache/"); os.IsNotExist(StatErr) {
+			MkdirErr := os.MkdirAll(filePath+"/data/cache/", 0700)
 			if MkdirErr != nil {
 				err = MkdirErr
 				return
@@ -37,8 +39,16 @@ func OpenCacheDB() (db *badger.DB, err error) {
 		}
 		opts := badger.DefaultOptions
 		opts.SyncWrites = false
-		opts.Dir = filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/cache"
-		opts.ValueDir = filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/cache"
+		opts.Dir = filePath + "/data/cache"
+		opts.ValueDir = filePath + "/data/cache"
+
+		if _, StatErr := os.Stat(filePath + "/data/cache/LOCK"); StatErr == nil {
+			DeleteErr := os.Remove(filePath + "/data/cache/LOCK")
+			if DeleteErr != nil {
+				err = DeleteErr
+				return
+			}
+		}
 
 		expDB, DBErr := badger.Open(opts)
 		if DBErr != nil {
@@ -62,15 +72,17 @@ func OpenUserDB() (db *badger.DB, err error) {
 	onceUser.Do(func() {
 		// Open the data.db file. It will be created if it doesn't exist.
 		configDirs := configdir.New("Nordgedanken", "Morpheus")
-		if _, StatErr := os.Stat(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/"); os.IsNotExist(StatErr) {
-			MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/data/", 0700)
+		filePath := filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)
+
+		if _, StatErr := os.Stat(filePath + "/data/"); os.IsNotExist(StatErr) {
+			MkdirErr := os.MkdirAll(filePath+"/data/", 0700)
 			if MkdirErr != nil {
 				err = MkdirErr
 				return
 			}
 		}
-		if _, StatErr := os.Stat(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/user/"); os.IsNotExist(StatErr) {
-			MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/data/user/", 0700)
+		if _, StatErr := os.Stat(filePath + "/data/user/"); os.IsNotExist(StatErr) {
+			MkdirErr := os.MkdirAll(filePath+"/data/user/", 0700)
 			if MkdirErr != nil {
 				err = MkdirErr
 				return
@@ -78,8 +90,16 @@ func OpenUserDB() (db *badger.DB, err error) {
 		}
 		opts := badger.DefaultOptions
 		opts.SyncWrites = false
-		opts.Dir = filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/user"
-		opts.ValueDir = filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/data/user"
+		opts.Dir = filePath + "/data/user"
+		opts.ValueDir = filePath + "/data/user"
+
+		if _, StatErr := os.Stat(filePath + "/data/user/LOCK"); StatErr == nil {
+			DeleteErr := os.Remove(filePath + "/data/user/LOCK")
+			if DeleteErr != nil {
+				err = DeleteErr
+				return
+			}
+		}
 
 		expDB, DBErr := badger.Open(opts)
 		if DBErr != nil {
