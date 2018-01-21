@@ -152,7 +152,7 @@ func (r *Room) crawlRoomName() {
 	roomName := struct {
 		Name string `json:"name"`
 	}{}
-	roomCanoncialAlias := struct {
+	roomCanonicalAlias := struct {
 		Alias string `json:"alias"`
 	}{}
 
@@ -161,16 +161,16 @@ func (r *Room) crawlRoomName() {
 		// Not returning as a Error NotFound is allowed
 	}
 	if roomName.Name == "" {
-		if roomCanoncialAliasStateEventErr := r.cli.StateEvent(r.RoomID, "m.room.canonical_alias", "", &roomCanoncialAlias); roomCanoncialAliasStateEventErr != nil {
-			log.Println(roomCanoncialAliasStateEventErr)
+		if roomCanonicalAliasStateEventErr := r.cli.StateEvent(r.RoomID, "m.room.canonical_alias", "", &roomCanonicalAlias); roomCanonicalAliasStateEventErr != nil {
+			log.Println(roomCanonicalAliasStateEventErr)
 			// Not returning as a Error NotFound is allowed
 		}
-		if roomCanoncialAlias.Alias == "" {
+		if roomCanonicalAlias.Alias == "" {
 			r.RoomNameEventType = "roomID"
 			r.RoomName = r.RoomID
 		} else {
 			r.RoomNameEventType = "m.room.canonical_alias"
-			r.RoomName = roomCanoncialAlias.Alias
+			r.RoomName = roomCanonicalAlias.Alias
 		}
 	} else {
 		r.RoomNameEventType = "m.room.name"
