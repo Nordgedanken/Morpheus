@@ -60,8 +60,11 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 	// Get cache
 	DBErr := cacheDB.View(func(txn *badger.Txn) error {
 		avatarDataResult, QueryErr := db.Get(txn, []byte("user|"+mxid+"|avatarData"+strconv.Itoa(size)+"x"+strconv.Itoa(size)))
+		if QueryErr != nil {
+			return QueryErr
+		}
 		avatarData = avatarDataResult
-		return QueryErr
+		return nil
 	})
 	if DBErr != nil {
 		err = DBErr
@@ -136,20 +139,23 @@ func GetUserDataFromCache() (accessToken, homeserverURL, userID string, err erro
 	// Get cache
 	DBErr := UserDB.View(func(txn *badger.Txn) error {
 		accessTokenResult, QueryErr := db.Get(txn, []byte("user|accessToken"))
-		accessToken = fmt.Sprintf("%s", accessTokenResult)
 		if QueryErr != nil {
 			return QueryErr
 		}
+		accessToken = fmt.Sprintf("%s", accessTokenResult)
 
 		homeserverURLResult, QueryErr := db.Get(txn, []byte("user|accessToken"))
-		homeserverURL = fmt.Sprintf("%s", homeserverURLResult)
 		if QueryErr != nil {
 			return QueryErr
 		}
+		homeserverURL = fmt.Sprintf("%s", homeserverURLResult)
 
 		userIDResult, QueryErr := db.Get(txn, []byte("user|accessToken"))
+		if QueryErr != nil {
+			return QueryErr
+		}
 		userID = fmt.Sprintf("%s", userIDResult)
-		return QueryErr
+		return nil
 	})
 	if DBErr != nil {
 		err = DBErr

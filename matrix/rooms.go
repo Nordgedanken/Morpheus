@@ -79,8 +79,11 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 	// Get cache
 	DBErr := cacheDB.View(func(txn *badger.Txn) error {
 		roomAvatarDataResult, QueryErr := db.Get(txn, []byte("room|"+r.RoomID+"|84x84"))
+		if QueryErr != nil {
+			return QueryErr
+		}
 		roomAvatarData = roomAvatarDataResult
-		return QueryErr
+		return nil
 	})
 	if DBErr != nil {
 		err = DBErr

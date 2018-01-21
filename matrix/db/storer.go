@@ -35,8 +35,11 @@ func (m *MorpheusStorage) UpdateNextBatch(userID, nextBatch string) (err error) 
 func (m *MorpheusStorage) LoadNextBatch(userID string) (nextBatch string, err error) {
 	DBerr := m.Database.View(func(txn *badger.Txn) error {
 		nextBatchResult, QueryErr := Get(txn, []byte("user|accessToken"))
+		if QueryErr != nil {
+			return QueryErr
+		}
 		nextBatch = fmt.Sprintf("%s", nextBatchResult)
-		return QueryErr
+		return nil
 	})
 	if DBerr != nil {
 		err = DBerr
