@@ -150,7 +150,7 @@ func GetUserDataFromCache() (accessToken, homeserverURL, userID string, err erro
 		}
 		homeserverURL = fmt.Sprintf("%s", homeserverURLResult)
 
-		userIDResult, QueryErr := db.Get(txn, []byte("user|accessToken"))
+		userIDResult, QueryErr := db.Get(txn, []byte("user|userID"))
 		if QueryErr != nil {
 			return QueryErr
 		}
