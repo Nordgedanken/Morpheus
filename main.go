@@ -19,6 +19,8 @@ import (
 )
 
 var window *widgets.QMainWindow
+var mainUIStruct *ui.MainUI
+var loginUIStruct *ui.LoginUI
 
 func main() {
 	runtime.GOMAXPROCS(128)
@@ -109,29 +111,28 @@ func main() {
 
 		//Show MainUI
 		for result := range results {
-			//TODO Don't switch screen on wrong login data.
-			MainUIStruct := ui.NewMainUIStruct(windowWidth, windowHeight, window)
-			MainUIStruct.SetCli(result)
-			mainUIErr := MainUIStruct.NewUI()
+			mainUIStruct = ui.NewMainUIStruct(windowWidth, windowHeight, window)
+			mainUIStruct.SetCli(result)
+			mainUIErr := mainUIStruct.NewUI()
 			if mainUIErr != nil {
 				log.Errorln("mainUI: ", mainUIErr)
 				return
 			}
 
-			MainUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
-			window.SetCentralWidget(MainUIStruct.GetWidget())
+			mainUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
+			window.SetCentralWidget(mainUIStruct.GetWidget())
 		}
 	} else {
 		//Show loginUI
-		LoginUIStruct := ui.NewLoginUIStruct(windowWidth, windowHeight, window)
-		loginUIErr := LoginUIStruct.NewUI()
+		loginUIStruct = ui.NewLoginUIStruct(windowWidth, windowHeight, window)
+		loginUIErr := loginUIStruct.NewUI()
 		if loginUIErr != nil {
 			log.Errorln("Login Err: ", loginUIErr)
 			return
 		}
 
-		LoginUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
-		window.SetCentralWidget(LoginUIStruct.GetWidget())
+		loginUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
+		window.SetCentralWidget(loginUIStruct.GetWidget())
 	}
 
 	window.Resize2(windowWidth, windowHeight)
@@ -151,6 +152,19 @@ func main() {
 
 func cleanup() bool {
 	log.Infoln("cleanup")
+
+	if mainUIStruct != nil {
+		if mainUIStruct.GetCli() != nil {
+			mainUIStruct.GetCli().StopSync()
+		}
+	}
+
+	if loginUIStruct != nil {
+		if loginUIStruct.GetCli() != nil {
+			loginUIStruct.GetCli().StopSync()
+		}
+	}
+
 	UserDB, DBOpenErr := db.OpenUserDB()
 	if DBOpenErr != nil {
 		log.Errorln(DBOpenErr)

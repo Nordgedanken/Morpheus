@@ -13,12 +13,12 @@ import (
 )
 
 // NewLoginUIStruct gives you a LoginUI struct with prefilled data
-func NewLoginUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow) (loginUIStruct LoginUI) {
+func NewLoginUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow) (loginUIStruct *LoginUI) {
 	configStruct := config{
 		windowWidth:  windowWidth,
 		windowHeight: windowHeight,
 	}
-	loginUIStruct = LoginUI{
+	loginUIStruct = &LoginUI{
 		config: configStruct,
 		window: window,
 	}
@@ -26,8 +26,8 @@ func NewLoginUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow
 }
 
 // NewLoginUIStructWithExistingConfig gives you a LoginUI struct with prefilled data and data from a previous Config
-func NewLoginUIStructWithExistingConfig(configStruct config, window *widgets.QMainWindow) (loginUIStruct LoginUI) {
-	loginUIStruct = LoginUI{
+func NewLoginUIStructWithExistingConfig(configStruct config, window *widgets.QMainWindow) (loginUIStruct *LoginUI) {
+	loginUIStruct = &LoginUI{
 		config: configStruct,
 		window: window,
 	}
@@ -165,7 +165,6 @@ func (l *LoginUI) login() (err error) {
 
 		//Show MainUI
 		for result := range results {
-			//TODO Don't switch screen on wrong login data.
 			l.cli = result
 			MainUIStruct := NewMainUIStructWithExistingConfig(l.config, l.window)
 			mainUIErr := MainUIStruct.NewUI()

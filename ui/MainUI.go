@@ -22,12 +22,12 @@ import (
 )
 
 // NewMainUIStruct gives you a MainUI struct with prefilled data
-func NewMainUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow) (mainUIStruct MainUI) {
+func NewMainUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow) (mainUIStruct *MainUI) {
 	configStruct := config{
 		windowWidth:  windowWidth,
 		windowHeight: windowHeight,
 	}
-	mainUIStruct = MainUI{
+	mainUIStruct = &MainUI{
 		config: configStruct,
 		window: window,
 		rooms:  make(map[string]*matrix.Room),
@@ -36,8 +36,8 @@ func NewMainUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow)
 }
 
 // NewMainUIStructWithExistingConfig gives you a MainUI struct with prefilled data and data from a previous Config
-func NewMainUIStructWithExistingConfig(configStruct config, window *widgets.QMainWindow) (mainUIStruct MainUI) {
-	mainUIStruct = MainUI{
+func NewMainUIStructWithExistingConfig(configStruct config, window *widgets.QMainWindow) (mainUIStruct *MainUI) {
+	mainUIStruct = &MainUI{
 		config: configStruct,
 		window: window,
 		rooms:  make(map[string]*matrix.Room),
