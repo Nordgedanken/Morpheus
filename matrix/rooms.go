@@ -247,6 +247,7 @@ func (r *Room) getRoomNameFromDB() (err error) {
 		if QueryErr != nil {
 			return QueryErr
 		}
+		fmt.Println(roomNameResult)
 		r.RoomName = fmt.Sprintf("%s", roomNameResult)
 		return nil
 	})
