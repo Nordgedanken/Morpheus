@@ -2,6 +2,8 @@
 [![CircleCI branch](https://img.shields.io/circleci/project/github/Nordgedanken/Morpheus/master.svg)](https://circleci.com/gh/Nordgedanken/Morpheus)
 
 [![Github All Releases](https://img.shields.io/github/downloads/Nordgedanken/Morpheus/total.svg)]()
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/Nordgedanken/Morpheus)](https://goreportcard.com/report/github.com/Nordgedanken/Morpheus)
 ---
 
 A Matrix client written in Go-QT
