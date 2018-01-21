@@ -1,6 +1,7 @@
 package matrix
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/Nordgedanken/Morpheus/matrix/db"
@@ -13,11 +14,12 @@ import (
 
 // Room saves the information of a Room
 type Room struct {
-	cli           *gomatrix.Client
-	RoomID        string
-	RoomName      string
-	RoomAvatarURL string
-	RoomTopic     string
+	cli               *gomatrix.Client
+	RoomID            string
+	RoomName          string
+	RoomNameEventType string
+	RoomAvatarURL     string
+	RoomTopic         string
 }
 
 // NewRoom Inits a new Room struct
@@ -174,10 +176,87 @@ func (r *Room) crawlRoomName() {
 
 }
 
+func (r *Room) UpdateRoomNameByEvent(newName, evType string) {
+	if r.RoomNameEventType == "" {
+		r.getRoomNameEventTypeFromDB()
+	}
+	if r.RoomNameEventType == "m.room.name" && r.RoomNameEventType == evType {
+		r.RoomName = newName
+		r.cacheRoomName()
+	} else if r.RoomNameEventType != "m.room.name" {
+		r.RoomName = newName
+		r.cacheRoomName()
+	}
+}
+
+func (r *Room) cacheRoomName() (err error) {
+	cacheDB, DBOpenErr := db.OpenCacheDB()
+	if DBOpenErr != nil {
+		err = DBOpenErr
+		return
+	}
+
+	// Update cache
+	DBSetErr := cacheDB.Update(func(txn *badger.Txn) error {
+		DBSetErr := txn.Set([]byte("room|"+r.RoomID+"|nameEventType"), []byte(r.RoomNameEventType))
+		if DBSetErr != nil {
+			return DBSetErr
+		}
+
+		DBSetErr = txn.Set([]byte("room|"+r.RoomID+"|name"), []byte(r.RoomName))
+		return DBSetErr
+	})
+	if DBSetErr != nil {
+		err = DBSetErr
+		return
+	}
+	return
+}
+
+func (r *Room) getRoomNameEventTypeFromDB() (err error) {
+	cacheDB, DBOpenErr := db.OpenCacheDB()
+	if DBOpenErr != nil {
+		err = DBOpenErr
+		return
+	}
+
+	cacheDB.View(func(txn *badger.Txn) error {
+		roomNameEventTypeResult, QueryErr := db.Get(txn, []byte("room|"+r.RoomID+"|nameEventType"))
+		if QueryErr != nil {
+			return QueryErr
+		}
+		r.RoomNameEventType = fmt.Sprintf("%s", roomNameEventTypeResult)
+		return nil
+	})
+
+	return
+}
+
+func (r *Room) getRoomNameFromDB() (err error) {
+	cacheDB, DBOpenErr := db.OpenCacheDB()
+	if DBOpenErr != nil {
+		err = DBOpenErr
+		return
+	}
+
+	cacheDB.View(func(txn *badger.Txn) error {
+		roomNameResult, QueryErr := db.Get(txn, []byte("room|"+r.RoomID+"|name"))
+		if QueryErr != nil {
+			return QueryErr
+		}
+		r.RoomName = fmt.Sprintf("%s", roomNameResult)
+		return nil
+	})
+
+	return
+}
+
 // GetRoomName gives you the name of the current Room
 func (r *Room) GetRoomName() (name string) {
+	r.getRoomNameFromDB()
 	if r.RoomName == "" {
 		r.crawlRoomName()
+		r.cacheRoomName()
 	}
 	name = r.RoomName
 	return

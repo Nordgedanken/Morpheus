@@ -111,6 +111,7 @@ func (m *MainUI) NewUI() (err error) {
 				}
 			}
 		}
+		fmt.Println("done until here")
 		go m.MessageListLayout.NewMessage(messageBody, m.cli, sender, timestamp, m.messageScrollArea, own, m)
 	})
 
@@ -353,6 +354,24 @@ func (m *MainUI) startSync() (err error) {
 		if room == m.currentRoom {
 			go m.MessageListLayout.TriggerMessage(msg, sender, timestamp)
 		}
+	})
+
+	m.syncer.OnEventType("m.room.name", func(ev *gomatrix.Event) {
+		roomNameRaw, _ := ev.Content["name"]
+		var roomName string
+		roomName, _ = roomNameRaw.(string)
+		evType := ev.Type
+		room := ev.RoomID
+		go m.rooms[room].UpdateRoomNameByEvent(roomName, evType)
+	})
+
+	m.syncer.OnEventType("m.room.name", func(ev *gomatrix.Event) {
+		roomNameRaw, _ := ev.Content["name"]
+		var roomName string
+		roomName, _ = roomNameRaw.(string)
+		evType := ev.Type
+		room := ev.RoomID
+		go m.rooms[room].UpdateRoomNameByEvent(roomName, evType)
 	})
 
 	// Start Non-blocking sync
