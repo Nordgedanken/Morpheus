@@ -8,6 +8,7 @@ import (
 
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
+	"github.com/Nordgedanken/Morpheus/matrix/scalar"
 	"github.com/Nordgedanken/Morpheus/ui"
 	"github.com/Nordgedanken/dugong"
 	"github.com/matrix-org/gomatrix"
@@ -118,7 +119,7 @@ func main() {
 				log.Errorln("mainUI: ", mainUIErr)
 				return
 			}
-			scalar.ReqAndSaveScalarToken(MainUIStruct.GetCli())
+			scalar.ReqAndSaveScalarToken(mainUIStruct.GetCli())
 
 			mainUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
 			window.SetCentralWidget(mainUIStruct.GetWidget())
