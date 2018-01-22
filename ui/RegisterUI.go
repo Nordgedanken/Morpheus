@@ -78,8 +78,12 @@ func (r *RegUI) NewUI() (err error) {
 		return
 	}
 
+	log.Println("helloMatrix got called")
+
 	hostnames := convertHelloMatrixRespToNameSlice(r.helloMatrixResp)
 	serverDropdown.AddItems(hostnames)
+
+	log.Println("serverDropdown initialized")
 
 	var layout = widgets.NewQHBoxLayout()
 	r.window.SetLayout(layout)
@@ -88,6 +92,8 @@ func (r *RegUI) NewUI() (err error) {
 	layout.SetContentsMargins(0, 0, 0, 0)
 	r.widget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 	r.RegWidget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
+
+	log.Println("widgets Got set")
 
 	r.widget.ConnectResizeEvent(func(event *gui.QResizeEvent) {
 		r.RegWidget.Resize(event.Size())
@@ -163,6 +169,8 @@ func (r *RegUI) NewUI() (err error) {
 	})
 
 	r.RegWidget.SetWindowTitle("Morpheus - Register")
+
+	log.Println("rests initialized")
 
 	return
 }
