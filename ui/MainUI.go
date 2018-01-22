@@ -501,6 +501,7 @@ func (m *MainUI) loadCache() (err error) {
 	}
 
 	if barAtBottom {
+		bar.Update()
 		bar.SetValue(bar.Maximum())
 	}
 
