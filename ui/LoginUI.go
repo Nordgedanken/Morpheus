@@ -61,6 +61,9 @@ func (l *LoginUI) NewUI() (err error) {
 	// loginButton
 	loginButton := widgets.NewQPushButtonFromPointer(l.widget.FindChild("LoginButton", core.Qt__FindChildrenRecursively).Pointer())
 
+	// registerButton
+	registerButton := widgets.NewQPushButtonFromPointer(l.widget.FindChild("registerButton", core.Qt__FindChildrenRecursively).Pointer())
+
 	var layout = widgets.NewQHBoxLayout()
 	l.window.SetLayout(layout)
 	layout.InsertWidget(0, l.LoginWidget, 0, core.Qt__AlignTop|core.Qt__AlignLeft)
@@ -98,6 +101,17 @@ func (l *LoginUI) NewUI() (err error) {
 		} else {
 			passwordInput.SetStyleSheet("border: 1px solid red")
 		}
+	})
+
+	registerButton.ConnectClicked(func(_ bool) {
+		registerUIStruct := NewRegUIStructWithExistingConfig(l.Config, l.window)
+		regUIErr := registerUIStruct.NewUI()
+		if regUIErr != nil {
+			err = regUIErr
+			return
+		}
+		l.window.SetCentralWidget(registerUIStruct.GetWidget())
+		l.window.Resize(l.widget.Size())
 	})
 
 	usernameInput.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
