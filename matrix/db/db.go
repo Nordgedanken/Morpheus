@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"sync"
 
 	"github.com/dgraph-io/badger"
 	"github.com/shibukawa/configdir"
@@ -13,8 +12,12 @@ import (
 
 var userDB *badger.DB
 var cacheDB *badger.DB
-var onceCache sync.Once
-var onceUser sync.Once
+var onceCache Once
+var onceUser Once
+
+func ResetOnceUser() {
+	onceUser.Reset()
+}
 
 // OpenCacheDB opens or generates the Database file for settings and Cache
 func OpenCacheDB() (db *badger.DB, err error) {

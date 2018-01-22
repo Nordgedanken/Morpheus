@@ -2,6 +2,8 @@ package ui
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -17,6 +19,7 @@ import (
 	"github.com/opennota/linkify"
 	"github.com/pkg/errors"
 	"github.com/rhinoman/go-commonmark"
+	"github.com/shibukawa/configdir"
 	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
@@ -273,28 +276,17 @@ func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScr
 		if DBOpenErr != nil {
 			log.Errorln(DBOpenErr)
 		}
+		userDB.Close()
 
-		//Flush complete DB
-		txn := userDB.NewTransaction(true) // Read-write txn
-		QueryErr := txn.Delete([]byte(""))
-		if QueryErr != nil {
-			log.Errorln(QueryErr)
+		configDirs := configdir.New("Nordgedanken", "Morpheus")
+		filePath := filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)
+		DeleteErr := os.RemoveAll(filePath + "/data/user/")
+		if DeleteErr != nil {
+			log.Errorln(DeleteErr)
 			results <- false
 		}
-
-		CommitErr := txn.Commit(nil)
-		if CommitErr != nil {
-			log.Errorln(CommitErr)
-			results <- false
-		}
-
-		DBPurgeErr := userDB.PurgeOlderVersions()
-		if DBPurgeErr != nil {
-			log.Errorln(DBPurgeErr)
-			results <- false
-		} else {
-			results <- true
-		}
+		db.ResetOnceUser()
+		results <- true
 	}(m.Cli, results)
 
 	go func() {
