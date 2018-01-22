@@ -450,7 +450,7 @@
                  </property>
                  <property name="icon">
                   <iconset resource="../../rcc.qrc">
-                   <normaloff>:/qml/icons/ic_power_settings_new_white_48px.svg</normaloff>:/qml/icons/ic_power_settings_new_white_48px.svg</iconset>
+                   <normaloff>:/qml/icons/sign-out.svg</normaloff>:/qml/icons/sign-out.svg</iconset>
                  </property>
                  <property name="iconSize">
                   <size>

@@ -35,3 +35,12 @@ type LoginUI struct {
 	widget      *widgets.QWidget
 	window      *widgets.QMainWindow
 }
+
+// RegUI holds information about the LoginUI
+type RegUI struct {
+	globalTypes.Config
+
+	RegWidget *widgets.QWidget
+	widget    *widgets.QWidget
+	window    *widgets.QMainWindow
+}
