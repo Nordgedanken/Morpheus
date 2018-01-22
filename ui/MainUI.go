@@ -437,7 +437,6 @@ func (m *MainUI) loadCache() (err error) {
 	}
 
 	DBerr := cacheDB.View(func(txn *badger.Txn) error {
-		log.Println("loadCache DBView")
 		MsgOpts := badger.DefaultIteratorOptions
 		MsgOpts.PrefetchSize = 10
 		MsgIt := txn.NewIterator(MsgOpts)
@@ -489,7 +488,6 @@ func (m *MainUI) loadCache() (err error) {
 					return errors.WithMessage(ConvErr, "Timestamp String: "+timestamp)
 				}
 
-				log.Println("next TriggerMessage")
 				go m.MessageListLayout.TriggerMessage(msg, sender, timestampInt)
 			}
 		}
