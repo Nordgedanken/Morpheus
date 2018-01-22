@@ -1,7 +1,8 @@
-package ui
+package listLayouts
 
 import (
-	"github.com/Nordgedanken/Morpheus/matrix"
+	"github.com/Nordgedanken/Morpheus/matrix/rooms"
+	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/uitools"
@@ -23,25 +24,24 @@ import (
 type QRoomVBoxLayoutWithTriggerSlot struct {
 	widgets.QVBoxLayout
 
-	_ func(roomID string) `slot:"TriggerRoom"`
-	_ func(url *core.QUrl) `slot:"ChangeRoom"`
+	_ func(roomID string) `signal:"TriggerRoom"`
+	_ func(roomID string) `signal:"ChangeRoom"`
 }
 
 // NewRoomList generates a new QRoomVBoxLayoutWithTriggerSlot and adds it to the room scrollArea
-func NewRoomList(scrollArea *widgets.QScrollArea, roomView *widgets.QWidget) (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) {
-	roomViewLayout = NewQRoomVBoxLayoutWithTriggerSlot2(roomView)
+func NewRoomList(scrollArea *widgets.QScrollArea) (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) {
+	roomViewLayout = NewQRoomVBoxLayoutWithTriggerSlot2(scrollArea.Widget())
 
 	roomViewLayout.SetSpacing(0)
 	roomViewLayout.SetContentsMargins(0, 0, 0, 0)
-	roomView.SetContentsMargins(0, 0, 0, 0)
-	scrollArea.SetWidget(roomView)
+	scrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
 	scrollArea.Widget().SetLayout(roomViewLayout)
 
 	return
 }
 
 // NewRoom adds a new room object to the view
-func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room, scrollArea *widgets.QScrollArea, mainUIStruct *MainUI) (err error) {
+func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (err error) {
 	roomAvatar, roomAvatarErr := room.GetRoomAvatar()
 	if roomAvatarErr != nil {
 		err = roomAvatarErr
@@ -61,17 +61,30 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room,
 	roomName := widgets.NewQLabelFromPointer(widget.FindChild("roomName", core.Qt__FindChildrenRecursively).Pointer())
 	/*lastMessageContent := widgets.NewQLabelFromPointer(widget.FindChild("lastMessage", core.Qt__FindChildrenRecursively).Pointer())*/
 
+	roomAvatarQLabel.ConnectSetPixmap(func(vqp *gui.QPixmap) {
+		log.Println("SetPixmapEventRoomAvatar")
+
+		vqp.Scaled2(roomAvatarQLabel.Width(), roomAvatarQLabel.Height(), 0, 0)
+
+		newPixmap := gui.NewQPixmap3(2*roomAvatarQLabel.Width(), 2*roomAvatarQLabel.Height())
+		newPixmap.Fill(nil)
+
+		painter := gui.NewQPainter2(newPixmap)
+
+		r := gui.NewQRegion2(roomAvatarQLabel.Width()/2, roomAvatarQLabel.Height()/2, roomAvatarQLabel.Width(), roomAvatarQLabel.Height(), gui.QRegion__Ellipse)
+
+		painter.SetClipRegion(r, 0)
+
+		painter.DrawPixmap10(roomAvatarQLabel.Rect(), vqp)
+		newImage := newPixmap.ToImage()
+		vqp.FromImage(newImage, 0)
+	})
+
 	roomAvatarQLabel.SetPixmap(roomAvatar)
 	roomName.SetText(room.GetRoomName())
 
-	/*
-		messageContent.SetText(markdownMessage)
-
-		messageContent.SetMinimumWidth(messageContent.LineWidth())
-
-		roomWidget.SetMinimumWidth(messageContent.LineWidth() + 100)
-	*/
-	widget.Resize(wrapperWidget.Size())
+	wrapperWidget.Resize2(scrollArea.Widget().Size().Width(), wrapperWidget.Size().Height())
+	widget.Resize2(scrollArea.Widget().Size().Width(), wrapperWidget.Size().Height())
 
 	var filterObject = core.NewQObject(nil)
 	filterObject.ConnectEventFilter(func(watched *core.QObject, event *core.QEvent) bool {
@@ -79,24 +92,7 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room,
 			var mouseEvent = gui.NewQMouseEventFromPointer(event.Pointer())
 
 			if mouseEvent.Button() == core.Qt__LeftButton {
-				if mainUIStruct.currentRoom != room.RoomID {
-					mainUIStruct.SetCurrentRoom(room.RoomID)
-					mainUIStruct.MainWidget.SetWindowTitle("Morpheus - " + room.GetRoomTopic())
-
-					mainUIStruct.RoomAvatar.SetPixmap(roomAvatar)
-
-					mainUIStruct.RoomTitle.SetText(room.GetRoomName())
-
-					mainUIStruct.RoomTopic.SetText(room.GetRoomTopic())
-					count := mainUIStruct.MessageListLayout.Count()
-					for i := 0; i < count; i++ {
-						widgetScroll := mainUIStruct.MessageListLayout.ItemAt(i).Widget()
-						widgetScroll.DeleteLater()
-					}
-
-					go mainUIStruct.loadCache()
-			}
-
+				go roomViewLayout.ChangeRoom(room.RoomID)
 				return true
 			}
 
@@ -112,6 +108,9 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *matrix.Room,
 	wrapperWidget.InstallEventFilter(filterObject)
 
 	roomViewLayout.InsertWidget(roomViewLayout.Count()+1, wrapperWidget, 0, 0)
+	scrollArea.SetWidgetResizable(true)
+	scrollArea.Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
+	scrollArea.Widget().Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
 
 	return
 }

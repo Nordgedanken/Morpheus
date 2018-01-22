@@ -3,65 +3,22 @@ package matrix
 import (
 	"bytes"
 	"fmt"
-	"image"
-	"image/color"
-	"image/draw"
-	// image/gif needed to load gif images
-	_ "image/gif"
-	// image/jpeg needed to load jpeg images
-	_ "image/jpeg"
 	"image/png"
-	// image/png needed to load png images
-	_ "image/png"
 	"strconv"
 	"strings"
 	"unicode"
 	"unicode/utf8"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/Nordgedanken/Morpheus/matrix/db"
+	"github.com/dgraph-io/badger"
 	"github.com/disintegration/letteravatar"
 	"github.com/matrix-org/gomatrix"
+	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/gui"
-
-	"github.com/dgraph-io/badger"
-	// golang.org/x/image/webp needed to load webp images
-	_ "golang.org/x/image/webp"
-
-	// golang.org/x/image/bmp needed to load bmp images
-	_ "golang.org/x/image/bmp"
-
-	// golang.org/x/image/riff needed to load riff images
-	_ "golang.org/x/image/riff"
-
-	// golang.org/x/image/tiff needed to load tiff images
-	_ "golang.org/x/image/tiff"
 )
 
-type circle struct {
-	p image.Point
-	r int
-}
-
-func (c *circle) ColorModel() color.Model {
-	return color.AlphaModel
-}
-
-func (c *circle) Bounds() image.Rectangle {
-	return image.Rect(c.p.X-c.r, c.p.Y-c.r, c.p.X+c.r, c.p.Y+c.r)
-}
-
-func (c *circle) At(x, y int) color.Color {
-	xx, yy, rr := float64(x-c.p.X)+0.5, float64(y-c.p.Y)+0.5, float64(c.r)
-	if xx*xx+yy*yy < rr*rr {
-		return color.Alpha{A: 255}
-	}
-	return color.Alpha{A: 0}
-}
-
-func generateGenericImages(displayname string, size int) (imgData []byte, err error) {
-	identifier := displayname
+// GenerateGenericImages generates a byte slice containing a Image with the starting char as symbol and a colored background
+func GenerateGenericImages(identifier string, size int) (imgData []byte, err error) {
 	if (identifier[0] == '#' || identifier[0] == '!' || identifier[0] == '@') && len(identifier) > 1 {
 		identifier = identifier[1:]
 	}
@@ -103,15 +60,11 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 
 	// Get cache
 	DBErr := cacheDB.View(func(txn *badger.Txn) error {
-		roomAvatarDataItem, QueryErr := txn.Get([]byte("user|" + mxid + "|avatarData" + strconv.Itoa(size) + "x" + strconv.Itoa(size)))
-		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
+		avatarDataResult, QueryErr := db.Get(txn, []byte("user|"+mxid+"|avatarData"+strconv.Itoa(size)+"x"+strconv.Itoa(size)))
+		if QueryErr != nil {
 			return QueryErr
 		}
-		if QueryErr != badger.ErrKeyNotFound {
-			avatarDataBytes, avatarDataErr := roomAvatarDataItem.Value()
-			avatarData = avatarDataBytes
-			return avatarDataErr
-		}
+		avatarData = avatarDataResult
 		return nil
 	})
 	if DBErr != nil {
@@ -151,7 +104,7 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 			DisplayNameResp, _ := cli.GetDisplayName(mxid)
 			DisplayName := DisplayNameResp.DisplayName
 			var GenerateImgErr error
-			IMGdata, GenerateImgErr = generateGenericImages(DisplayName, size)
+			IMGdata, GenerateImgErr = GenerateGenericImages(DisplayName, size)
 			if GenerateImgErr != nil {
 				err = GenerateImgErr
 				return
@@ -171,70 +124,38 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 		IMGdata = avatarData
 	}
 
-	r := bytes.NewReader(IMGdata)
-	srcIMG, _, DecodeErr := image.Decode(r)
-	if DecodeErr != nil {
-		err = DecodeErr
-	}
-
-	// Convert avatarimage to QPixmap for usage in QT
-	canvas := image.NewRGBA(srcIMG.Bounds())
-	cx := srcIMG.Bounds().Min.X + srcIMG.Bounds().Dx()/2
-	cy := srcIMG.Bounds().Min.Y + srcIMG.Bounds().Dy()/2
-	draw.DrawMask(canvas, canvas.Bounds(), srcIMG, image.ZP, &circle{image.Point{cx, cy}, cx}, image.ZP, draw.Over)
-
 	avatar := gui.NewQPixmap()
-	buf := new(bytes.Buffer)
-	ConvErr := png.Encode(buf, canvas)
-	if ConvErr != nil {
-		err = ConvErr
-	}
 
-	str := buf.Bytes()
+	str := string(IMGdata[:])
 
-	avatar.LoadFromData(string(str[:]), uint(len(str)), "PNG", 0)
+	avatar.LoadFromData(string(str[:]), uint(len(str)), "", 0)
 	avatarResp = avatar
 	return
 }
 
+//GetUserDataFromCache gets the last User from the cache
 func GetUserDataFromCache() (accessToken, homeserverURL, userID string, err error) {
 	UserDB, err := db.OpenUserDB()
 
 	// Get cache
 	DBErr := UserDB.View(func(txn *badger.Txn) error {
-		accessTokenItem, QueryErr := txn.Get([]byte("user|accessToken"))
-		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
+		accessTokenResult, QueryErr := db.Get(txn, []byte("user|accessToken"))
+		if QueryErr != nil {
 			return QueryErr
 		}
-		if QueryErr != badger.ErrKeyNotFound {
-			accessTokenByte, accessTokenErr := accessTokenItem.Value()
-			accessToken = fmt.Sprintf("%s", accessTokenByte)
-			if accessTokenErr != nil {
-				return accessTokenErr
-			}
-		}
+		accessToken = fmt.Sprintf("%s", accessTokenResult)
 
-		homeserverURLItem, QueryErr := txn.Get([]byte("user|homeserverURL"))
-		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
+		homeserverURLResult, QueryErr := db.Get(txn, []byte("user|homeserverURL"))
+		if QueryErr != nil {
 			return QueryErr
 		}
-		if QueryErr != badger.ErrKeyNotFound {
-			homeserverURLByte, homeserverURLErr := homeserverURLItem.Value()
-			homeserverURL = fmt.Sprintf("%s", homeserverURLByte)
-			if homeserverURLErr != nil {
-				return homeserverURLErr
-			}
-		}
+		homeserverURL = fmt.Sprintf("%s", homeserverURLResult)
 
-		userIDItem, QueryErr := txn.Get([]byte("user|userID"))
-		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
+		userIDResult, QueryErr := db.Get(txn, []byte("user|userID"))
+		if QueryErr != nil {
 			return QueryErr
 		}
-		if QueryErr != badger.ErrKeyNotFound {
-			userIDByte, userIDErr := userIDItem.Value()
-			userID = fmt.Sprintf("%s", userIDByte)
-			return userIDErr
-		}
+		userID = fmt.Sprintf("%s", userIDResult)
 		return nil
 	})
 	if DBErr != nil {

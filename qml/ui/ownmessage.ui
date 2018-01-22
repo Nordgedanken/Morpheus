@@ -114,7 +114,7 @@ border: 0;
 border-radius:7px;</string>
            </property>
            <property name="text">
-            <string>Test</string>
+            <string/>
            </property>
            <property name="scaledContents">
             <bool>false</bool>
@@ -150,7 +150,7 @@ border-radius:7px;</string>
                <string notr="true">color:grey;</string>
               </property>
               <property name="text">
-               <string>Way to early to say a time^^</string>
+               <string/>
               </property>
               <property name="alignment">
                <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -174,7 +174,7 @@ border-radius:7px;</string>
                <string notr="true">color:grey;</string>
               </property>
               <property name="text">
-               <string>MTRNord</string>
+               <string/>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

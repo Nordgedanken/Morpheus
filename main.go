@@ -8,7 +8,6 @@ import (
 
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
-	"github.com/Nordgedanken/Morpheus/matrix/scalar"
 	"github.com/Nordgedanken/Morpheus/ui"
 	"github.com/Nordgedanken/dugong"
 	"github.com/matrix-org/gomatrix"
@@ -20,6 +19,8 @@ import (
 )
 
 var window *widgets.QMainWindow
+var mainUIStruct *ui.MainUI
+var loginUIStruct *ui.LoginUI
 
 func main() {
 	runtime.GOMAXPROCS(128)
@@ -110,31 +111,29 @@ func main() {
 
 		//Show MainUI
 		for result := range results {
-			//TODO Don't switch screen on wrong login data.
-			MainUIStruct := ui.NewMainUIStruct(windowWidth, windowHeight, window)
-			MainUIStruct.SetCli(result)
-			mainUIErr := MainUIStruct.NewUI()
+			mainUIStruct = ui.NewMainUIStruct(windowWidth, windowHeight, window)
+			mainUIStruct.SetCli(result)
+			mainUIErr := mainUIStruct.NewUI()
 			if mainUIErr != nil {
 				log.Errorln("mainUI: ", mainUIErr)
 				return
 			}
-
 			scalar.ReqAndSaveScalarToken(MainUIStruct.GetCli())
 
-			MainUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
-			window.SetCentralWidget(MainUIStruct.GetWidget())
+			mainUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
+			window.SetCentralWidget(mainUIStruct.GetWidget())
 		}
 	} else {
 		//Show loginUI
-		LoginUIStruct := ui.NewLoginUIStruct(windowWidth, windowHeight, window)
-		loginUIErr := LoginUIStruct.NewUI()
+		loginUIStruct = ui.NewLoginUIStruct(windowWidth, windowHeight, window)
+		loginUIErr := loginUIStruct.NewUI()
 		if loginUIErr != nil {
 			log.Errorln("Login Err: ", loginUIErr)
 			return
 		}
 
-		LoginUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
-		window.SetCentralWidget(LoginUIStruct.GetWidget())
+		loginUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
+		window.SetCentralWidget(loginUIStruct.GetWidget())
 	}
 
 	window.Resize2(windowWidth, windowHeight)
@@ -154,6 +153,21 @@ func main() {
 
 func cleanup() bool {
 	log.Infoln("cleanup")
+
+	if mainUIStruct != nil {
+		if mainUIStruct.GetCli() != nil {
+			log.Infoln("Stop Sync")
+			mainUIStruct.GetCli().StopSync()
+		}
+	}
+
+	if loginUIStruct != nil {
+		if loginUIStruct.GetCli() != nil {
+			log.Infoln("Stop Sync")
+			loginUIStruct.GetCli().StopSync()
+		}
+	}
+
 	UserDB, DBOpenErr := db.OpenUserDB()
 	if DBOpenErr != nil {
 		log.Errorln(DBOpenErr)

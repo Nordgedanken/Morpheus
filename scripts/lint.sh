@@ -25,8 +25,8 @@ then args="$args --enable-gc"
 fi
 
 echo "Installing lint search engine..."
-go install github.com/alecthomas/gometalinter/
-gometalinter --config=linter.json ./... --install
+go get -u -v github.com/alecthomas/gometalinter/
+$GOPATH/bin/gometalinter --config=linter.json ./... --install
 
 echo "Looking for lint..."
-gometalinter ./... ${args}
+$GOPATH/bin/gometalinter ./... ${args} --skip=vendor --exclude "vendor" --exclude "moc" --exclude "qt"

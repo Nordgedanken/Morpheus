@@ -2,18 +2,24 @@ package ui
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
 
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
+	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
+	"github.com/Nordgedanken/Morpheus/matrix/rooms"
 	"github.com/Nordgedanken/Morpheus/matrix/syncer"
+	"github.com/Nordgedanken/Morpheus/ui/listLayouts"
 	"github.com/dgraph-io/badger"
 	"github.com/matrix-org/gomatrix"
 	"github.com/opennota/linkify"
 	"github.com/pkg/errors"
 	"github.com/rhinoman/go-commonmark"
+	"github.com/shibukawa/configdir"
 	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
@@ -22,32 +28,32 @@ import (
 )
 
 // NewMainUIStruct gives you a MainUI struct with prefilled data
-func NewMainUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow) (mainUIStruct MainUI) {
-	configStruct := config{
-		windowWidth:  windowWidth,
-		windowHeight: windowHeight,
+func NewMainUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow) (mainUIStruct *MainUI) {
+	configStruct := globalTypes.Config{
+		WindowWidth:  windowWidth,
+		WindowHeight: windowHeight,
+		Rooms:        make(map[string]*rooms.Room),
 	}
-	mainUIStruct = MainUI{
-		config: configStruct,
+	mainUIStruct = &MainUI{
+		Config: configStruct,
 		window: window,
-		rooms:  make(map[string]*matrix.Room),
 	}
 	return
 }
 
 // NewMainUIStructWithExistingConfig gives you a MainUI struct with prefilled data and data from a previous Config
-func NewMainUIStructWithExistingConfig(configStruct config, window *widgets.QMainWindow) (mainUIStruct MainUI) {
-	mainUIStruct = MainUI{
-		config: configStruct,
+func NewMainUIStructWithExistingConfig(configStruct globalTypes.Config, window *widgets.QMainWindow) (mainUIStruct *MainUI) {
+	configStruct.Rooms = make(map[string]*rooms.Room)
+	mainUIStruct = &MainUI{
+		Config: configStruct,
 		window: window,
-		rooms:  make(map[string]*matrix.Room),
 	}
 	return
 }
 
 // SetCli allows you to add a gomatrix.Client to your MainUI struct
 func (m *MainUI) SetCli(cli *gomatrix.Client) {
-	m.cli = cli
+	m.Cli = cli
 }
 
 // GetWidget gives you the widget of the MainUI struct
@@ -58,38 +64,11 @@ func (m *MainUI) GetWidget() (widget *widgets.QWidget) {
 
 // NewUI initializes a new Main Screen
 func (m *MainUI) NewUI() (err error) {
-	m.widget = widgets.NewQWidget(nil, 0)
-
-	var loader = uitools.NewQUiLoader(nil)
-	var file = core.NewQFile2(":/qml/ui/chat.ui")
-
-	file.Open(core.QIODevice__ReadOnly)
-	m.MainWidget = loader.Load(file, m.widget)
-	file.Close()
-
-	m.messageScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
-	messagesScrollAreaContent := widgets.NewQWidgetFromPointer(m.widget.FindChild("messagesScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
-	roomScrollArea := widgets.NewQScrollAreaFromPointer(m.widget.FindChild("roomScroll", core.Qt__FindChildrenRecursively).Pointer())
-	roomScrollAreaContent := widgets.NewQWidgetFromPointer(m.widget.FindChild("roomScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
-
-	m.RoomAvatar = widgets.NewQLabelFromPointer(m.widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
-	m.RoomTitle = widgets.NewQLabelFromPointer(m.widget.FindChild("RoomTitle", core.Qt__FindChildrenRecursively).Pointer())
-	m.RoomTopic = widgets.NewQLabelFromPointer(m.widget.FindChild("Topic", core.Qt__FindChildrenRecursively).Pointer())
-
-	var layout = widgets.NewQHBoxLayout()
-	m.window.SetLayout(layout)
-	layout.InsertWidget(0, m.MainWidget, 0, core.Qt__AlignTop|core.Qt__AlignLeft)
-	layout.SetSpacing(0)
-	layout.SetContentsMargins(0, 0, 0, 0)
-
-	m.widget.ConnectResizeEvent(func(event *gui.QResizeEvent) {
-		m.MainWidget.Resize(event.Size())
-		event.Accept()
-	})
+	m.loadChatUIDefaults()
 
 	//Set Avatar
 	avatarLogo := widgets.NewQLabelFromPointer(m.widget.FindChild("UserAvatar", core.Qt__FindChildrenRecursively).Pointer())
-	avatar, AvatarErr := matrix.GetOwnUserAvatar(m.cli)
+	avatar, AvatarErr := matrix.GetOwnUserAvatar(m.Cli)
 	if AvatarErr != nil {
 		err = AvatarErr
 		return
@@ -106,25 +85,12 @@ func (m *MainUI) NewUI() (err error) {
 		}
 	})
 
-	// Init Message View
-	m.MessageListLayout = NewMessageList(m.messageScrollArea, messagesScrollAreaContent)
-
-	// Init Room View
-	roomListLayout := NewRoomList(roomScrollArea, roomScrollAreaContent)
-
-	m.messageScrollArea.SetWidgetResizable(true)
-	m.messageScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
-	m.messageScrollArea.SetContentsMargins(0, 0, 0, 0)
-	//messageScrollArea.SetSizeAdjustPolicy(widgets.QAbstractScrollArea__AdjustToContents)
-
-	roomScrollArea.SetWidgetResizable(true)
-	roomScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
-	roomScrollArea.SetContentsMargins(0, 0, 0, 0)
-	roomScrollArea.SetSizeAdjustPolicy(widgets.QAbstractScrollArea__AdjustToContents)
+	m.initScrolls()
 
 	m.MessageListLayout.ConnectTriggerMessage(func(messageBody, sender string, timestamp int64) {
+		log.Println("triggered Message")
 		var own bool
-		if sender == m.cli.UserID {
+		if sender == m.Cli.UserID {
 			own = true
 		} else {
 			own = false
@@ -152,43 +118,24 @@ func (m *MainUI) NewUI() (err error) {
 				}
 			}
 		}
-		NewMessageErr := m.MessageListLayout.NewMessage(messageBody, m.cli, sender, timestamp, m.messageScrollArea, own, m)
-		if NewMessageErr != nil {
-			err = NewMessageErr
-			return
-		}
+		m.MessageListLayout.NewMessage(messageBody, m.Cli, sender, timestamp, m.messageScrollArea, own)
 	})
 
-	m.startSync()
+	go m.startSync()
 	m.widget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 	m.MainWidget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 
-	roomListLayout.ConnectTriggerRoom(func(roomID string) {
-		room := m.rooms[roomID]
+	m.RoomListLayout.ConnectTriggerRoom(func(roomID string) {
+		room := m.Rooms[roomID]
 
-		NewRoomErr := roomListLayout.NewRoom(room, roomScrollArea, m)
+		NewRoomErr := m.RoomListLayout.NewRoom(room, m.roomScrollArea)
 		if NewRoomErr != nil {
 			err = NewRoomErr
 			return
 		}
 	})
 
-	m.initRoomList(roomListLayout, roomScrollArea)
-
-	go m.loadCache()
-
-	m.MainWidget.SetWindowTitle("Morpheus - " + m.rooms[m.currentRoom].GetRoomTopic())
-
-	avatar, roomAvatarErr := m.rooms[m.currentRoom].GetRoomAvatar()
-	if roomAvatarErr != nil {
-		err = roomAvatarErr
-		return
-	}
-	m.RoomAvatar.SetPixmap(avatar)
-
-	m.RoomTitle.SetText(m.rooms[m.currentRoom].GetRoomName())
-
-	m.RoomTopic.SetText(m.rooms[m.currentRoom].GetRoomTopic())
+	go m.initRoomList()
 
 	var message string
 	messageInput := widgets.NewQLineEditFromPointer(m.widget.FindChild("MessageInput", core.Qt__FindChildrenRecursively).Pointer())
@@ -198,11 +145,7 @@ func (m *MainUI) NewUI() (err error) {
 
 	m.window.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
 		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
-			MessageErr := m.sendMessage(message)
-			if MessageErr != nil {
-				err = MessageErr
-				return
-			}
+			go m.sendMessage(message)
 
 			messageInput.Clear()
 			ev.Accept()
@@ -210,9 +153,82 @@ func (m *MainUI) NewUI() (err error) {
 			messageInput.KeyPressEventDefault(ev)
 			ev.Ignore()
 		}
+		return
+	})
+
+	m.RoomListLayout.ConnectChangeRoom(func(roomID string) {
+		room := m.Rooms[roomID]
+		roomAvatar, roomAvatarErr := room.GetRoomAvatar()
+		if roomAvatarErr != nil {
+			err = roomAvatarErr
+			return
+		}
+		if m.CurrentRoom != room.RoomID {
+			m.SetCurrentRoom(room.RoomID)
+			m.MainWidget.SetWindowTitle("Morpheus - " + room.GetRoomTopic())
+
+			m.RoomAvatar.SetPixmap(roomAvatar)
+
+			m.RoomTitle.SetText(room.GetRoomName())
+
+			m.RoomTopic.SetText(room.GetRoomTopic())
+			count := m.MessageListLayout.Count()
+			for i := 0; i < count; i++ {
+				widgetScroll := m.MessageListLayout.ItemAt(i).Widget()
+				widgetScroll.DeleteLater()
+			}
+
+			log.Println("next loadCache")
+			go m.loadCache()
+		}
 	})
 
 	return
+}
+
+func (m *MainUI) initScrolls() {
+	// Init Message View
+	m.MessageListLayout = listLayouts.NewMessageList(m.messageScrollArea)
+
+	// Init Room View
+	m.RoomListLayout = listLayouts.NewRoomList(m.roomScrollArea)
+
+	m.messageScrollArea.SetWidgetResizable(true)
+	m.messageScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
+	m.messageScrollArea.SetContentsMargins(0, 0, 0, 0)
+
+	m.roomScrollArea.SetWidgetResizable(true)
+	m.roomScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
+	m.roomScrollArea.SetContentsMargins(0, 0, 0, 0)
+}
+
+func (m *MainUI) loadChatUIDefaults() {
+	m.widget = widgets.NewQWidget(nil, 0)
+
+	var loader = uitools.NewQUiLoader(nil)
+	var file = core.NewQFile2(":/qml/ui/chat.ui")
+
+	file.Open(core.QIODevice__ReadOnly)
+	m.MainWidget = loader.Load(file, m.widget)
+	file.Close()
+
+	m.messageScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
+	m.roomScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("roomScroll", core.Qt__FindChildrenRecursively).Pointer())
+
+	m.RoomAvatar = widgets.NewQLabelFromPointer(m.widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
+	m.RoomTitle = widgets.NewQLabelFromPointer(m.widget.FindChild("RoomTitle", core.Qt__FindChildrenRecursively).Pointer())
+	m.RoomTopic = widgets.NewQLabelFromPointer(m.widget.FindChild("Topic", core.Qt__FindChildrenRecursively).Pointer())
+
+	var layout = widgets.NewQHBoxLayout()
+	m.window.SetLayout(layout)
+	layout.InsertWidget(0, m.MainWidget, 0, core.Qt__AlignTop|core.Qt__AlignLeft)
+	layout.SetSpacing(0)
+	layout.SetContentsMargins(0, 0, 0, 0)
+
+	m.widget.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+		m.MainWidget.Resize(event.Size())
+		event.Accept()
+	})
 }
 
 func (m *MainUI) sendMessage(message string) (err error) {
@@ -225,13 +241,13 @@ func (m *MainUI) sendMessage(message string) (err error) {
 
 	mardownMessage := commonmark.Md2Html(message, 0)
 	if mardownMessage == message {
-		_, SendErr := m.cli.SendMessageEvent(m.currentRoom, "m.room.message", matrix.HTMLMessage{MsgType: "m.text", Body: messageOriginal, FormattedBody: message, Format: "org.matrix.custom.html"})
+		_, SendErr := m.Cli.SendMessageEvent(m.CurrentRoom, "m.room.message", matrix.HTMLMessage{MsgType: "m.text", Body: messageOriginal, FormattedBody: message, Format: "org.matrix.custom.html"})
 		if SendErr != nil {
 			err = SendErr
 			return
 		}
 	} else {
-		_, SendErr := m.cli.SendMessageEvent(m.currentRoom, "m.room.message", matrix.HTMLMessage{MsgType: "m.text", Body: message, FormattedBody: mardownMessage, Format: "org.matrix.custom.html"})
+		_, SendErr := m.Cli.SendMessageEvent(m.CurrentRoom, "m.room.message", matrix.HTMLMessage{MsgType: "m.text", Body: message, FormattedBody: mardownMessage, Format: "org.matrix.custom.html"})
 		if SendErr != nil {
 			err = SendErr
 			return
@@ -241,7 +257,6 @@ func (m *MainUI) sendMessage(message string) (err error) {
 }
 
 func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScrollArea) (err error) {
-	//TODO register enter and show loader or so
 	log.Infoln("Starting Logout Sequence in background")
 	var wg sync.WaitGroup
 	results := make(chan bool)
@@ -249,6 +264,7 @@ func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScr
 	wg.Add(1)
 	go func(cli *gomatrix.Client, results chan<- bool) {
 		defer wg.Done()
+		cli.StopSync()
 		_, LogoutErr := cli.Logout()
 		if LogoutErr != nil {
 			log.Errorln(LogoutErr)
@@ -260,29 +276,18 @@ func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScr
 		if DBOpenErr != nil {
 			log.Errorln(DBOpenErr)
 		}
+		userDB.Close()
 
-		//Flush complete DB
-		txn := userDB.NewTransaction(true) // Read-write txn
-		QueryErr := txn.Delete([]byte(""))
-		if QueryErr != nil {
-			log.Errorln(QueryErr)
+		configDirs := configdir.New("Nordgedanken", "Morpheus")
+		filePath := filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)
+		DeleteErr := os.RemoveAll(filePath + "/data/user/")
+		if DeleteErr != nil {
+			log.Errorln(DeleteErr)
 			results <- false
 		}
-
-		CommitErr := txn.Commit(nil)
-		if CommitErr != nil {
-			log.Errorln(CommitErr)
-			results <- false
-		}
-
-		DBPurgeErr := userDB.PurgeOlderVersions()
-		if DBPurgeErr != nil {
-			log.Errorln(DBPurgeErr)
-			results <- false
-		} else {
-			results <- true
-		}
-	}(m.cli, results)
+		db.ResetOnceUser()
+		results <- true
+	}(m.Cli, results)
 
 	go func() {
 		wg.Wait()      // wait for each execTask to return
@@ -297,7 +302,7 @@ func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScr
 			widget.DisconnectResizeEvent()
 			messageScrollArea.DisconnectResizeEvent()
 
-			LoginUIStruct := NewLoginUIStructWithExistingConfig(m.config, m.window)
+			LoginUIStruct := NewLoginUIStructWithExistingConfig(m.Config, m.window)
 			loginUIErr := LoginUIStruct.NewUI()
 			if loginUIErr != nil {
 				err = loginUIErr
@@ -321,16 +326,16 @@ func (m *MainUI) startSync() (err error) {
 	})
 	m.storage = &syncer.MorpheusStore{
 		InMemoryStore: *gomatrix.NewInMemoryStore(),
-		CacheDatabase: m.cacheDB,
+		CacheDatabase: m.CacheDB,
 	}
 
-	m.syncer = syncer.NewMorpheusSyncer(m.cli.UserID, m.storage)
+	Syncer := syncer.NewMorpheusSyncer(m.Cli.UserID, m.storage)
 
-	m.cli.Store = m.storage
-	m.cli.Syncer = m.syncer
-	m.syncer.Store = m.storage
+	m.Cli.Store = m.storage
+	m.Cli.Syncer = Syncer
+	Syncer.Store = m.storage
 
-	m.syncer.OnEventType("m.room.message", func(ev *gomatrix.Event) {
+	Syncer.OnEventType("m.room.message", func(ev *gomatrix.Event) {
 		formattedBody, _ := ev.Content["formatted_body"]
 		var msg string
 		msg, _ = formattedBody.(string)
@@ -342,17 +347,38 @@ func (m *MainUI) startSync() (err error) {
 		id := ev.ID
 		timestamp := ev.Timestamp
 		go db.CacheMessageEvents(id, sender, room, msg, timestamp)
-		if room == m.currentRoom {
+		if room == m.CurrentRoom {
 			go m.MessageListLayout.TriggerMessage(msg, sender, timestamp)
 		}
+	})
+
+	Syncer.OnEventType("m.room.name", func(ev *gomatrix.Event) {
+		roomNameRaw, _ := ev.Content["name"]
+		var roomName string
+		roomName, _ = roomNameRaw.(string)
+		evType := ev.Type
+		room := ev.RoomID
+		go m.Rooms[room].UpdateRoomNameByEvent(roomName, evType)
+	})
+
+	Syncer.OnEventType("m.room.name", func(ev *gomatrix.Event) {
+		roomNameRaw, _ := ev.Content["name"]
+		var roomName string
+		roomName, _ = roomNameRaw.(string)
+		evType := ev.Type
+		room := ev.RoomID
+		go m.Rooms[room].UpdateRoomNameByEvent(roomName, evType)
 	})
 
 	// Start Non-blocking sync
 	go func() {
 		log.Infoln("Start sync")
 		for {
-
-			if e := m.cli.Sync(); e != nil {
+			e := m.Cli.Sync()
+			if e == nil {
+				break
+			}
+			if e != nil {
 				err = e
 			}
 		}
@@ -360,21 +386,21 @@ func (m *MainUI) startSync() (err error) {
 	return
 }
 
-func (m *MainUI) initRoomList(roomListLayout *QRoomVBoxLayoutWithTriggerSlot, roomScrollArea *widgets.QScrollArea) (err error) {
-	rooms, ReqErr := m.cli.JoinedRooms()
-	if ReqErr != nil {
-		err = ReqErr
+func (m *MainUI) initRoomList() (err error) {
+	roomsStruct, roomsErr := rooms.GetRooms(m.Cli)
+	if roomsErr != nil {
+		err = roomsErr
 		return
 	}
 
-	x := 0
-	for _, roomID := range rooms.JoinedRooms {
-		if x == 0 {
-			m.currentRoom = roomID
+	first := true
+	for _, roomID := range roomsStruct {
+		m.Rooms[roomID] = rooms.NewRoom(roomID, m.Cli)
+		m.RoomListLayout.TriggerRoom(roomID)
+		if first {
+			go m.RoomListLayout.ChangeRoom(roomID)
 		}
-		x++
-		m.rooms[roomID] = matrix.NewRoom(roomID, m.cli)
-		roomListLayout.TriggerRoom(roomID)
+		first = false
 	}
 
 	return
@@ -406,7 +432,7 @@ func (m *MainUI) loadCache() (err error) {
 		MsgOpts := badger.DefaultIteratorOptions
 		MsgOpts.PrefetchSize = 10
 		MsgIt := txn.NewIterator(MsgOpts)
-		MsgPrefix := []byte("room|" + m.currentRoom + "|messages|")
+		MsgPrefix := []byte("room|" + m.CurrentRoom + "|messages")
 
 		var doneMsg []string
 
@@ -414,203 +440,47 @@ func (m *MainUI) loadCache() (err error) {
 			item := MsgIt.Item()
 			key := item.Key()
 			stringKey := fmt.Sprintf("%s", key)
+			stringKeySlice := strings.Split(stringKey, "|")
+			stringKeyEnd := stringKeySlice[len(stringKeySlice)-1]
+			if stringKeyEnd != "id" {
+				continue
+			}
+
 			value, ValueErr := item.Value()
 			if ValueErr != nil {
 				return ValueErr
 			}
-			stringValue := fmt.Sprintf("%s", value)
+			idValue := fmt.Sprintf("%s", value)
 
-			if strings.HasSuffix(stringKey, "|id") {
-				if !contains(doneMsg, stringValue) {
-					// Remember we already added this message to the view
-					doneMsg = append(doneMsg, stringValue)
+			if !contains(doneMsg, idValue) {
+				// Remember we already added this message to the view
+				doneMsg = append(doneMsg, idValue)
 
-					// Get all Data
-					senderItem, senderErr := txn.Get([]byte(strings.Replace(stringKey, "|id", "|sender", -1)))
-					if senderErr != nil {
-						return errors.WithMessage(senderErr, "Key: "+strings.Replace(stringKey, "|id", "|sender", -1))
-					}
-
-					senderValue, senderValueErr := senderItem.Value()
-					if senderValueErr != nil {
-						return senderValueErr
-					}
-					sender := fmt.Sprintf("%s", senderValue)
-
-					messageItem, messageErr := txn.Get([]byte(strings.Replace(stringKey, "|id", "|messageString", -1)))
-					if messageErr != nil {
-						return errors.WithMessage(messageErr, "Key: "+strings.Replace(stringKey, "|id", "|messageString", -1))
-					}
-
-					messageValue, messageValueErr := messageItem.Value()
-					if messageValueErr != nil {
-						return messageValueErr
-					}
-					msg := fmt.Sprintf("%s", messageValue)
-
-					timestampItem, timestampErr := txn.Get([]byte(strings.Replace(stringKey, "|id", "|timestamp", -1)))
-					if timestampErr != nil {
-						return errors.WithMessage(timestampErr, "Key: "+strings.Replace(stringKey, "|id", "|timestamp", -1))
-					}
-
-					timestampValue, timestampValueErr := timestampItem.Value()
-					if timestampValueErr != nil {
-						return timestampValueErr
-					}
-					timestamp := fmt.Sprintf("%s", timestampValue)
-					timestampInt, ConvErr := strconv.ParseInt(timestamp, 10, 64)
-					if ConvErr != nil {
-						return ConvErr
-					}
-
-					m.MessageListLayout.TriggerMessage(msg, sender, timestampInt)
+				// Get all Data
+				senderResult, QueryErr := db.Get(txn, []byte(strings.Replace(stringKey, "|id", "|sender", -1)))
+				if QueryErr != nil {
+					return errors.WithMessage(QueryErr, "Key: "+strings.Replace(stringKey, "|id", "|sender", -1))
 				}
-			}
+				sender := fmt.Sprintf("%s", senderResult)
 
-			if strings.HasSuffix(stringKey, "|sender") {
-				idItem, idErr := txn.Get([]byte(strings.Replace(stringKey, "|sender", "|id", -1)))
-				if idErr != nil {
-					return errors.WithMessage(idErr, "Key: "+strings.Replace(stringKey, "|sender", "|id", -1))
+				msgResult, QueryErr := db.Get(txn, []byte(strings.Replace(stringKey, "|id", "|messageString", -1)))
+				if QueryErr != nil {
+					return errors.WithMessage(QueryErr, "Key: "+strings.Replace(stringKey, "|id", "|messageString", -1))
 				}
-				idValue, idValueErr := idItem.Value()
-				if idValueErr != nil {
-					return idValueErr
+				msg := fmt.Sprintf("%s", msgResult)
+
+				timestampResult, QueryErr := db.Get(txn, []byte(strings.Replace(stringKey, "|id", "|timestamp", -1)))
+				if QueryErr != nil {
+					return errors.WithMessage(QueryErr, "Key: "+strings.Replace(stringKey, "|id", "|timestamp", -1))
 				}
-				id := fmt.Sprintf("%s", idValue)
+				timestamp := fmt.Sprintf("%s", timestampResult)
 
-				if !contains(doneMsg, id) {
-					// Remember we already added this message to the view
-					doneMsg = append(doneMsg, id)
-
-					// Get all Data
-					sender := stringValue
-
-					messageItem, messageErr := txn.Get([]byte(strings.Replace(stringKey, "|sender", "|messageString", -1)))
-					if messageErr != nil {
-						return errors.WithMessage(messageErr, "Key: "+strings.Replace(stringKey, "|sender", "|messageString", -1))
-					}
-
-					messageValue, messageValueErr := messageItem.Value()
-					if messageValueErr != nil {
-						return messageValueErr
-					}
-					msg := fmt.Sprintf("%s", messageValue)
-
-					timestampItem, timestampErr := txn.Get([]byte(strings.Replace(stringKey, "|sender", "|timestamp", -1)))
-					if timestampErr != nil {
-						return errors.WithMessage(timestampErr, "Key: "+strings.Replace(stringKey, "|sender", "|timestamp", -1))
-					}
-
-					timestampValue, timestampValueErr := timestampItem.Value()
-					if timestampValueErr != nil {
-						return timestampValueErr
-					}
-					timestamp := fmt.Sprintf("%s", timestampValue)
-
-					timestampInt, ConvErr := strconv.ParseInt(timestamp, 10, 64)
-					if ConvErr != nil {
-						return ConvErr
-					}
-
-					m.MessageListLayout.TriggerMessage(msg, sender, timestampInt)
-				}
-			}
-
-			if strings.HasSuffix(stringKey, "|messageString") {
-				idItem, idErr := txn.Get([]byte(strings.Replace(stringKey, "|messageString", "|id", -1)))
-				if idErr != nil {
-					return errors.WithMessage(idErr, "Key: "+strings.Replace(stringKey, "|messageString", "|id", -1))
+				timestampInt, ConvErr := strconv.ParseInt(timestamp, 10, 64)
+				if ConvErr != nil {
+					return errors.WithMessage(ConvErr, "Timestamp String: "+timestamp)
 				}
 
-				idValue, idValueErr := idItem.Value()
-				if idValueErr != nil {
-					return idValueErr
-				}
-				id := fmt.Sprintf("%s", idValue)
-
-				if !contains(doneMsg, id) {
-					// Remember we already added this message to the view
-					doneMsg = append(doneMsg, id)
-
-					// Get all Data
-					senderItem, senderErr := txn.Get([]byte(strings.Replace(stringKey, "|messageString", "|sender", -1)))
-					if senderErr != nil {
-						return errors.WithMessage(senderErr, "Key: "+strings.Replace(stringKey, "|messageString", "|sender", -1))
-					}
-
-					senderValue, senderValueErr := senderItem.Value()
-					if senderValueErr != nil {
-						return senderValueErr
-					}
-					sender := fmt.Sprintf("%s", senderValue)
-
-					msg := stringValue
-
-					timestampItem, timestampErr := txn.Get([]byte(strings.Replace(stringKey, "|messageString", "|timestamp", -1)))
-					if timestampErr != nil {
-						return errors.WithMessage(timestampErr, "Key: "+strings.Replace(stringKey, "|messageString", "|timestamp", -1))
-					}
-
-					timestampValue, timestampValueErr := timestampItem.Value()
-					if timestampValueErr != nil {
-						return timestampValueErr
-					}
-					timestamp := fmt.Sprintf("%s", timestampValue)
-
-					timestampInt, ConvErr := strconv.ParseInt(timestamp, 10, 64)
-					if ConvErr != nil {
-						return ConvErr
-					}
-
-					m.MessageListLayout.TriggerMessage(msg, sender, timestampInt)
-				}
-			}
-
-			if strings.HasSuffix(stringKey, "|timestamp") {
-				idItem, idErr := txn.Get([]byte(strings.Replace(stringKey, "|timestamp", "|id", -1)))
-				if idErr != nil {
-					return errors.WithMessage(idErr, "Key: "+strings.Replace(stringKey, "|timestamp", "|id", -1))
-				}
-				idValue, idValueErr := idItem.Value()
-				if idValueErr != nil {
-					return idValueErr
-				}
-				id := fmt.Sprintf("%s", idValue)
-
-				if !contains(doneMsg, id) {
-					// Remember we already added this message to the view
-					doneMsg = append(doneMsg, id)
-
-					// Get all Data
-					senderItem, senderErr := txn.Get([]byte(strings.Replace(stringKey, "|timestamp", "|sender", -1)))
-					if senderErr != nil {
-						return errors.WithMessage(senderErr, "Key: "+strings.Replace(stringKey, "|timestamp", "|sender", -1))
-					}
-					senderValue, senderValueErr := senderItem.Value()
-					if senderValueErr != nil {
-						return senderValueErr
-					}
-					sender := fmt.Sprintf("%s", senderValue)
-
-					messageItem, messageErr := txn.Get([]byte(strings.Replace(stringKey, "|timestamp", "|messageString", -1)))
-					if messageErr != nil {
-						return errors.WithMessage(messageErr, "Key: "+strings.Replace(stringKey, "|timestamp", "|messageString", -1))
-					}
-					messageValue, messageValueErr := messageItem.Value()
-					if messageValueErr != nil {
-						return messageValueErr
-					}
-					msg := fmt.Sprintf("%s", messageValue)
-
-					timestamp := stringValue
-
-					timestampInt, ConvErr := strconv.ParseInt(timestamp, 10, 64)
-					if ConvErr != nil {
-						return ConvErr
-					}
-
-					m.MessageListLayout.TriggerMessage(msg, sender, timestampInt)
-				}
+				go m.MessageListLayout.TriggerMessage(msg, sender, timestampInt)
 			}
 		}
 
@@ -623,6 +493,7 @@ func (m *MainUI) loadCache() (err error) {
 	}
 
 	if barAtBottom {
+		bar.Update()
 		bar.SetValue(bar.Maximum())
 	}
 

@@ -5,6 +5,7 @@ import (
 
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/scalar"
+	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
 	"github.com/matrix-org/gomatrix"
 	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
@@ -14,22 +15,22 @@ import (
 )
 
 // NewLoginUIStruct gives you a LoginUI struct with prefilled data
-func NewLoginUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow) (loginUIStruct LoginUI) {
-	configStruct := config{
-		windowWidth:  windowWidth,
-		windowHeight: windowHeight,
+func NewLoginUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow) (loginUIStruct *LoginUI) {
+	configStruct := globalTypes.Config{
+		WindowWidth:  windowWidth,
+		WindowHeight: windowHeight,
 	}
-	loginUIStruct = LoginUI{
-		config: configStruct,
+	loginUIStruct = &LoginUI{
+		Config: configStruct,
 		window: window,
 	}
 	return
 }
 
 // NewLoginUIStructWithExistingConfig gives you a LoginUI struct with prefilled data and data from a previous Config
-func NewLoginUIStructWithExistingConfig(configStruct config, window *widgets.QMainWindow) (loginUIStruct LoginUI) {
-	loginUIStruct = LoginUI{
-		config: configStruct,
+func NewLoginUIStructWithExistingConfig(configStruct globalTypes.Config, window *widgets.QMainWindow) (loginUIStruct *LoginUI) {
+	loginUIStruct = &LoginUI{
+		Config: configStruct,
 		window: window,
 	}
 	return
@@ -78,35 +79,31 @@ func (l *LoginUI) NewUI() (err error) {
 		if usernameInput.StyleSheet() == "border: 1px solid red" {
 			usernameInput.SetStyleSheet("")
 		}
-		l.username = value
+		l.Username = value
 	})
 
 	passwordInput.ConnectTextChanged(func(value string) {
 		if passwordInput.StyleSheet() == "border: 1px solid red" {
 			passwordInput.SetStyleSheet("")
 		}
-		l.password = value
+		l.Password = value
 	})
 
 	loginButton.ConnectClicked(func(_ bool) {
-		if l.username != "" {
-			if l.password != "" {
-				LoginErr := l.login()
-				if LoginErr != nil {
-					err = LoginErr
-					return
-				}
-			} else {
-				passwordInput.SetStyleSheet("border: 1px solid red")
+		if l.Username != "" && l.Password != "" {
+			LoginErr := l.login()
+			if LoginErr != nil {
+				err = LoginErr
+				return
 			}
 		} else {
-			usernameInput.SetStyleSheet("border: 1px solid red")
+			passwordInput.SetStyleSheet("border: 1px solid red")
 		}
 	})
 
 	usernameInput.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
 		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
-			if l.password != "" {
+			if l.Password != "" {
 				LoginErr := l.login()
 				if LoginErr != nil {
 					err = LoginErr
@@ -127,7 +124,7 @@ func (l *LoginUI) NewUI() (err error) {
 
 	passwordInput.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
 		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
-			if l.username != "" {
+			if l.Username != "" {
 				LoginErr := l.login()
 				if LoginErr != nil {
 					err = LoginErr
@@ -156,12 +153,12 @@ func (l *LoginUI) login() (err error) {
 
 	var wg sync.WaitGroup
 
-	if l.username != "" && l.password != "" {
+	if l.Username != "" && l.Password != "" {
 		log.Infoln("Starting Login Sequenze in background")
 		results := make(chan *gomatrix.Client)
 
 		wg.Add(1)
-		go matrix.DoLogin(l.username, l.password, "", "", "", results, &wg)
+		go matrix.DoLogin(l.Username, l.Password, "", "", "", results, &wg)
 
 		go func() {
 			wg.Wait()      // wait for each execTask to return
@@ -170,9 +167,8 @@ func (l *LoginUI) login() (err error) {
 
 		//Show MainUI
 		for result := range results {
-			//TODO Don't switch screen on wrong login data.
-			l.cli = result
-			MainUIStruct := NewMainUIStructWithExistingConfig(l.config, l.window)
+			l.Cli = result
+			MainUIStruct := NewMainUIStructWithExistingConfig(l.Config, l.window)
 			mainUIErr := MainUIStruct.NewUI()
 			if mainUIErr != nil {
 				err = mainUIErr

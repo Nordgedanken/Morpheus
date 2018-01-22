@@ -1,4 +1,4 @@
-package ui
+package listLayouts
 
 import (
 	"time"
@@ -6,7 +6,9 @@ import (
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/matrix-org/gomatrix"
 	"github.com/rhinoman/go-commonmark"
+	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
+	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
 )
@@ -26,17 +28,17 @@ import (
 type QVBoxLayoutWithTriggerSlot struct {
 	widgets.QVBoxLayout
 
-	_ func(messageBody, sender string, timestamp int64) `slot:"TriggerMessage"`
+	_ func(messageBody, sender string, timestamp int64) `signal:"TriggerMessage"`
 }
 
 // NewMessageList generates a new QVBoxLayoutWithTriggerSlot and adds it to the message scrollArea
-func NewMessageList(scrollArea *widgets.QScrollArea, messageView *widgets.QWidget) (messageViewLayout *QVBoxLayoutWithTriggerSlot) {
-	messageViewLayout = NewQVBoxLayoutWithTriggerSlot2(messageView)
+func NewMessageList(scrollArea *widgets.QScrollArea) (messageViewLayout *QVBoxLayoutWithTriggerSlot) {
+	messageViewLayout = NewQVBoxLayoutWithTriggerSlot2(scrollArea.Widget())
 
 	messageViewLayout.SetSpacing(0)
-	messageViewLayout.SetContentsMargins(0, 0, 0, 0)
-	messageView.SetContentsMargins(0, 0, 0, 0)
-	scrollArea.SetWidget(messageView)
+	messageViewLayout.AddStretch(1)
+	messageViewLayout.SetContentsMargins(15, 0, 15, 15)
+	scrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
 	scrollArea.SetAlignment(core.Qt__AlignLeading | core.Qt__AlignLeft | core.Qt__AlignVCenter)
 	scrollArea.Widget().SetLayout(messageViewLayout)
 
@@ -44,7 +46,7 @@ func NewMessageList(scrollArea *widgets.QScrollArea, messageView *widgets.QWidge
 }
 
 // NewMessage adds a new message object to the view
-func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli *gomatrix.Client, sender string, timestamp int64, scrollArea *widgets.QScrollArea, own bool, mainUIStruct *MainUI) (err error) {
+func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli *gomatrix.Client, sender string, timestamp int64, scrollArea *widgets.QScrollArea, own bool) (err error) {
 	barAtBottom := false
 	bar := scrollArea.VerticalScrollBar()
 	if bar.Value() == bar.Maximum() {
@@ -94,6 +96,21 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 	}
 	senderContent.SetText(senderDisplayName)
 	timestampContent.SetText(timestampString)
+
+	avatarNew := gui.NewQPixmap()
+	avatarLogo.ConnectPaintEvent(func(event *gui.QPaintEvent) {
+		log.Println("PaintEventAvatar")
+		painter := gui.NewQPainter2(avatarLogo)
+
+		aWidth := 61 / 2
+		aHeight := 61 / 2
+
+		painter.DrawEllipse3(aWidth, aHeight, 61.0, 61.0)
+		painter.DrawPixmap2(avatarLogo.Rect(), avatarNew, avatar.Rect())
+		//avatarLogo.Update()
+		avatarLogo.SetPixmap(avatarNew)
+	})
+
 	avatarLogo.SetPixmap(avatar)
 
 	var lineLength int

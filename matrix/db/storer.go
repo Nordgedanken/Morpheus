@@ -1,6 +1,8 @@
 package db
 
 import (
+	"fmt"
+
 	"github.com/dgraph-io/badger"
 )
 
@@ -10,6 +12,7 @@ type Storer interface {
 	LoadNextBatch(userID string) (nextBatch string, err error)
 }
 
+// MorpheusStorage is the StorageInterface which needs to be conformed to in order to persist Go-NEB data
 type MorpheusStorage struct {
 	Database *badger.DB
 }
@@ -31,18 +34,11 @@ func (m *MorpheusStorage) UpdateNextBatch(userID, nextBatch string) (err error) 
 // LoadNextBatch loads the next_batch token for the given user.
 func (m *MorpheusStorage) LoadNextBatch(userID string) (nextBatch string, err error) {
 	DBerr := m.Database.View(func(txn *badger.Txn) error {
-
-		nextBatchItem, NextBatchErr := txn.Get([]byte("matrix|" + userID + "|nextBatch|"))
-		if NextBatchErr != nil {
-			return NextBatchErr
+		nextBatchResult, QueryErr := Get(txn, []byte("user|accessToken"))
+		if QueryErr != nil {
+			return QueryErr
 		}
-
-		nextBatchByte, nextBatchByteErr := nextBatchItem.Value()
-		if nextBatchByteErr != nil {
-			return nextBatchByteErr
-		}
-
-		nextBatch = string(nextBatchByte)
+		nextBatch = fmt.Sprintf("%s", nextBatchResult)
 		return nil
 	})
 	if DBerr != nil {
