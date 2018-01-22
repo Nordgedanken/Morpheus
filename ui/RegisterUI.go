@@ -74,6 +74,7 @@ func (r *RegUI) NewUI() (err error) {
 	var helloMatrixRespErr error
 	r.helloMatrixResp, helloMatrixRespErr = getHelloMatrixList()
 	if helloMatrixRespErr != nil {
+		log.Println(helloMatrixRespErr)
 		err = helloMatrixRespErr
 		return
 	}
@@ -180,10 +181,12 @@ func (r *RegUI) register() error {
 }
 
 func getHelloMatrixList() (resp helloMatrixResp, err error) {
+	log.Println("Get HelloMatrix List")
 	var httpClient = &http.Client{Timeout: 10 * time.Second}
 
 	url := "https://www.hello-matrix.net/public_servers.php?format=json&only_public=true&show_from=Switzerland+%28Hosttech%29"
 
+	log.Println("Before HTTPGet HelloMatrix List")
 	r, RespErr := httpClient.Get(url)
 	if RespErr != nil {
 		err = RespErr
@@ -191,6 +194,7 @@ func getHelloMatrixList() (resp helloMatrixResp, err error) {
 	}
 	defer r.Body.Close()
 
+	log.Println("Before HelloMatrix List decode")
 	decodeErr := json.NewDecoder(r.Body).Decode(resp)
 	if decodeErr != nil {
 		err = decodeErr
