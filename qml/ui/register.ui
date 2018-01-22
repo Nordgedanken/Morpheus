@@ -751,7 +751,7 @@ border-radius: 2px;</string>
                 </spacer>
                </item>
                <item>
-                <widget class="QLineEdit" name="PasswordConfirmInput_2">
+                <widget class="QLineEdit" name="PasswordConfirmInput">
                  <property name="echoMode">
                   <enum>QLineEdit::Password</enum>
                  </property>

@@ -1,6 +1,11 @@
 package ui
 
 import (
+	"encoding/json"
+	"net/http"
+	"sort"
+	"time"
+
 	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
@@ -53,8 +58,24 @@ func (r *RegUI) NewUI() (err error) {
 	// PasswordInput
 	passwordInput := widgets.NewQLineEditFromPointer(r.widget.FindChild("PasswordInput", core.Qt__FindChildrenRecursively).Pointer())
 
-	// registernButton
-	registernButton := widgets.NewQPushButtonFromPointer(r.widget.FindChild("RegisterButton", core.Qt__FindChildrenRecursively).Pointer())
+	// PasswordConfirmInput
+	//passwordConfirmInput := widgets.NewQLineEditFromPointer(r.widget.FindChild("PasswordConfirmInput", core.Qt__FindChildrenRecursively).Pointer())
+
+	// ServerDropdown
+	serverDropdown := widgets.NewQComboBoxFromPointer(r.widget.FindChild("ServerChooserDropdown", core.Qt__FindChildrenRecursively).Pointer())
+
+	// registerButton
+	registerButton := widgets.NewQPushButtonFromPointer(r.widget.FindChild("RegisterButton", core.Qt__FindChildrenRecursively).Pointer())
+
+	var helloMatrixRespErr error
+	r.helloMatrixResp, helloMatrixRespErr = getHelloMatrixList()
+	if helloMatrixRespErr != nil {
+		err = helloMatrixRespErr
+		return
+	}
+
+	hostnames := convertHelloMatrixRespToNameSlice(r.helloMatrixResp)
+	serverDropdown.AddItems(hostnames)
 
 	var layout = widgets.NewQHBoxLayout()
 	r.window.SetLayout(layout)
@@ -83,7 +104,7 @@ func (r *RegUI) NewUI() (err error) {
 		r.Password = value
 	})
 
-	registernButton.ConnectClicked(func(_ bool) {
+	registerButton.ConnectClicked(func(_ bool) {
 		if r.Username != "" && r.Password != "" {
 			LoginErr := r.register()
 			if LoginErr != nil {
@@ -144,4 +165,36 @@ func (r *RegUI) NewUI() (err error) {
 
 func (r *RegUI) register() error {
 	return nil
+}
+
+func getHelloMatrixList() (resp helloMatrixResp, err error) {
+	var httpClient = &http.Client{Timeout: 10 * time.Second}
+
+	url := "https://www.hello-matrix.net/public_servers.php?format=json&only_public=true&show_from=Switzerland+%28Hosttech%29"
+
+	r, RespErr := httpClient.Get(url)
+	if RespErr != nil {
+		err = RespErr
+		return
+	}
+	defer r.Body.Close()
+
+	decodeErr := json.NewDecoder(r.Body).Decode(resp)
+	if decodeErr != nil {
+		err = decodeErr
+		return
+	}
+
+	return
+}
+
+func convertHelloMatrixRespToNameSlice(resp helloMatrixResp) (hostnames []string) {
+	sort.Slice(resp, func(i, j int) bool {
+		return resp[i].LastResponseTime < resp[i].LastResponseTime
+	})
+	for _, v := range resp {
+		hostnames = append(hostnames, v.Hostname)
+	}
+
+	return
 }
