@@ -108,7 +108,9 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *rooms.Room, 
 	wrapperWidget.InstallEventFilter(filterObject)
 
 	roomViewLayout.InsertWidget(roomViewLayout.Count()+1, wrapperWidget, 0, 0)
+	scrollArea.SetWidgetResizable(true)
 	scrollArea.Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
+	scrollArea.Widget().Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
 
 	return
 }
