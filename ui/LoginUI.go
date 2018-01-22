@@ -62,7 +62,7 @@ func (l *LoginUI) NewUI() (err error) {
 	loginButton := widgets.NewQPushButtonFromPointer(l.widget.FindChild("LoginButton", core.Qt__FindChildrenRecursively).Pointer())
 
 	// registerButton
-	registerButton := widgets.NewQPushButtonFromPointer(l.widget.FindChild("registerButton", core.Qt__FindChildrenRecursively).Pointer())
+	registerButton := widgets.NewQPushButtonFromPointer(l.widget.FindChild("RegisterButton", core.Qt__FindChildrenRecursively).Pointer())
 
 	var layout = widgets.NewQHBoxLayout()
 	l.window.SetLayout(layout)
@@ -104,6 +104,7 @@ func (l *LoginUI) NewUI() (err error) {
 	})
 
 	registerButton.ConnectClicked(func(_ bool) {
+		log.Println("register Clicked")
 		registerUIStruct := NewRegUIStructWithExistingConfig(l.Config, l.window)
 		regUIErr := registerUIStruct.NewUI()
 		if regUIErr != nil {

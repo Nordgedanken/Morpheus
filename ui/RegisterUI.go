@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
+	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/uitools"
@@ -43,6 +44,7 @@ func (r *RegUI) GetWidget() (widget *widgets.QWidget) {
 
 // NewUI initializes a new login Screen
 func (r *RegUI) NewUI() (err error) {
+	log.Println("register UI started")
 	r.widget = widgets.NewQWidget(nil, 0)
 
 	var loader = uitools.NewQUiLoader(nil)
@@ -66,6 +68,8 @@ func (r *RegUI) NewUI() (err error) {
 
 	// registerButton
 	registerButton := widgets.NewQPushButtonFromPointer(r.widget.FindChild("RegisterButton", core.Qt__FindChildrenRecursively).Pointer())
+
+	log.Println("register UI Items loaded")
 
 	var helloMatrixRespErr error
 	r.helloMatrixResp, helloMatrixRespErr = getHelloMatrixList()

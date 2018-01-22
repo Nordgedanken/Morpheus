@@ -151,7 +151,7 @@
              <widget class="QWidget" name="registerButtonLayout" native="true">
               <layout class="QHBoxLayout" name="horizontalLayout_4">
                <item>
-                <widget class="QPushButton" name="registerButton">
+                <widget class="QPushButton" name="RegisterButton">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -165,7 +165,7 @@
                   </size>
                  </property>
                  <property name="toolTip">
-                  <string>New Room</string>
+                  <string>Register</string>
                  </property>
                  <property name="layoutDirection">
                   <enum>Qt::LeftToRight</enum>
