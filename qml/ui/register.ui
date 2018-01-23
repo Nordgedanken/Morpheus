@@ -152,10 +152,10 @@
              </spacer>
             </item>
             <item>
-             <widget class="QWidget" name="newRoomButtonLayout" native="true">
+             <widget class="QWidget" name="loginButtonLayout" native="true">
               <layout class="QHBoxLayout" name="horizontalLayout_4">
                <item>
-                <widget class="QPushButton" name="newRoomButton">
+                <widget class="QPushButton" name="loginButton">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -265,7 +265,7 @@
             </item>
            </layout>
            <zorder>settingsButtonLayout</zorder>
-           <zorder>newRoomButtonLayout</zorder>
+           <zorder>loginButtonLayout</zorder>
            <zorder>verticalSpacer</zorder>
           </widget>
          </item>

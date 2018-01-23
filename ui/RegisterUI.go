@@ -69,6 +69,20 @@ func (r *RegUI) NewUI() (err error) {
 	// registerButton
 	registerButton := widgets.NewQPushButtonFromPointer(r.widget.FindChild("RegisterButton", core.Qt__FindChildrenRecursively).Pointer())
 
+	// loginButton
+	loginButton := widgets.NewQPushButtonFromPointer(r.widget.FindChild("loginButton", core.Qt__FindChildrenRecursively).Pointer())
+
+	loginButton.ConnectClicked(func(_ bool) {
+		loginUIStruct := NewLoginUIStructWithExistingConfig(r.Config, r.window)
+		logUIErr := loginUIStruct.NewUI()
+		if logUIErr != nil {
+			err = logUIErr
+			return
+		}
+		r.window.SetCentralWidget(loginUIStruct.GetWidget())
+		r.window.Resize(r.widget.Size())
+	})
+
 	log.Println("register UI Items loaded")
 
 	var helloMatrixRespErr error
@@ -83,6 +97,10 @@ func (r *RegUI) NewUI() (err error) {
 
 	hostnames := convertHelloMatrixRespToNameSlice(r.helloMatrixResp)
 	serverDropdown.AddItems(hostnames)
+
+	serverDropdown.ConnectCurrentIndexChanged2(func(text string) {
+		log.Println("Selected Server: ", text)
+	})
 
 	log.Println("serverDropdown initialized")
 
