@@ -195,7 +195,7 @@ func getHelloMatrixList() (resp helloMatrixResp, err error) {
 	defer r.Body.Close()
 
 	log.Println("Before HelloMatrix List decode")
-	decodeErr := json.NewDecoder(r.Body).Decode(resp)
+	decodeErr := json.NewDecoder(r.Body).Decode(&resp)
 	if decodeErr != nil {
 		err = decodeErr
 		return
