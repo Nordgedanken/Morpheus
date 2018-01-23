@@ -100,6 +100,15 @@ func (r *RegUI) NewUI() (err error) {
 
 	serverDropdown.ConnectCurrentIndexChanged2(func(text string) {
 		log.Println("Selected Server: ", text)
+		if text == "Type custom ServerAddress" {
+			serverDropdown.SetEditable(true)
+		} else {
+			if contains(hostnames, text) {
+				serverDropdown.SetEditable(false)
+			}
+			r.Server = text
+		}
+
 	})
 
 	log.Println("serverDropdown initialized")
@@ -223,12 +232,15 @@ func getHelloMatrixList() (resp helloMatrixResp, err error) {
 }
 
 func convertHelloMatrixRespToNameSlice(resp helloMatrixResp) (hostnames []string) {
+	hostnames = append(hostnames, "Select a Server")
+
 	sort.Slice(resp, func(i, j int) bool {
 		return resp[i].LastResponseTime < resp[i].LastResponseTime
 	})
 	for _, v := range resp {
 		hostnames = append(hostnames, v.Hostname)
 	}
+	hostnames = append(hostnames, "Type custom ServerAddress")
 
 	return
 }

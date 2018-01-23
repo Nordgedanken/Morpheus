@@ -11,6 +11,7 @@ import (
 type Config struct {
 	Username string
 	Password string
+	Server   string
 
 	WindowWidth  int
 	WindowHeight int
