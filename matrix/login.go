@@ -50,7 +50,7 @@ func GetClient(homeserverURL, userID, accessToken string) (client *gomatrix.Clie
 
 //LoginUser Creates a Session for the User
 func LoginUser(username, password string) (*gomatrix.Client, error) {
-	usernameSplit := strings.Split(username, ":")
+	usernameSplit := strings.SplitN(username, ":", 2)
 	homeserverURL := usernameSplit[1]
 	var cli *gomatrix.Client
 	var cliErr error
