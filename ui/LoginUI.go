@@ -80,6 +80,14 @@ func (l *LoginUI) NewUI() (err error) {
 		event.Accept()
 	})
 
+	var helloMatrixRespErr error
+	l.helloMatrixResp, helloMatrixRespErr = getHelloMatrixList()
+	if helloMatrixRespErr != nil {
+		log.Println(helloMatrixRespErr)
+		err = helloMatrixRespErr
+		return
+	}
+
 	hostnames := convertHelloMatrixRespToNameSlice(l.helloMatrixResp)
 	serverDropdown.AddItems(hostnames)
 
@@ -96,10 +104,12 @@ func (l *LoginUI) NewUI() (err error) {
 
 	})
 
-	serverDropdown.ConnectEditTextChanged(func(text string) {
+	serverDropdown.ConnectFocusOutEvent(func(event *gui.QFocusEvent) {
 		if serverDropdown.IsEditable() {
-			l.Server = text
+			l.Server = serverDropdown.CurrentText()
+			event.Accept()
 		}
+		event.Ignore()
 	})
 
 	usernameInput.ConnectTextChanged(func(value string) {
