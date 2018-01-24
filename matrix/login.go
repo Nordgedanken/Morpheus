@@ -63,6 +63,8 @@ func LoginUser(localpart, password, homeserverURL string) (*gomatrix.Client, err
 		return nil, cliErr
 	}
 
+	localpart = strings.Replace(localpart, "@", "", -1)
+
 	resp, err := cli.Login(&gomatrix.ReqLogin{
 		Type:                     "m.login.password",
 		User:                     localpart,

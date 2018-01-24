@@ -114,7 +114,11 @@ func (l *LoginUI) NewUI() (err error) {
 				return
 			}
 		} else {
-			passwordInput.SetStyleSheet("border: 1px solid red")
+			if l.Localpart == "" {
+				localpartInput.SetStyleSheet("border: 1px solid red")
+			} else {
+				passwordInput.SetStyleSheet("border: 1px solid red")
+			}
 		}
 	})
 
