@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -25,8 +26,15 @@ var loginUIStruct *ui.LoginUI
 func main() {
 	runtime.GOMAXPROCS(128)
 
-	// Init Logs
+	// Init Logs and folders
 	configDirs := configdir.New("Nordgedanken", "Morpheus")
+	if _, StatErr := os.Stat(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/log/"); os.IsNotExist(StatErr) {
+		MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/log/", 0700)
+		if MkdirErr != nil {
+			fmt.Errorf("%s", MkdirErr)
+			return
+		}
+	}
 
 	log.SetFormatter(&log.TextFormatter{
 		TimestampFormat:  "2006-01-02 15:04:05.000000",
