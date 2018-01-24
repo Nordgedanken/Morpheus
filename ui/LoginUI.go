@@ -96,12 +96,9 @@ func (l *LoginUI) NewUI() (err error) {
 		log.Println("Selected Server as in variable: ", serverDropdown.CurrentText())
 		if text == "Type custom ServerAddress" {
 			serverDropdown.SetEditable(true)
-		} else {
-			if contains(hostnames, text) {
-				serverDropdown.SetEditable(false)
-			}
+		} else if contains(hostnames, serverDropdown.CurrentText()) {
+			serverDropdown.SetEditable(false)
 		}
-
 	})
 
 	usernameInput.ConnectTextChanged(func(value string) {
