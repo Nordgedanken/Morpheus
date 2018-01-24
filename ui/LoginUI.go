@@ -52,8 +52,8 @@ func (l *LoginUI) NewUI() (err error) {
 	l.LoginWidget = loader.Load(file, l.widget)
 	file.Close()
 
-	// UsernameInput
-	usernameInput := widgets.NewQLineEditFromPointer(l.widget.FindChild("UsernameInput", core.Qt__FindChildrenRecursively).Pointer())
+	// LocalpartInput
+	localpartInput := widgets.NewQLineEditFromPointer(l.widget.FindChild("LocalpartInput", core.Qt__FindChildrenRecursively).Pointer())
 
 	// PasswordInput
 	passwordInput := widgets.NewQLineEditFromPointer(l.widget.FindChild("PasswordInput", core.Qt__FindChildrenRecursively).Pointer())
@@ -91,11 +91,11 @@ func (l *LoginUI) NewUI() (err error) {
 	hostnames := convertHelloMatrixRespToNameSlice(l.helloMatrixResp)
 	serverDropdown.AddItems(hostnames)
 
-	usernameInput.ConnectTextChanged(func(value string) {
-		if usernameInput.StyleSheet() == "border: 1px solid red" {
-			usernameInput.SetStyleSheet("")
+	localpartInput.ConnectTextChanged(func(value string) {
+		if localpartInput.StyleSheet() == "border: 1px solid red" {
+			localpartInput.SetStyleSheet("")
 		}
-		l.Username = value
+		l.Localpart = value
 	})
 
 	passwordInput.ConnectTextChanged(func(value string) {
@@ -106,7 +106,7 @@ func (l *LoginUI) NewUI() (err error) {
 	})
 
 	loginButton.ConnectClicked(func(_ bool) {
-		if l.Username != "" && l.Password != "" {
+		if l.Localpart != "" && l.Password != "" {
 			l.Server = serverDropdown.CurrentText()
 			LoginErr := l.login()
 			if LoginErr != nil {
@@ -130,7 +130,7 @@ func (l *LoginUI) NewUI() (err error) {
 		l.window.Resize(l.widget.Size())
 	})
 
-	usernameInput.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
+	localpartInput.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
 		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
 			if l.Password != "" {
 				l.Server = serverDropdown.CurrentText()
@@ -140,21 +140,21 @@ func (l *LoginUI) NewUI() (err error) {
 					return
 				}
 
-				usernameInput.Clear()
+				localpartInput.Clear()
 				ev.Accept()
 			} else {
 				passwordInput.SetStyleSheet("border: 1px solid red")
 				ev.Ignore()
 			}
 		} else {
-			usernameInput.KeyPressEventDefault(ev)
+			localpartInput.KeyPressEventDefault(ev)
 			ev.Ignore()
 		}
 	})
 
 	passwordInput.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
 		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
-			if l.Username != "" {
+			if l.Localpart != "" {
 				l.Server = serverDropdown.CurrentText()
 				LoginErr := l.login()
 				if LoginErr != nil {
@@ -165,7 +165,7 @@ func (l *LoginUI) NewUI() (err error) {
 				passwordInput.Clear()
 				ev.Accept()
 			} else {
-				usernameInput.SetStyleSheet("border: 1px solid red")
+				localpartInput.SetStyleSheet("border: 1px solid red")
 				ev.Ignore()
 			}
 		} else {
@@ -185,12 +185,12 @@ func (l *LoginUI) login() (err error) {
 
 	var wg sync.WaitGroup
 
-	if l.Username != "" && l.Password != "" {
-		log.Infoln("Starting Login Sequenze in background")
+	if l.Localpart != "" && l.Password != "" {
+		log.Infoln("Starting Login Sequence in background")
 		results := make(chan *gomatrix.Client)
 
 		wg.Add(1)
-		go matrix.DoLogin(l.Username, l.Password, l.Server, "", "", results, &wg)
+		go matrix.DoLogin(l.Localpart, l.Password, l.Server, "", "", results, &wg)
 
 		go func() {
 			wg.Wait()      // wait for each execTask to return
@@ -210,7 +210,7 @@ func (l *LoginUI) login() (err error) {
 			l.window.Resize(l.widget.Size())
 		}
 	} else {
-		log.Warningln("Username and/or password is empty. Do Nothing.")
+		log.Warningln("Localpart and/or password is empty. Do Nothing.")
 	}
 	return
 }

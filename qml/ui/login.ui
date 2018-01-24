@@ -595,7 +595,7 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
              </widget>
             </item>
             <item>
-             <widget class="QWidget" name="Username_w" native="true">
+             <widget class="QWidget" name="Localpart_w" native="true">
               <property name="sizePolicy">
                <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
                 <horstretch>0</horstretch>
@@ -619,7 +619,7 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
                 <number>0</number>
                </property>
                <item>
-                <widget class="QLabel" name="Username">
+                <widget class="QLabel" name="Localpart">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
                    <horstretch>0</horstretch>
@@ -627,7 +627,7 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
                   </sizepolicy>
                  </property>
                  <property name="text">
-                  <string>Username</string>
+                  <string>Localpart</string>
                  </property>
                 </widget>
                </item>
@@ -645,7 +645,7 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
                 </spacer>
                </item>
                <item>
-                <widget class="QLineEdit" name="UsernameInput">
+                <widget class="QLineEdit" name="LocalpartInput">
                  <property name="sizePolicy">
                   <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
                    <horstretch>0</horstretch>
@@ -653,7 +653,7 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
                   </sizepolicy>
                  </property>
                  <property name="placeholderText">
-                  <string>Insert MXID</string>
+                  <string>Insert Localpart (@Username)</string>
                  </property>
                 </widget>
                </item>

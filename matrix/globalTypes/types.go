@@ -9,9 +9,9 @@ import (
 
 // Config holds important reused information in the UI
 type Config struct {
-	Username string
-	Password string
-	Server   string
+	Localpart string
+	Password  string
+	Server    string
 
 	WindowWidth  int
 	WindowHeight int

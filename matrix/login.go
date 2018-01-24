@@ -49,7 +49,7 @@ func GetClient(homeserverURL, userID, accessToken string) (client *gomatrix.Clie
 }
 
 //LoginUser Creates a Session for the User
-func LoginUser(username, password, homeserverURL string) (*gomatrix.Client, error) {
+func LoginUser(localpart, password, homeserverURL string) (*gomatrix.Client, error) {
 	var cli *gomatrix.Client
 	var cliErr error
 	if strings.HasPrefix(homeserverURL, "https://") {
@@ -65,7 +65,7 @@ func LoginUser(username, password, homeserverURL string) (*gomatrix.Client, erro
 
 	resp, err := cli.Login(&gomatrix.ReqLogin{
 		Type:     "m.login.password",
-		User:     username,
+		User:     localpart,
 		Password: password,
 	})
 	if err != nil {
@@ -108,7 +108,7 @@ func LoginUser(username, password, homeserverURL string) (*gomatrix.Client, erro
 }
 
 // DoLogin generates the needed Client
-func DoLogin(username, password, homeserverURL, userID, accessToken string, results chan<- *gomatrix.Client, wg *sync.WaitGroup) {
+func DoLogin(localpart, password, homeserverURL, userID, accessToken string, results chan<- *gomatrix.Client, wg *sync.WaitGroup) {
 	defer wg.Done()
 	var cli *gomatrix.Client
 	if accessToken != "" && homeserverURL != "" && userID != "" {
@@ -126,7 +126,7 @@ func DoLogin(username, password, homeserverURL, userID, accessToken string, resu
 		cli.SetCredentials(userID, accessToken)
 	} else {
 		var err error
-		cli, err = LoginUser(username, password, homeserverURL)
+		cli, err = LoginUser(localpart, password, homeserverURL)
 		if err != nil {
 			log.Errorln(err)
 		}
