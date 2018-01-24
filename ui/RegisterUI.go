@@ -98,25 +98,6 @@ func (r *RegUI) NewUI() (err error) {
 	hostnames := convertHelloMatrixRespToNameSlice(r.helloMatrixResp)
 	serverDropdown.AddItems(hostnames)
 
-	serverDropdown.ConnectCurrentIndexChanged2(func(text string) {
-		log.Println("Selected Server: ", text)
-		if text == "Type custom ServerAddress" {
-			serverDropdown.SetEditable(true)
-		} else {
-			if contains(hostnames, text) {
-				serverDropdown.SetEditable(false)
-			}
-			r.Server = text
-		}
-
-	})
-
-	serverDropdown.ConnectEditTextChanged(func(text string) {
-		if serverDropdown.IsEditable() {
-			r.Server = text
-		}
-	})
-
 	log.Println("serverDropdown initialized")
 
 	var layout = widgets.NewQHBoxLayout()
@@ -150,9 +131,10 @@ func (r *RegUI) NewUI() (err error) {
 
 	registerButton.ConnectClicked(func(_ bool) {
 		if r.Localpart != "" && r.Password != "" {
-			LoginErr := r.register()
-			if LoginErr != nil {
-				err = LoginErr
+			r.Server = serverDropdown.CurrentText()
+			RegisterErr := r.register()
+			if RegisterErr != nil {
+				err = RegisterErr
 				return
 			}
 		} else {
@@ -163,9 +145,10 @@ func (r *RegUI) NewUI() (err error) {
 	usernameInput.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
 		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
 			if r.Password != "" {
-				LoginErr := r.register()
-				if LoginErr != nil {
-					err = LoginErr
+				r.Server = serverDropdown.CurrentText()
+				RegisterErr := r.register()
+				if RegisterErr != nil {
+					err = RegisterErr
 					return
 				}
 
@@ -184,6 +167,7 @@ func (r *RegUI) NewUI() (err error) {
 	passwordInput.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
 		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
 			if r.Localpart != "" {
+				r.Server = serverDropdown.CurrentText()
 				RegisterErr := r.register()
 				if RegisterErr != nil {
 					err = RegisterErr

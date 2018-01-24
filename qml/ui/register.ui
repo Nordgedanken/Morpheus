@@ -570,7 +570,7 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
 }</string>
                  </property>
                  <property name="editable">
-                  <bool>false</bool>
+                  <bool>true</bool>
                  </property>
                 </widget>
                </item>
@@ -639,7 +639,7 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
                   </sizepolicy>
                  </property>
                  <property name="placeholderText">
-                  <string>Insert MXID</string>
+                  <string>Insert Localpart (@Username)</string>
                  </property>
                 </widget>
                </item>
