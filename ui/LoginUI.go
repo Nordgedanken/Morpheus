@@ -61,6 +61,9 @@ func (l *LoginUI) NewUI() (err error) {
 	// loginButton
 	loginButton := widgets.NewQPushButtonFromPointer(l.widget.FindChild("LoginButton", core.Qt__FindChildrenRecursively).Pointer())
 
+	// ServerDropdown
+	serverDropdown := widgets.NewQComboBoxFromPointer(l.widget.FindChild("ServerChooserDropdown", core.Qt__FindChildrenRecursively).Pointer())
+
 	// registerButton
 	registerButton := widgets.NewQPushButtonFromPointer(l.widget.FindChild("RegisterButton", core.Qt__FindChildrenRecursively).Pointer())
 
@@ -75,6 +78,28 @@ func (l *LoginUI) NewUI() (err error) {
 	l.widget.ConnectResizeEvent(func(event *gui.QResizeEvent) {
 		l.LoginWidget.Resize(event.Size())
 		event.Accept()
+	})
+
+	hostnames := convertHelloMatrixRespToNameSlice(l.helloMatrixResp)
+	serverDropdown.AddItems(hostnames)
+
+	serverDropdown.ConnectCurrentIndexChanged2(func(text string) {
+		log.Println("Selected Server: ", text)
+		if text == "Type custom ServerAddress" {
+			serverDropdown.SetEditable(true)
+		} else {
+			if contains(hostnames, text) {
+				serverDropdown.SetEditable(false)
+			}
+			l.Server = text
+		}
+
+	})
+
+	serverDropdown.ConnectEditTextChanged(func(text string) {
+		if serverDropdown.IsEditable() {
+			l.Server = text
+		}
 	})
 
 	usernameInput.ConnectTextChanged(func(value string) {
@@ -172,7 +197,7 @@ func (l *LoginUI) login() (err error) {
 		results := make(chan *gomatrix.Client)
 
 		wg.Add(1)
-		go matrix.DoLogin(l.Username, l.Password, "", "", "", results, &wg)
+		go matrix.DoLogin(l.Username, l.Password, l.Server, "", "", results, &wg)
 
 		go func() {
 			wg.Wait()      // wait for each execTask to return

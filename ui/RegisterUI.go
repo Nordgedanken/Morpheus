@@ -111,6 +111,12 @@ func (r *RegUI) NewUI() (err error) {
 
 	})
 
+	serverDropdown.ConnectEditTextChanged(func(text string) {
+		if serverDropdown.IsEditable() {
+			r.Server = text
+		}
+	})
+
 	log.Println("serverDropdown initialized")
 
 	var layout = widgets.NewQHBoxLayout()

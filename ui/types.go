@@ -31,9 +31,10 @@ func (m *MainUI) SetCurrentRoom(RoomID string) {
 type LoginUI struct {
 	globalTypes.Config
 
-	LoginWidget *widgets.QWidget
-	widget      *widgets.QWidget
-	window      *widgets.QMainWindow
+	LoginWidget     *widgets.QWidget
+	widget          *widgets.QWidget
+	window          *widgets.QMainWindow
+	helloMatrixResp helloMatrixResp
 }
 
 // RegUI holds information about the LoginUI

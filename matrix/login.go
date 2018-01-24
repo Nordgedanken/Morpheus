@@ -49,10 +49,7 @@ func GetClient(homeserverURL, userID, accessToken string) (client *gomatrix.Clie
 }
 
 //LoginUser Creates a Session for the User
-func LoginUser(username, password string) (*gomatrix.Client, error) {
-	usernameSplit := strings.Split(username, ":")
-	usernameURlSplit := strings.SplitN(username, ":", 2)
-	homeserverURL := usernameURlSplit[1]
+func LoginUser(username, password, homeserverURL string) (*gomatrix.Client, error) {
 	var cli *gomatrix.Client
 	var cliErr error
 	if strings.HasPrefix(homeserverURL, "https://") {
@@ -65,7 +62,6 @@ func LoginUser(username, password string) (*gomatrix.Client, error) {
 	if cliErr != nil {
 		return nil, cliErr
 	}
-	username = strings.TrimSuffix(username, usernameSplit[len(usernameSplit)-1])
 
 	resp, err := cli.Login(&gomatrix.ReqLogin{
 		Type:     "m.login.password",
@@ -130,7 +126,7 @@ func DoLogin(username, password, homeserverURL, userID, accessToken string, resu
 		cli.SetCredentials(userID, accessToken)
 	} else {
 		var err error
-		cli, err = LoginUser(username, password)
+		cli, err = LoginUser(username, password, homeserverURL)
 		if err != nil {
 			log.Errorln(err)
 		}
