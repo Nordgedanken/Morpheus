@@ -91,25 +91,17 @@ func (l *LoginUI) NewUI() (err error) {
 	hostnames := convertHelloMatrixRespToNameSlice(l.helloMatrixResp)
 	serverDropdown.AddItems(hostnames)
 
-	serverDropdown.ConnectCurrentIndexChanged2(func(text string) {
-		log.Println("Selected Server: ", text)
+	serverDropdown.ConnectCurrentTextChanged(func(text string) {
+		log.Println("Selected Server as in Event: ", text)
+		log.Println("Selected Server as in variable: ", serverDropdown.CurrentText())
 		if text == "Type custom ServerAddress" {
 			serverDropdown.SetEditable(true)
 		} else {
 			if contains(hostnames, text) {
 				serverDropdown.SetEditable(false)
 			}
-			l.Server = text
 		}
 
-	})
-
-	serverDropdown.ConnectFocusOutEvent(func(event *gui.QFocusEvent) {
-		if serverDropdown.IsEditable() {
-			l.Server = serverDropdown.CurrentText()
-			event.Accept()
-		}
-		event.Ignore()
 	})
 
 	usernameInput.ConnectTextChanged(func(value string) {
@@ -128,6 +120,7 @@ func (l *LoginUI) NewUI() (err error) {
 
 	loginButton.ConnectClicked(func(_ bool) {
 		if l.Username != "" && l.Password != "" {
+			l.Server = serverDropdown.CurrentText()
 			LoginErr := l.login()
 			if LoginErr != nil {
 				err = LoginErr
@@ -153,6 +146,7 @@ func (l *LoginUI) NewUI() (err error) {
 	usernameInput.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
 		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
 			if l.Password != "" {
+				l.Server = serverDropdown.CurrentText()
 				LoginErr := l.login()
 				if LoginErr != nil {
 					err = LoginErr
@@ -174,6 +168,7 @@ func (l *LoginUI) NewUI() (err error) {
 	passwordInput.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
 		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
 			if l.Username != "" {
+				l.Server = serverDropdown.CurrentText()
 				LoginErr := l.login()
 				if LoginErr != nil {
 					err = LoginErr
@@ -199,6 +194,7 @@ func (l *LoginUI) NewUI() (err error) {
 
 func (l *LoginUI) login() (err error) {
 	//TODO register enter and show loader or so
+	log.Println(l.Server)
 
 	var wg sync.WaitGroup
 
