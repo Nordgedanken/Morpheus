@@ -54,8 +54,15 @@ jobs:
           name: Deb Generating
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
           command: mkdir debian && go-bin-deb generate -o debian
+      - run:
+          name: Generate tar.gz
+          working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
+          command: tar -czf Morpheus.tar.gz deploy/linux/
       - store_artifacts:
           path: /home/user/work/src/github.com/Nordgedanken/Morpheus/debian/
+          destination: debian
+      - store_artifacts:
+          path: /home/user/work/src/github.com/Nordgedanken/Morpheus/Morpheus.tar.gz
           destination: debian
   test:
     docker:
