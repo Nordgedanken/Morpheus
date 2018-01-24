@@ -65,7 +65,7 @@ func LoginUser(username, password string) (*gomatrix.Client, error) {
 	if cliErr != nil {
 		return nil, cliErr
 	}
-	username = strings.TrimSuffix(username, usernameSplit[len(usernameSplit)])
+	username = strings.TrimSuffix(username, usernameSplit[len(usernameSplit)-1])
 
 	resp, err := cli.Login(&gomatrix.ReqLogin{
 		Type:     "m.login.password",
