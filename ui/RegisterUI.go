@@ -138,7 +138,7 @@ func (r *RegUI) NewUI() (err error) {
 		if usernameInput.StyleSheet() == "border: 1px solid red" {
 			usernameInput.SetStyleSheet("")
 		}
-		r.Username = value
+		r.Localpart = value
 	})
 
 	passwordInput.ConnectTextChanged(func(value string) {
@@ -149,7 +149,7 @@ func (r *RegUI) NewUI() (err error) {
 	})
 
 	registerButton.ConnectClicked(func(_ bool) {
-		if r.Username != "" && r.Password != "" {
+		if r.Localpart != "" && r.Password != "" {
 			LoginErr := r.register()
 			if LoginErr != nil {
 				err = LoginErr
@@ -183,7 +183,7 @@ func (r *RegUI) NewUI() (err error) {
 
 	passwordInput.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
 		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
-			if r.Username != "" {
+			if r.Localpart != "" {
 				RegisterErr := r.register()
 				if RegisterErr != nil {
 					err = RegisterErr
