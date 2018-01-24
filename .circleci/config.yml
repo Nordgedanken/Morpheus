@@ -63,7 +63,7 @@ jobs:
           destination: debian
       - store_artifacts:
           path: /home/user/work/src/github.com/Nordgedanken/Morpheus/Morpheus.tar.gz
-          destination: debian
+          destination: Morpheus.tar.gz
   test:
     docker:
       - image: therecipe/qt:linux
