@@ -586,6 +586,9 @@ QComboBox::down-arrow:on { /* shift the arrow when popup is open */
     left: 1px;
 }</string>
                  </property>
+                 <property name="editable">
+                  <bool>true</bool>
+                 </property>
                 </widget>
                </item>
               </layout>

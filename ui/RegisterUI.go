@@ -246,7 +246,6 @@ func convertHelloMatrixRespToNameSlice(resp helloMatrixResp) (hostnames []string
 	for _, v := range resp {
 		hostnames = append(hostnames, v.Hostname)
 	}
-	hostnames = append(hostnames, "Type custom ServerAddress")
 
 	return
 }

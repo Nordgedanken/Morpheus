@@ -91,15 +91,6 @@ func (l *LoginUI) NewUI() (err error) {
 	hostnames := convertHelloMatrixRespToNameSlice(l.helloMatrixResp)
 	serverDropdown.AddItems(hostnames)
 
-	serverDropdown.ConnectCurrentIndexChanged(func(_ int) {
-		log.Println("Selected Server as in variable: ", serverDropdown.CurrentText())
-		if serverDropdown.CurrentText() == "Type custom ServerAddress" {
-			serverDropdown.SetEditable(true)
-		} else if contains(hostnames, serverDropdown.CurrentText()) {
-			serverDropdown.SetEditable(false)
-		}
-	})
-
 	usernameInput.ConnectTextChanged(func(value string) {
 		if usernameInput.StyleSheet() == "border: 1px solid red" {
 			usernameInput.SetStyleSheet("")
