@@ -64,9 +64,10 @@ func LoginUser(localpart, password, homeserverURL string) (*gomatrix.Client, err
 	}
 
 	resp, err := cli.Login(&gomatrix.ReqLogin{
-		Type:     "m.login.password",
-		User:     localpart,
-		Password: password,
+		Type:                     "m.login.password",
+		User:                     localpart,
+		Password:                 password,
+		InitialDeviceDisplayName: "Morpheus 0.1.0-Alpha",
 	})
 	if err != nil {
 		return nil, err
