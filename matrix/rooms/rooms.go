@@ -11,6 +11,7 @@ import (
 	"github.com/rhinoman/go-commonmark"
 	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/gui"
+	"github.com/therecipe/qt/widgets"
 )
 
 const mRoomNameEv = "m.room.name"
@@ -18,7 +19,10 @@ const mRoomCanonicalAliasEv = "m.room.canonical_alias"
 
 // Room saves the information of a Room
 type Room struct {
-	cli               *gomatrix.Client
+	widgets.QHBoxLayout
+
+	_                 func(roomAvatar *gui.QPixmap) `signal:"SetAvatar"`
+	Cli               *gomatrix.Client
 	RoomID            string
 	RoomName          string
 	RoomNameEventType string
@@ -69,17 +73,11 @@ func GetRooms(cli *gomatrix.Client) (rooms []string, err error) {
 	return
 }
 
-// NewRoom Inits a new Room struct
-func NewRoom(roomID string, cli *gomatrix.Client) (room *Room) {
-	room = &Room{RoomID: roomID, cli: cli}
-	return
-}
-
 func (r *Room) crawlRoomAvatarURL() {
 	roomAvatar := struct {
 		URL string `json:"url"`
 	}{}
-	r.cli.StateEvent(r.RoomID, "m.room.avatar", "", &roomAvatar)
+	r.Cli.StateEvent(r.RoomID, "m.room.avatar", "", &roomAvatar)
 	r.RoomAvatarURL = roomAvatar.URL
 }
 
@@ -87,7 +85,7 @@ func (r *Room) crawlRoomTopic() {
 	roomTopic := struct {
 		Topic string `json:"topic"`
 	}{}
-	r.cli.StateEvent(r.RoomID, "m.room.topic", "", &roomTopic)
+	r.Cli.StateEvent(r.RoomID, "m.room.topic", "", &roomTopic)
 	r.RoomTopic = roomTopic.Topic
 }
 
@@ -109,7 +107,7 @@ func (r *Room) GetRoomTopic() (topic string) {
 }
 
 // GetRoomAvatar generates the Avatar Image for a Room
-func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
+func (r *Room) GetRoomAvatar() {
 	// Get the Avatar URL if needed
 	if r.RoomAvatarURL == "" {
 		r.crawlRoomAvatarURL()
@@ -135,7 +133,7 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 		return nil
 	})
 	if DBErr != nil {
-		err = DBErr
+		log.Errorf("%s", DBErr)
 		return
 	}
 
@@ -145,14 +143,14 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 		log.Println("Empty")
 		// If avatarURL is not empty (aka. has a avatar set) download it at the size of 84x84. Else make the data string empty
 		if r.RoomAvatarURL != "" {
-			hsURL := r.cli.HomeserverURL.String()
+			hsURL := r.Cli.HomeserverURL.String()
 			roomAvatarURLSplits := strings.Split(strings.Replace(r.RoomAvatarURL, "mxc://", "", -1), "/")
 
 			urlPath := hsURL + "/_matrix/media/r0/thumbnail/" + roomAvatarURLSplits[0] + "/" + roomAvatarURLSplits[1] + "?width=84&height=84&method=crop"
 
-			data, ReqErr := r.cli.MakeRequest("GET", urlPath, nil, nil)
+			data, ReqErr := r.Cli.MakeRequest("GET", urlPath, nil, nil)
 			if ReqErr != nil {
-				err = ReqErr
+				log.Errorf("%s", ReqErr)
 				return
 			}
 			IMGdata = data
@@ -170,7 +168,7 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 			}
 			IMGdata, GenerateImgErr = matrix.GenerateGenericImages(roomName, 84)
 			if GenerateImgErr != nil {
-				err = GenerateImgErr
+				log.Errorf("%s", GenerateImgErr)
 				return
 			}
 		}
@@ -181,7 +179,7 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 			return DBSetErr
 		})
 		if DBSetErr != nil {
-			err = DBSetErr
+			log.Errorf("%s", DBSetErr)
 			return
 		}
 
@@ -193,7 +191,7 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 
 	str := string(IMGdata[:])
 	avatar.LoadFromData(str, uint(len(str)), "", 0)
-	avatarResp = avatar
+	r.SetAvatar(avatar)
 	return
 }
 
@@ -205,12 +203,12 @@ func (r *Room) crawlRoomName() {
 		Alias string `json:"alias"`
 	}{}
 
-	if roomNameStateEventErr := r.cli.StateEvent(r.RoomID, mRoomNameEv, "", &roomName); roomNameStateEventErr != nil {
+	if roomNameStateEventErr := r.Cli.StateEvent(r.RoomID, mRoomNameEv, "", &roomName); roomNameStateEventErr != nil {
 		log.Println(roomNameStateEventErr)
 		// Not returning as a Error NotFound is allowed
 	}
 	if roomName.Name == "" {
-		if roomCanonicalAliasStateEventErr := r.cli.StateEvent(r.RoomID, mRoomCanonicalAliasEv, "", &roomCanonicalAlias); roomCanonicalAliasStateEventErr != nil {
+		if roomCanonicalAliasStateEventErr := r.Cli.StateEvent(r.RoomID, mRoomCanonicalAliasEv, "", &roomCanonicalAlias); roomCanonicalAliasStateEventErr != nil {
 			log.Println(roomCanonicalAliasStateEventErr)
 			// Not returning as a Error NotFound is allowed
 		}

@@ -2,7 +2,7 @@ package listLayouts
 
 import (
 	"github.com/Nordgedanken/Morpheus/matrix/rooms"
-	//log "github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/uitools"
@@ -42,12 +42,6 @@ func NewRoomList(scrollArea *widgets.QScrollArea) (roomViewLayout *QRoomVBoxLayo
 
 // NewRoom adds a new room object to the view
 func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (err error) {
-	/*	roomAvatar, roomAvatarErr := room.GetRoomAvatar()
-		if roomAvatarErr != nil {
-			err = roomAvatarErr
-			return
-		}*/
-
 	var widget = widgets.NewQWidget(nil, 0)
 
 	var loader = uitools.NewQUiLoader(nil)
@@ -57,30 +51,10 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *rooms.Room, 
 	var wrapperWidget = loader.Load(file, widget)
 	file.Close()
 
-	//roomAvatarQLabel := widgets.NewQLabelFromPointer(widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
+	roomAvatarQLabel := widgets.NewQLabelFromPointer(widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
 	roomName := widgets.NewQLabelFromPointer(widget.FindChild("roomName", core.Qt__FindChildrenRecursively).Pointer())
 	/*lastMessageContent := widgets.NewQLabelFromPointer(widget.FindChild("lastMessage", core.Qt__FindChildrenRecursively).Pointer())*/
 
-	/*roomAvatarQLabel.ConnectSetPixmap(func(vqp *gui.QPixmap) {
-		log.Println("SetPixmapEventRoomAvatar")
-
-		vqp.Scaled2(roomAvatarQLabel.Width(), roomAvatarQLabel.Height(), 0, 0)
-
-		newPixmap := gui.NewQPixmap3(2*roomAvatarQLabel.Width(), 2*roomAvatarQLabel.Height())
-		newPixmap.Fill(nil)
-
-		painter := gui.NewQPainter2(newPixmap)
-
-		r := gui.NewQRegion2(roomAvatarQLabel.Width()/2, roomAvatarQLabel.Height()/2, roomAvatarQLabel.Width(), roomAvatarQLabel.Height(), gui.QRegion__Ellipse)
-
-		painter.SetClipRegion(r, 0)
-
-		painter.DrawPixmap10(roomAvatarQLabel.Rect(), vqp)
-		newImage := newPixmap.ToImage()
-		vqp.FromImage(newImage, 0)
-	})*/
-
-	/*	roomAvatarQLabel.SetPixmap(roomAvatar)*/
 	roomName.SetText(room.GetRoomName())
 
 	wrapperWidget.Resize2(scrollArea.Widget().Size().Width(), wrapperWidget.Size().Height())
@@ -111,6 +85,31 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *rooms.Room, 
 	scrollArea.SetWidgetResizable(true)
 	scrollArea.Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
 	scrollArea.Widget().Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
+
+	room.ConnectSetAvatar(func(roomAvatar *gui.QPixmap) {
+		roomAvatarQLabel.ConnectSetPixmap(func(vqp *gui.QPixmap) {
+			log.Println("SetPixmapEventRoomAvatar")
+
+			vqp.Scaled2(roomAvatarQLabel.Width(), roomAvatarQLabel.Height(), 0, 0)
+
+			newPixmap := gui.NewQPixmap3(2*roomAvatarQLabel.Width(), 2*roomAvatarQLabel.Height())
+			newPixmap.Fill(nil)
+
+			painter := gui.NewQPainter2(newPixmap)
+
+			r := gui.NewQRegion2(roomAvatarQLabel.Width()/2, roomAvatarQLabel.Height()/2, roomAvatarQLabel.Width(), roomAvatarQLabel.Height(), gui.QRegion__Ellipse)
+
+			painter.SetClipRegion(r, 0)
+
+			painter.DrawPixmap10(roomAvatarQLabel.Rect(), vqp)
+			newImage := newPixmap.ToImage()
+			vqp.FromImage(newImage, 0)
+		})
+
+		roomAvatarQLabel.SetPixmap(roomAvatar)
+	})
+
+	go room.GetRoomAvatar()
 
 	return
 }

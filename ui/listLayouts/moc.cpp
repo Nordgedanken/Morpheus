@@ -9,6 +9,7 @@
 #include <QByteArray>
 #include <QChildEvent>
 #include <QEvent>
+#include <QHBoxLayout>
 #include <QLayout>
 #include <QLayoutItem>
 #include <QList>
@@ -25,6 +26,12 @@
 #include <QVBoxLayout>
 #include <QWidget>
 
+class Room: public QHBoxLayout{
+public:
+	Room() : QHBoxLayout() {};
+	Room(QWidget *parent) : QHBoxLayout(parent) {};
+
+};
 
 class QRoomVBoxLayoutWithTriggerSlot: public QVBoxLayout
 {
@@ -126,6 +133,336 @@ Q_DECLARE_METATYPE(QVBoxLayoutWithTriggerSlot*)
 
 
 void QVBoxLayoutWithTriggerSlot_QVBoxLayoutWithTriggerSlot_QRegisterMetaTypes() {
+}
+
+class QRoomLayout: public QHBoxLayout
+{
+Q_OBJECT
+public:
+	QRoomLayout() : QHBoxLayout() {qRegisterMetaType<quintptr>("quintptr");QRoomLayout_QRoomLayout_QRegisterMetaType();QRoomLayout_QRoomLayout_QRegisterMetaTypes();callbackQRoomLayout_Constructor(this);};
+	QRoomLayout(QWidget *parent) : QHBoxLayout(parent) {qRegisterMetaType<quintptr>("quintptr");QRoomLayout_QRoomLayout_QRegisterMetaType();QRoomLayout_QRoomLayout_QRegisterMetaTypes();callbackQRoomLayout_Constructor(this);};
+	void Signal_SetAvatar(QString roomID) { QByteArray tdf131c = roomID.toUtf8(); Moc_PackedString roomIDPacked = { const_cast<char*>(tdf131c.prepend("WHITESPACE").constData()+10), tdf131c.size()-10 };callbackQRoomLayout_SetAvatar(this, roomIDPacked); };
+	QLayoutItem * takeAt(int index) { return static_cast<QLayoutItem*>(callbackQRoomLayout_TakeAt(this, index)); };
+	void addItem(QLayoutItem * item) { callbackQRoomLayout_AddItem(this, item); };
+	void invalidate() { callbackQRoomLayout_Invalidate(this); };
+	void setGeometry(const QRect & r) { callbackQRoomLayout_SetGeometry(this, const_cast<QRect*>(&r)); };
+	QLayoutItem * itemAt(int index) const { return static_cast<QLayoutItem*>(callbackQRoomLayout_ItemAt(const_cast<void*>(static_cast<const void*>(this)), index)); };
+	QSize maximumSize() const { return *static_cast<QSize*>(callbackQRoomLayout_MaximumSize(const_cast<void*>(static_cast<const void*>(this)))); };
+	QSize minimumSize() const { return *static_cast<QSize*>(callbackQRoomLayout_MinimumSize(const_cast<void*>(static_cast<const void*>(this)))); };
+	QSize sizeHint() const { return *static_cast<QSize*>(callbackQRoomLayout_SizeHint(const_cast<void*>(static_cast<const void*>(this)))); };
+	Qt::Orientations expandingDirections() const { return static_cast<Qt::Orientation>(callbackQRoomLayout_ExpandingDirections(const_cast<void*>(static_cast<const void*>(this)))); };
+	bool hasHeightForWidth() const { return callbackQRoomLayout_HasHeightForWidth(const_cast<void*>(static_cast<const void*>(this))) != 0; };
+	int count() const { return callbackQRoomLayout_Count(const_cast<void*>(static_cast<const void*>(this))); };
+	int heightForWidth(int w) const { return callbackQRoomLayout_HeightForWidth(const_cast<void*>(static_cast<const void*>(this)), w); };
+	int minimumHeightForWidth(int w) const { return callbackQRoomLayout_MinimumHeightForWidth(const_cast<void*>(static_cast<const void*>(this)), w); };
+	QLayout * layout() { return static_cast<QLayout*>(callbackQRoomLayout_Layout(this)); };
+	void childEvent(QChildEvent * e) { callbackQRoomLayout_ChildEvent(this, e); };
+	QRect geometry() const { return *static_cast<QRect*>(callbackQRoomLayout_Geometry(const_cast<void*>(static_cast<const void*>(this)))); };
+	QSizePolicy::ControlTypes controlTypes() const { return static_cast<QSizePolicy::ControlType>(callbackQRoomLayout_ControlTypes(const_cast<void*>(static_cast<const void*>(this)))); };
+	bool isEmpty() const { return callbackQRoomLayout_IsEmpty(const_cast<void*>(static_cast<const void*>(this))) != 0; };
+	int indexOf(QWidget * widget) const { return callbackQRoomLayout_IndexOf(const_cast<void*>(static_cast<const void*>(this)), widget); };
+	bool event(QEvent * e) { return callbackQRoomLayout_Event(this, e) != 0; };
+	bool eventFilter(QObject * watched, QEvent * event) { return callbackQRoomLayout_EventFilter(this, watched, event) != 0; };
+	void connectNotify(const QMetaMethod & sign) { callbackQRoomLayout_ConnectNotify(this, const_cast<QMetaMethod*>(&sign)); };
+	void customEvent(QEvent * event) { callbackQRoomLayout_CustomEvent(this, event); };
+	void deleteLater() { callbackQRoomLayout_DeleteLater(this); };
+	void Signal_Destroyed(QObject * obj) { callbackQRoomLayout_Destroyed(this, obj); };
+	void disconnectNotify(const QMetaMethod & sign) { callbackQRoomLayout_DisconnectNotify(this, const_cast<QMetaMethod*>(&sign)); };
+	void Signal_ObjectNameChanged(const QString & objectName) { QByteArray taa2c4f = objectName.toUtf8(); Moc_PackedString objectNamePacked = { const_cast<char*>(taa2c4f.prepend("WHITESPACE").constData()+10), taa2c4f.size()-10 };callbackQRoomLayout_ObjectNameChanged(this, objectNamePacked); };
+	void timerEvent(QTimerEvent * event) { callbackQRoomLayout_TimerEvent(this, event); };
+	
+	QSpacerItem * spacerItem() { return static_cast<QSpacerItem*>(callbackQRoomLayout_SpacerItem(this)); };
+	QWidget * widget() { return static_cast<QWidget*>(callbackQRoomLayout_Widget(this)); };
+signals:
+	void SetAvatar(QString roomID);
+public slots:
+private:
+};
+
+Q_DECLARE_METATYPE(QRoomLayout*)
+
+
+void QRoomLayout_QRoomLayout_QRegisterMetaTypes() {
+}
+
+void QRoomLayout_ConnectSetAvatar(void* ptr)
+{
+	QObject::connect(static_cast<QRoomLayout*>(ptr), static_cast<void (QRoomLayout::*)(QString)>(&QRoomLayout::SetAvatar), static_cast<QRoomLayout*>(ptr), static_cast<void (QRoomLayout::*)(QString)>(&QRoomLayout::Signal_SetAvatar));
+}
+
+void QRoomLayout_DisconnectSetAvatar(void* ptr)
+{
+	QObject::disconnect(static_cast<QRoomLayout*>(ptr), static_cast<void (QRoomLayout::*)(QString)>(&QRoomLayout::SetAvatar), static_cast<QRoomLayout*>(ptr), static_cast<void (QRoomLayout::*)(QString)>(&QRoomLayout::Signal_SetAvatar));
+}
+
+void QRoomLayout_SetAvatar(void* ptr, struct Moc_PackedString roomID)
+{
+	static_cast<QRoomLayout*>(ptr)->SetAvatar(QString::fromUtf8(roomID.data, roomID.len));
+}
+
+int QRoomLayout_QRoomLayout_QRegisterMetaType()
+{
+	return qRegisterMetaType<QRoomLayout*>();
+}
+
+int QRoomLayout_QRoomLayout_QRegisterMetaType2(char* typeName)
+{
+	return qRegisterMetaType<QRoomLayout*>(const_cast<const char*>(typeName));
+}
+
+int QRoomLayout_QRoomLayout_QmlRegisterType()
+{
+#ifdef QT_QML_LIB
+	return qmlRegisterType<QRoomLayout>();
+#else
+	return 0;
+#endif
+}
+
+int QRoomLayout_QRoomLayout_QmlRegisterType2(char* uri, int versionMajor, int versionMinor, char* qmlName)
+{
+#ifdef QT_QML_LIB
+	return qmlRegisterType<QRoomLayout>(const_cast<const char*>(uri), versionMajor, versionMinor, const_cast<const char*>(qmlName));
+#else
+	return 0;
+#endif
+}
+
+void* QRoomLayout___dynamicPropertyNames_atList(void* ptr, int i)
+{
+	return new QByteArray(static_cast<QList<QByteArray>*>(ptr)->at(i));
+}
+
+void QRoomLayout___dynamicPropertyNames_setList(void* ptr, void* i)
+{
+	static_cast<QList<QByteArray>*>(ptr)->append(*static_cast<QByteArray*>(i));
+}
+
+void* QRoomLayout___dynamicPropertyNames_newList(void* ptr)
+{
+	Q_UNUSED(ptr);
+	return new QList<QByteArray>;
+}
+
+void* QRoomLayout___findChildren_atList2(void* ptr, int i)
+{
+	return const_cast<QObject*>(static_cast<QList<QObject*>*>(ptr)->at(i));
+}
+
+void QRoomLayout___findChildren_setList2(void* ptr, void* i)
+{
+	static_cast<QList<QObject*>*>(ptr)->append(static_cast<QObject*>(i));
+}
+
+void* QRoomLayout___findChildren_newList2(void* ptr)
+{
+	Q_UNUSED(ptr);
+	return new QList<QObject*>;
+}
+
+void* QRoomLayout___findChildren_atList3(void* ptr, int i)
+{
+	return const_cast<QObject*>(static_cast<QList<QObject*>*>(ptr)->at(i));
+}
+
+void QRoomLayout___findChildren_setList3(void* ptr, void* i)
+{
+	static_cast<QList<QObject*>*>(ptr)->append(static_cast<QObject*>(i));
+}
+
+void* QRoomLayout___findChildren_newList3(void* ptr)
+{
+	Q_UNUSED(ptr);
+	return new QList<QObject*>;
+}
+
+void* QRoomLayout___findChildren_atList(void* ptr, int i)
+{
+	return const_cast<QObject*>(static_cast<QList<QObject*>*>(ptr)->at(i));
+}
+
+void QRoomLayout___findChildren_setList(void* ptr, void* i)
+{
+	static_cast<QList<QObject*>*>(ptr)->append(static_cast<QObject*>(i));
+}
+
+void* QRoomLayout___findChildren_newList(void* ptr)
+{
+	Q_UNUSED(ptr);
+	return new QList<QObject*>;
+}
+
+void* QRoomLayout___children_atList(void* ptr, int i)
+{
+	return const_cast<QObject*>(static_cast<QList<QObject *>*>(ptr)->at(i));
+}
+
+void QRoomLayout___children_setList(void* ptr, void* i)
+{
+	static_cast<QList<QObject *>*>(ptr)->append(static_cast<QObject*>(i));
+}
+
+void* QRoomLayout___children_newList(void* ptr)
+{
+	Q_UNUSED(ptr);
+	return new QList<QObject *>;
+}
+
+void* QRoomLayout_NewQRoomLayout()
+{
+	return new QRoomLayout();
+}
+
+void* QRoomLayout_NewQRoomLayout2(void* parent)
+{
+		return new QRoomLayout(static_cast<QWidget*>(parent));
+}
+
+void QRoomLayout_DestroyQRoomLayout(void* ptr)
+{
+	static_cast<QRoomLayout*>(ptr)->~QRoomLayout();
+}
+
+void* QRoomLayout_TakeAtDefault(void* ptr, int index)
+{
+	return static_cast<QRoomLayout*>(ptr)->QHBoxLayout::takeAt(index);
+}
+
+void QRoomLayout_AddItemDefault(void* ptr, void* item)
+{
+	static_cast<QRoomLayout*>(ptr)->QHBoxLayout::addItem(static_cast<QLayoutItem*>(item));
+}
+
+void QRoomLayout_InvalidateDefault(void* ptr)
+{
+	static_cast<QRoomLayout*>(ptr)->QHBoxLayout::invalidate();
+}
+
+void QRoomLayout_SetGeometryDefault(void* ptr, void* r)
+{
+	static_cast<QRoomLayout*>(ptr)->QHBoxLayout::setGeometry(*static_cast<QRect*>(r));
+}
+
+void* QRoomLayout_ItemAtDefault(void* ptr, int index)
+{
+	return static_cast<QRoomLayout*>(ptr)->QHBoxLayout::itemAt(index);
+}
+
+void* QRoomLayout_MaximumSizeDefault(void* ptr)
+{
+	return ({ QSize tmpValue = static_cast<QRoomLayout*>(ptr)->QHBoxLayout::maximumSize(); new QSize(tmpValue.width(), tmpValue.height()); });
+}
+
+void* QRoomLayout_MinimumSizeDefault(void* ptr)
+{
+	return ({ QSize tmpValue = static_cast<QRoomLayout*>(ptr)->QHBoxLayout::minimumSize(); new QSize(tmpValue.width(), tmpValue.height()); });
+}
+
+void* QRoomLayout_SizeHintDefault(void* ptr)
+{
+	return ({ QSize tmpValue = static_cast<QRoomLayout*>(ptr)->QHBoxLayout::sizeHint(); new QSize(tmpValue.width(), tmpValue.height()); });
+}
+
+long long QRoomLayout_ExpandingDirectionsDefault(void* ptr)
+{
+	return static_cast<QRoomLayout*>(ptr)->QHBoxLayout::expandingDirections();
+}
+
+char QRoomLayout_HasHeightForWidthDefault(void* ptr)
+{
+	return static_cast<QRoomLayout*>(ptr)->QHBoxLayout::hasHeightForWidth();
+}
+
+int QRoomLayout_CountDefault(void* ptr)
+{
+	return static_cast<QRoomLayout*>(ptr)->QHBoxLayout::count();
+}
+
+int QRoomLayout_HeightForWidthDefault(void* ptr, int w)
+{
+	return static_cast<QRoomLayout*>(ptr)->QHBoxLayout::heightForWidth(w);
+}
+
+int QRoomLayout_MinimumHeightForWidthDefault(void* ptr, int w)
+{
+	return static_cast<QRoomLayout*>(ptr)->QHBoxLayout::minimumHeightForWidth(w);
+}
+
+void* QRoomLayout_LayoutDefault(void* ptr)
+{
+	return static_cast<QRoomLayout*>(ptr)->QHBoxLayout::layout();
+}
+
+void QRoomLayout_ChildEventDefault(void* ptr, void* e)
+{
+	static_cast<QRoomLayout*>(ptr)->QHBoxLayout::childEvent(static_cast<QChildEvent*>(e));
+}
+
+void* QRoomLayout_GeometryDefault(void* ptr)
+{
+	return ({ QRect tmpValue = static_cast<QRoomLayout*>(ptr)->QHBoxLayout::geometry(); new QRect(tmpValue.x(), tmpValue.y(), tmpValue.width(), tmpValue.height()); });
+}
+
+long long QRoomLayout_ControlTypesDefault(void* ptr)
+{
+	return static_cast<QRoomLayout*>(ptr)->QHBoxLayout::controlTypes();
+}
+
+char QRoomLayout_IsEmptyDefault(void* ptr)
+{
+	return static_cast<QRoomLayout*>(ptr)->QHBoxLayout::isEmpty();
+}
+
+int QRoomLayout_IndexOfDefault(void* ptr, void* widget)
+{
+	return static_cast<QRoomLayout*>(ptr)->QHBoxLayout::indexOf(static_cast<QWidget*>(widget));
+}
+
+char QRoomLayout_EventDefault(void* ptr, void* e)
+{
+	return static_cast<QRoomLayout*>(ptr)->QHBoxLayout::event(static_cast<QEvent*>(e));
+}
+
+char QRoomLayout_EventFilterDefault(void* ptr, void* watched, void* event)
+{
+	return static_cast<QRoomLayout*>(ptr)->QHBoxLayout::eventFilter(static_cast<QObject*>(watched), static_cast<QEvent*>(event));
+}
+
+void QRoomLayout_ConnectNotifyDefault(void* ptr, void* sign)
+{
+	static_cast<QRoomLayout*>(ptr)->QHBoxLayout::connectNotify(*static_cast<QMetaMethod*>(sign));
+}
+
+void QRoomLayout_CustomEventDefault(void* ptr, void* event)
+{
+	static_cast<QRoomLayout*>(ptr)->QHBoxLayout::customEvent(static_cast<QEvent*>(event));
+}
+
+void QRoomLayout_DeleteLaterDefault(void* ptr)
+{
+	static_cast<QRoomLayout*>(ptr)->QHBoxLayout::deleteLater();
+}
+
+void QRoomLayout_DisconnectNotifyDefault(void* ptr, void* sign)
+{
+	static_cast<QRoomLayout*>(ptr)->QHBoxLayout::disconnectNotify(*static_cast<QMetaMethod*>(sign));
+}
+
+void QRoomLayout_TimerEventDefault(void* ptr, void* event)
+{
+	static_cast<QRoomLayout*>(ptr)->QHBoxLayout::timerEvent(static_cast<QTimerEvent*>(event));
+}
+
+
+
+void* QRoomLayout_SpacerItemDefault(void* ptr)
+{
+	return static_cast<QRoomLayout*>(ptr)->QHBoxLayout::spacerItem();
+}
+
+void* QRoomLayout_WidgetDefault(void* ptr)
+{
+	return static_cast<QRoomLayout*>(ptr)->QHBoxLayout::widget();
 }
 
 void QRoomVBoxLayoutWithTriggerSlot_ConnectTriggerRoom(void* ptr)

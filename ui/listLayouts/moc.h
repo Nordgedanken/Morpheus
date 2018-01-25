@@ -8,15 +8,71 @@
 #include <stdint.h>
 
 #ifdef __cplusplus
-class QVBoxLayoutWithTriggerSlot;
-void QVBoxLayoutWithTriggerSlot_QVBoxLayoutWithTriggerSlot_QRegisterMetaTypes();
+class QRoomLayout;
+void QRoomLayout_QRoomLayout_QRegisterMetaTypes();
 class QRoomVBoxLayoutWithTriggerSlot;
 void QRoomVBoxLayoutWithTriggerSlot_QRoomVBoxLayoutWithTriggerSlot_QRegisterMetaTypes();
+class QVBoxLayoutWithTriggerSlot;
+void QVBoxLayoutWithTriggerSlot_QVBoxLayoutWithTriggerSlot_QRegisterMetaTypes();
 extern "C" {
 #endif
 
 struct Moc_PackedString { char* data; long long len; };
 struct Moc_PackedList { void* data; long long len; };
+void QRoomLayout_ConnectSetAvatar(void* ptr);
+void QRoomLayout_DisconnectSetAvatar(void* ptr);
+void QRoomLayout_SetAvatar(void* ptr, struct Moc_PackedString roomID);
+int QRoomLayout_QRoomLayout_QRegisterMetaType();
+int QRoomLayout_QRoomLayout_QRegisterMetaType2(char* typeName);
+int QRoomLayout_QRoomLayout_QmlRegisterType();
+int QRoomLayout_QRoomLayout_QmlRegisterType2(char* uri, int versionMajor, int versionMinor, char* qmlName);
+void* QRoomLayout___dynamicPropertyNames_atList(void* ptr, int i);
+void QRoomLayout___dynamicPropertyNames_setList(void* ptr, void* i);
+void* QRoomLayout___dynamicPropertyNames_newList(void* ptr);
+void* QRoomLayout___findChildren_atList2(void* ptr, int i);
+void QRoomLayout___findChildren_setList2(void* ptr, void* i);
+void* QRoomLayout___findChildren_newList2(void* ptr);
+void* QRoomLayout___findChildren_atList3(void* ptr, int i);
+void QRoomLayout___findChildren_setList3(void* ptr, void* i);
+void* QRoomLayout___findChildren_newList3(void* ptr);
+void* QRoomLayout___findChildren_atList(void* ptr, int i);
+void QRoomLayout___findChildren_setList(void* ptr, void* i);
+void* QRoomLayout___findChildren_newList(void* ptr);
+void* QRoomLayout___children_atList(void* ptr, int i);
+void QRoomLayout___children_setList(void* ptr, void* i);
+void* QRoomLayout___children_newList(void* ptr);
+void* QRoomLayout_NewQRoomLayout();
+void* QRoomLayout_NewQRoomLayout2(void* parent);
+void QRoomLayout_DestroyQRoomLayout(void* ptr);
+void* QRoomLayout_TakeAtDefault(void* ptr, int index);
+void QRoomLayout_AddItemDefault(void* ptr, void* item);
+void QRoomLayout_InvalidateDefault(void* ptr);
+void QRoomLayout_SetGeometryDefault(void* ptr, void* r);
+void* QRoomLayout_ItemAtDefault(void* ptr, int index);
+void* QRoomLayout_MaximumSizeDefault(void* ptr);
+void* QRoomLayout_MinimumSizeDefault(void* ptr);
+void* QRoomLayout_SizeHintDefault(void* ptr);
+long long QRoomLayout_ExpandingDirectionsDefault(void* ptr);
+char QRoomLayout_HasHeightForWidthDefault(void* ptr);
+int QRoomLayout_CountDefault(void* ptr);
+int QRoomLayout_HeightForWidthDefault(void* ptr, int w);
+int QRoomLayout_MinimumHeightForWidthDefault(void* ptr, int w);
+void* QRoomLayout_LayoutDefault(void* ptr);
+void QRoomLayout_ChildEventDefault(void* ptr, void* e);
+void* QRoomLayout_GeometryDefault(void* ptr);
+long long QRoomLayout_ControlTypesDefault(void* ptr);
+char QRoomLayout_IsEmptyDefault(void* ptr);
+int QRoomLayout_IndexOfDefault(void* ptr, void* widget);
+char QRoomLayout_EventDefault(void* ptr, void* e);
+char QRoomLayout_EventFilterDefault(void* ptr, void* watched, void* event);
+void QRoomLayout_ConnectNotifyDefault(void* ptr, void* sign);
+void QRoomLayout_CustomEventDefault(void* ptr, void* event);
+void QRoomLayout_DeleteLaterDefault(void* ptr);
+void QRoomLayout_DisconnectNotifyDefault(void* ptr, void* sign);
+void QRoomLayout_TimerEventDefault(void* ptr, void* event);
+;
+void* QRoomLayout_SpacerItemDefault(void* ptr);
+void* QRoomLayout_WidgetDefault(void* ptr);
 void QRoomVBoxLayoutWithTriggerSlot_ConnectTriggerRoom(void* ptr);
 void QRoomVBoxLayoutWithTriggerSlot_DisconnectTriggerRoom(void* ptr);
 void QRoomVBoxLayoutWithTriggerSlot_TriggerRoom(void* ptr, struct Moc_PackedString roomID);

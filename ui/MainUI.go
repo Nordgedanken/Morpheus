@@ -160,16 +160,14 @@ func (m *MainUI) NewUI() (err error) {
 
 	m.RoomListLayout.ConnectChangeRoom(func(roomID string) {
 		room := m.Rooms[roomID]
-		roomAvatar, roomAvatarErr := room.GetRoomAvatar()
-		if roomAvatarErr != nil {
-			err = roomAvatarErr
-			return
-		}
+
 		if m.CurrentRoom != room.RoomID {
 			m.SetCurrentRoom(room.RoomID)
 			m.MainWidget.SetWindowTitle("Morpheus - " + room.GetRoomTopic())
 
-			m.RoomAvatar.SetPixmap(roomAvatar)
+			room.ConnectSetAvatar(func(roomAvatar *gui.QPixmap) {
+				m.RoomAvatar.SetPixmap(roomAvatar)
+			})
 
 			m.RoomTitle.SetText(room.GetRoomName())
 
@@ -181,6 +179,7 @@ func (m *MainUI) NewUI() (err error) {
 			}
 
 			log.Println("next loadCache")
+			go room.GetRoomAvatar()
 			go m.loadCache()
 		}
 	})
@@ -397,7 +396,9 @@ func (m *MainUI) initRoomList() (err error) {
 
 	first := true
 	for _, roomID := range roomsStruct {
-		m.Rooms[roomID] = rooms.NewRoom(roomID, m.Cli)
+		m.Rooms[roomID] = rooms.NewRoom()
+		m.Rooms[roomID].Cli = m.Cli
+		m.Rooms[roomID].RoomID = roomID
 		m.RoomListLayout.TriggerRoom(roomID)
 		if first {
 			go m.RoomListLayout.ChangeRoom(roomID)
