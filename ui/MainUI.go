@@ -123,7 +123,7 @@ func (m *MainUI) NewUI() (err error) {
 		m.MessageListLayout.NewMessage(messageBody, m.Cli, sender, timestamp, m.messageScrollArea, own)
 	})
 
-	go m.startSync()
+	//go m.startSync()
 	m.widget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 	m.MainWidget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 
