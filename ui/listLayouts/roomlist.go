@@ -2,7 +2,7 @@ package listLayouts
 
 import (
 	"github.com/Nordgedanken/Morpheus/matrix/rooms"
-	log "github.com/sirupsen/logrus"
+	//log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/uitools"
@@ -57,11 +57,11 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *rooms.Room, 
 	var wrapperWidget = loader.Load(file, widget)
 	file.Close()
 
-	roomAvatarQLabel := widgets.NewQLabelFromPointer(widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
+	//roomAvatarQLabel := widgets.NewQLabelFromPointer(widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
 	roomName := widgets.NewQLabelFromPointer(widget.FindChild("roomName", core.Qt__FindChildrenRecursively).Pointer())
 	/*lastMessageContent := widgets.NewQLabelFromPointer(widget.FindChild("lastMessage", core.Qt__FindChildrenRecursively).Pointer())*/
 
-	roomAvatarQLabel.ConnectSetPixmap(func(vqp *gui.QPixmap) {
+	/*roomAvatarQLabel.ConnectSetPixmap(func(vqp *gui.QPixmap) {
 		log.Println("SetPixmapEventRoomAvatar")
 
 		vqp.Scaled2(roomAvatarQLabel.Width(), roomAvatarQLabel.Height(), 0, 0)
@@ -78,7 +78,7 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *rooms.Room, 
 		painter.DrawPixmap10(roomAvatarQLabel.Rect(), vqp)
 		newImage := newPixmap.ToImage()
 		vqp.FromImage(newImage, 0)
-	})
+	})*/
 
 	/*	roomAvatarQLabel.SetPixmap(roomAvatar)*/
 	roomName.SetText(room.GetRoomName())
