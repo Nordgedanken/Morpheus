@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"net/http"
+	_ "net/http/pprof"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -25,6 +27,10 @@ var loginUIStruct *ui.LoginUI
 
 func main() {
 	runtime.GOMAXPROCS(128)
+
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
 
 	// Init Logs and folders
 	configDirs := configdir.New("Nordgedanken", "Morpheus")
