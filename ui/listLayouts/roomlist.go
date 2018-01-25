@@ -87,6 +87,7 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *rooms.Room, 
 	scrollArea.Widget().Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
 
 	room.ConnectSetAvatar(func(roomAvatar *gui.QPixmap) {
+		log.Println("Set RoomAvatar")
 		roomAvatarQLabel.ConnectSetPixmap(func(vqp *gui.QPixmap) {
 			log.Println("SetPixmapEventRoomAvatar")
 

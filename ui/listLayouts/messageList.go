@@ -91,6 +91,7 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(message *message
 	senderContent.SetText(senderDisplayName)
 	timestampContent.SetText(timestampString)
 	message.ConnectSetAvatar(func(avatar *gui.QPixmap) {
+		log.Println("Set Avatar")
 		avatarNew := gui.NewQPixmap()
 		avatarLogo.ConnectPaintEvent(func(event *gui.QPaintEvent) {
 			log.Println("PaintEventAvatar")
