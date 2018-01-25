@@ -99,6 +99,8 @@ func (m *MainUI) NewUI() (err error) {
 		for _, l := range lm {
 			link := messageBody[l.Start:l.End]
 			if l.Start-10 > 0 {
+				log.Println(messageBody[l.Start-10 : l.Start])
+				log.Println(messageBody[l.Start-(1+l.Start+l.End) : l.Start])
 				if !strings.Contains(messageBody[l.Start-10:l.Start], "<a href='") {
 					if l.Start-(1+l.Start+l.End) > 0 {
 						if !strings.Contains(messageBody[l.Start-(1+l.Start+l.End):l.Start], "<a href='"+link+"'>") {

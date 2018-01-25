@@ -201,7 +201,7 @@ func getHelloMatrixList() (resp helloMatrixResp, err error) {
 	log.Println("Get HelloMatrix List")
 	var httpClient = &http.Client{Timeout: 10 * time.Second}
 
-	url := "https://www.hello-matrix.net/public_servers.php?format=json&only_public=true&show_from=Switzerland+%28Hosttech%29"
+	url := "https://www.hello-matrix.net/public_servers.php?format=json&only_public=true"
 
 	log.Println("Before HTTPGet HelloMatrix List")
 	r, RespErr := httpClient.Get(url)
