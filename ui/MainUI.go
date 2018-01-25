@@ -396,7 +396,7 @@ func (m *MainUI) initRoomList() (err error) {
 
 	first := true
 	for _, roomID := range roomsStruct {
-		m.Rooms[roomID] = rooms.NewRoom()
+		m.Rooms[roomID] = rooms.NewRoom(nil)
 		m.Rooms[roomID].Cli = m.Cli
 		m.Rooms[roomID].RoomID = roomID
 		m.RoomListLayout.TriggerRoom(roomID)

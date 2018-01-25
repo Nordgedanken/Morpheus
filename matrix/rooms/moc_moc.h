@@ -84,7 +84,7 @@ void Room::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void *
 }
 
 const QMetaObject Room::staticMetaObject = {
-    { &QHBoxLayout::staticMetaObject, qt_meta_stringdata_Room.data,
+    { &QObject::staticMetaObject, qt_meta_stringdata_Room.data,
       qt_meta_data_Room,  qt_static_metacall, nullptr, nullptr}
 };
 
@@ -99,12 +99,12 @@ void *Room::qt_metacast(const char *_clname)
     if (!_clname) return nullptr;
     if (!strcmp(_clname, qt_meta_stringdata_Room.stringdata0))
         return static_cast<void*>(this);
-    return QHBoxLayout::qt_metacast(_clname);
+    return QObject::qt_metacast(_clname);
 }
 
 int Room::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 {
-    _id = QHBoxLayout::qt_metacall(_c, _id, _a);
+    _id = QObject::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {

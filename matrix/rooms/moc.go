@@ -12,7 +12,6 @@ import (
 	"github.com/therecipe/qt"
 	std_core "github.com/therecipe/qt/core"
 	std_gui "github.com/therecipe/qt/gui"
-	std_widgets "github.com/therecipe/qt/widgets"
 )
 
 func cGoUnpackString(s C.struct_Moc_PackedString) string {
@@ -23,7 +22,7 @@ func cGoUnpackString(s C.struct_Moc_PackedString) string {
 }
 
 type Room_ITF interface {
-	std_widgets.QHBoxLayout_ITF
+	std_core.QObject_ITF
 	Room_PTR() *Room
 }
 
@@ -33,14 +32,14 @@ func (ptr *Room) Room_PTR() *Room {
 
 func (ptr *Room) Pointer() unsafe.Pointer {
 	if ptr != nil {
-		return ptr.QHBoxLayout_PTR().Pointer()
+		return ptr.QObject_PTR().Pointer()
 	}
 	return nil
 }
 
 func (ptr *Room) SetPointer(p unsafe.Pointer) {
 	if ptr != nil {
-		ptr.QHBoxLayout_PTR().SetPointer(p)
+		ptr.QObject_PTR().SetPointer(p)
 	}
 }
 
@@ -61,8 +60,8 @@ func NewRoomFromPointer(ptr unsafe.Pointer) *Room {
 		case *Room:
 			n = deduced
 
-		case *std_widgets.QHBoxLayout:
-			n = &Room{QHBoxLayout: *deduced}
+		case *std_core.QObject:
+			n = &Room{QObject: *deduced}
 
 		default:
 			n = new(Room)
@@ -282,20 +281,42 @@ func (ptr *Room) __children_newList() unsafe.Pointer {
 	return unsafe.Pointer(C.Room___children_newList(ptr.Pointer()))
 }
 
-func NewRoom() *Room {
-	var tmpValue = NewRoomFromPointer(C.Room_NewRoom())
+func NewRoom(parent std_core.QObject_ITF) *Room {
+	var tmpValue = NewRoomFromPointer(C.Room_NewRoom(std_core.PointerFromQObject(parent)))
 	if !qt.ExistsSignal(tmpValue.Pointer(), "destroyed") {
 		tmpValue.ConnectDestroyed(func(*std_core.QObject) { tmpValue.SetPointer(nil) })
 	}
 	return tmpValue
 }
 
-func NewRoom2(parent std_widgets.QWidget_ITF) *Room {
-	var tmpValue = NewRoomFromPointer(C.Room_NewRoom2(std_widgets.PointerFromQWidget(parent)))
-	if !qt.ExistsSignal(tmpValue.Pointer(), "destroyed") {
-		tmpValue.ConnectDestroyed(func(*std_core.QObject) { tmpValue.SetPointer(nil) })
+//export callbackRoom_DestroyRoom
+func callbackRoom_DestroyRoom(ptr unsafe.Pointer) {
+	if signal := qt.GetSignal(ptr, "~Room"); signal != nil {
+		signal.(func())()
+	} else {
+		NewRoomFromPointer(ptr).DestroyRoomDefault()
 	}
-	return tmpValue
+}
+
+func (ptr *Room) ConnectDestroyRoom(f func()) {
+	if ptr.Pointer() != nil {
+
+		if signal := qt.LendSignal(ptr.Pointer(), "~Room"); signal != nil {
+			qt.ConnectSignal(ptr.Pointer(), "~Room", func() {
+				signal.(func())()
+				f()
+			})
+		} else {
+			qt.ConnectSignal(ptr.Pointer(), "~Room", f)
+		}
+	}
+}
+
+func (ptr *Room) DisconnectDestroyRoom() {
+	if ptr.Pointer() != nil {
+
+		qt.DisconnectSignal(ptr.Pointer(), "~Room")
+	}
 }
 
 func (ptr *Room) DestroyRoom() {
@@ -306,316 +327,12 @@ func (ptr *Room) DestroyRoom() {
 	}
 }
 
-//export callbackRoom_TakeAt
-func callbackRoom_TakeAt(ptr unsafe.Pointer, index C.int) unsafe.Pointer {
-	if signal := qt.GetSignal(ptr, "takeAt"); signal != nil {
-		return std_widgets.PointerFromQLayoutItem(signal.(func(int) *std_widgets.QLayoutItem)(int(int32(index))))
-	}
-
-	return std_widgets.PointerFromQLayoutItem(NewRoomFromPointer(ptr).TakeAtDefault(int(int32(index))))
-}
-
-func (ptr *Room) TakeAtDefault(index int) *std_widgets.QLayoutItem {
+func (ptr *Room) DestroyRoomDefault() {
 	if ptr.Pointer() != nil {
-		return std_widgets.NewQLayoutItemFromPointer(C.Room_TakeAtDefault(ptr.Pointer(), C.int(int32(index))))
+		C.Room_DestroyRoomDefault(ptr.Pointer())
+		ptr.SetPointer(nil)
+		runtime.SetFinalizer(ptr, nil)
 	}
-	return nil
-}
-
-//export callbackRoom_AddItem
-func callbackRoom_AddItem(ptr unsafe.Pointer, item unsafe.Pointer) {
-	if signal := qt.GetSignal(ptr, "addItem"); signal != nil {
-		signal.(func(*std_widgets.QLayoutItem))(std_widgets.NewQLayoutItemFromPointer(item))
-	} else {
-		NewRoomFromPointer(ptr).AddItemDefault(std_widgets.NewQLayoutItemFromPointer(item))
-	}
-}
-
-func (ptr *Room) AddItemDefault(item std_widgets.QLayoutItem_ITF) {
-	if ptr.Pointer() != nil {
-		C.Room_AddItemDefault(ptr.Pointer(), std_widgets.PointerFromQLayoutItem(item))
-	}
-}
-
-//export callbackRoom_Invalidate
-func callbackRoom_Invalidate(ptr unsafe.Pointer) {
-	if signal := qt.GetSignal(ptr, "invalidate"); signal != nil {
-		signal.(func())()
-	} else {
-		NewRoomFromPointer(ptr).InvalidateDefault()
-	}
-}
-
-func (ptr *Room) InvalidateDefault() {
-	if ptr.Pointer() != nil {
-		C.Room_InvalidateDefault(ptr.Pointer())
-	}
-}
-
-//export callbackRoom_SetGeometry
-func callbackRoom_SetGeometry(ptr unsafe.Pointer, r unsafe.Pointer) {
-	if signal := qt.GetSignal(ptr, "setGeometry"); signal != nil {
-		signal.(func(*std_core.QRect))(std_core.NewQRectFromPointer(r))
-	} else {
-		NewRoomFromPointer(ptr).SetGeometryDefault(std_core.NewQRectFromPointer(r))
-	}
-}
-
-func (ptr *Room) SetGeometryDefault(r std_core.QRect_ITF) {
-	if ptr.Pointer() != nil {
-		C.Room_SetGeometryDefault(ptr.Pointer(), std_core.PointerFromQRect(r))
-	}
-}
-
-//export callbackRoom_ItemAt
-func callbackRoom_ItemAt(ptr unsafe.Pointer, index C.int) unsafe.Pointer {
-	if signal := qt.GetSignal(ptr, "itemAt"); signal != nil {
-		return std_widgets.PointerFromQLayoutItem(signal.(func(int) *std_widgets.QLayoutItem)(int(int32(index))))
-	}
-
-	return std_widgets.PointerFromQLayoutItem(NewRoomFromPointer(ptr).ItemAtDefault(int(int32(index))))
-}
-
-func (ptr *Room) ItemAtDefault(index int) *std_widgets.QLayoutItem {
-	if ptr.Pointer() != nil {
-		return std_widgets.NewQLayoutItemFromPointer(C.Room_ItemAtDefault(ptr.Pointer(), C.int(int32(index))))
-	}
-	return nil
-}
-
-//export callbackRoom_MaximumSize
-func callbackRoom_MaximumSize(ptr unsafe.Pointer) unsafe.Pointer {
-	if signal := qt.GetSignal(ptr, "maximumSize"); signal != nil {
-		return std_core.PointerFromQSize(signal.(func() *std_core.QSize)())
-	}
-
-	return std_core.PointerFromQSize(NewRoomFromPointer(ptr).MaximumSizeDefault())
-}
-
-func (ptr *Room) MaximumSizeDefault() *std_core.QSize {
-	if ptr.Pointer() != nil {
-		var tmpValue = std_core.NewQSizeFromPointer(C.Room_MaximumSizeDefault(ptr.Pointer()))
-		runtime.SetFinalizer(tmpValue, (*std_core.QSize).DestroyQSize)
-		return tmpValue
-	}
-	return nil
-}
-
-//export callbackRoom_MinimumSize
-func callbackRoom_MinimumSize(ptr unsafe.Pointer) unsafe.Pointer {
-	if signal := qt.GetSignal(ptr, "minimumSize"); signal != nil {
-		return std_core.PointerFromQSize(signal.(func() *std_core.QSize)())
-	}
-
-	return std_core.PointerFromQSize(NewRoomFromPointer(ptr).MinimumSizeDefault())
-}
-
-func (ptr *Room) MinimumSizeDefault() *std_core.QSize {
-	if ptr.Pointer() != nil {
-		var tmpValue = std_core.NewQSizeFromPointer(C.Room_MinimumSizeDefault(ptr.Pointer()))
-		runtime.SetFinalizer(tmpValue, (*std_core.QSize).DestroyQSize)
-		return tmpValue
-	}
-	return nil
-}
-
-//export callbackRoom_SizeHint
-func callbackRoom_SizeHint(ptr unsafe.Pointer) unsafe.Pointer {
-	if signal := qt.GetSignal(ptr, "sizeHint"); signal != nil {
-		return std_core.PointerFromQSize(signal.(func() *std_core.QSize)())
-	}
-
-	return std_core.PointerFromQSize(NewRoomFromPointer(ptr).SizeHintDefault())
-}
-
-func (ptr *Room) SizeHintDefault() *std_core.QSize {
-	if ptr.Pointer() != nil {
-		var tmpValue = std_core.NewQSizeFromPointer(C.Room_SizeHintDefault(ptr.Pointer()))
-		runtime.SetFinalizer(tmpValue, (*std_core.QSize).DestroyQSize)
-		return tmpValue
-	}
-	return nil
-}
-
-//export callbackRoom_ExpandingDirections
-func callbackRoom_ExpandingDirections(ptr unsafe.Pointer) C.longlong {
-	if signal := qt.GetSignal(ptr, "expandingDirections"); signal != nil {
-		return C.longlong(signal.(func() std_core.Qt__Orientation)())
-	}
-
-	return C.longlong(NewRoomFromPointer(ptr).ExpandingDirectionsDefault())
-}
-
-func (ptr *Room) ExpandingDirectionsDefault() std_core.Qt__Orientation {
-	if ptr.Pointer() != nil {
-		return std_core.Qt__Orientation(C.Room_ExpandingDirectionsDefault(ptr.Pointer()))
-	}
-	return 0
-}
-
-//export callbackRoom_HasHeightForWidth
-func callbackRoom_HasHeightForWidth(ptr unsafe.Pointer) C.char {
-	if signal := qt.GetSignal(ptr, "hasHeightForWidth"); signal != nil {
-		return C.char(int8(qt.GoBoolToInt(signal.(func() bool)())))
-	}
-
-	return C.char(int8(qt.GoBoolToInt(NewRoomFromPointer(ptr).HasHeightForWidthDefault())))
-}
-
-func (ptr *Room) HasHeightForWidthDefault() bool {
-	if ptr.Pointer() != nil {
-		return C.Room_HasHeightForWidthDefault(ptr.Pointer()) != 0
-	}
-	return false
-}
-
-//export callbackRoom_Count
-func callbackRoom_Count(ptr unsafe.Pointer) C.int {
-	if signal := qt.GetSignal(ptr, "count"); signal != nil {
-		return C.int(int32(signal.(func() int)()))
-	}
-
-	return C.int(int32(NewRoomFromPointer(ptr).CountDefault()))
-}
-
-func (ptr *Room) CountDefault() int {
-	if ptr.Pointer() != nil {
-		return int(int32(C.Room_CountDefault(ptr.Pointer())))
-	}
-	return 0
-}
-
-//export callbackRoom_HeightForWidth
-func callbackRoom_HeightForWidth(ptr unsafe.Pointer, w C.int) C.int {
-	if signal := qt.GetSignal(ptr, "heightForWidth"); signal != nil {
-		return C.int(int32(signal.(func(int) int)(int(int32(w)))))
-	}
-
-	return C.int(int32(NewRoomFromPointer(ptr).HeightForWidthDefault(int(int32(w)))))
-}
-
-func (ptr *Room) HeightForWidthDefault(w int) int {
-	if ptr.Pointer() != nil {
-		return int(int32(C.Room_HeightForWidthDefault(ptr.Pointer(), C.int(int32(w)))))
-	}
-	return 0
-}
-
-//export callbackRoom_MinimumHeightForWidth
-func callbackRoom_MinimumHeightForWidth(ptr unsafe.Pointer, w C.int) C.int {
-	if signal := qt.GetSignal(ptr, "minimumHeightForWidth"); signal != nil {
-		return C.int(int32(signal.(func(int) int)(int(int32(w)))))
-	}
-
-	return C.int(int32(NewRoomFromPointer(ptr).MinimumHeightForWidthDefault(int(int32(w)))))
-}
-
-func (ptr *Room) MinimumHeightForWidthDefault(w int) int {
-	if ptr.Pointer() != nil {
-		return int(int32(C.Room_MinimumHeightForWidthDefault(ptr.Pointer(), C.int(int32(w)))))
-	}
-	return 0
-}
-
-//export callbackRoom_Layout
-func callbackRoom_Layout(ptr unsafe.Pointer) unsafe.Pointer {
-	if signal := qt.GetSignal(ptr, "layout"); signal != nil {
-		return std_widgets.PointerFromQLayout(signal.(func() *std_widgets.QLayout)())
-	}
-
-	return std_widgets.PointerFromQLayout(NewRoomFromPointer(ptr).LayoutDefault())
-}
-
-func (ptr *Room) LayoutDefault() *std_widgets.QLayout {
-	if ptr.Pointer() != nil {
-		var tmpValue = std_widgets.NewQLayoutFromPointer(C.Room_LayoutDefault(ptr.Pointer()))
-		if !qt.ExistsSignal(tmpValue.Pointer(), "destroyed") {
-			tmpValue.ConnectDestroyed(func(*std_core.QObject) { tmpValue.SetPointer(nil) })
-		}
-		return tmpValue
-	}
-	return nil
-}
-
-//export callbackRoom_ChildEvent
-func callbackRoom_ChildEvent(ptr unsafe.Pointer, e unsafe.Pointer) {
-	if signal := qt.GetSignal(ptr, "childEvent"); signal != nil {
-		signal.(func(*std_core.QChildEvent))(std_core.NewQChildEventFromPointer(e))
-	} else {
-		NewRoomFromPointer(ptr).ChildEventDefault(std_core.NewQChildEventFromPointer(e))
-	}
-}
-
-func (ptr *Room) ChildEventDefault(e std_core.QChildEvent_ITF) {
-	if ptr.Pointer() != nil {
-		C.Room_ChildEventDefault(ptr.Pointer(), std_core.PointerFromQChildEvent(e))
-	}
-}
-
-//export callbackRoom_Geometry
-func callbackRoom_Geometry(ptr unsafe.Pointer) unsafe.Pointer {
-	if signal := qt.GetSignal(ptr, "geometry"); signal != nil {
-		return std_core.PointerFromQRect(signal.(func() *std_core.QRect)())
-	}
-
-	return std_core.PointerFromQRect(NewRoomFromPointer(ptr).GeometryDefault())
-}
-
-func (ptr *Room) GeometryDefault() *std_core.QRect {
-	if ptr.Pointer() != nil {
-		var tmpValue = std_core.NewQRectFromPointer(C.Room_GeometryDefault(ptr.Pointer()))
-		runtime.SetFinalizer(tmpValue, (*std_core.QRect).DestroyQRect)
-		return tmpValue
-	}
-	return nil
-}
-
-//export callbackRoom_ControlTypes
-func callbackRoom_ControlTypes(ptr unsafe.Pointer) C.longlong {
-	if signal := qt.GetSignal(ptr, "controlTypes"); signal != nil {
-		return C.longlong(signal.(func() std_widgets.QSizePolicy__ControlType)())
-	}
-
-	return C.longlong(NewRoomFromPointer(ptr).ControlTypesDefault())
-}
-
-func (ptr *Room) ControlTypesDefault() std_widgets.QSizePolicy__ControlType {
-	if ptr.Pointer() != nil {
-		return std_widgets.QSizePolicy__ControlType(C.Room_ControlTypesDefault(ptr.Pointer()))
-	}
-	return 0
-}
-
-//export callbackRoom_IsEmpty
-func callbackRoom_IsEmpty(ptr unsafe.Pointer) C.char {
-	if signal := qt.GetSignal(ptr, "isEmpty"); signal != nil {
-		return C.char(int8(qt.GoBoolToInt(signal.(func() bool)())))
-	}
-
-	return C.char(int8(qt.GoBoolToInt(NewRoomFromPointer(ptr).IsEmptyDefault())))
-}
-
-func (ptr *Room) IsEmptyDefault() bool {
-	if ptr.Pointer() != nil {
-		return C.Room_IsEmptyDefault(ptr.Pointer()) != 0
-	}
-	return false
-}
-
-//export callbackRoom_IndexOf
-func callbackRoom_IndexOf(ptr unsafe.Pointer, widget unsafe.Pointer) C.int {
-	if signal := qt.GetSignal(ptr, "indexOf"); signal != nil {
-		return C.int(int32(signal.(func(*std_widgets.QWidget) int)(std_widgets.NewQWidgetFromPointer(widget))))
-	}
-
-	return C.int(int32(NewRoomFromPointer(ptr).IndexOfDefault(std_widgets.NewQWidgetFromPointer(widget))))
-}
-
-func (ptr *Room) IndexOfDefault(widget std_widgets.QWidget_ITF) int {
-	if ptr.Pointer() != nil {
-		return int(int32(C.Room_IndexOfDefault(ptr.Pointer(), std_widgets.PointerFromQWidget(widget))))
-	}
-	return 0
 }
 
 //export callbackRoom_Event
@@ -648,6 +365,21 @@ func (ptr *Room) EventFilterDefault(watched std_core.QObject_ITF, event std_core
 		return C.Room_EventFilterDefault(ptr.Pointer(), std_core.PointerFromQObject(watched), std_core.PointerFromQEvent(event)) != 0
 	}
 	return false
+}
+
+//export callbackRoom_ChildEvent
+func callbackRoom_ChildEvent(ptr unsafe.Pointer, event unsafe.Pointer) {
+	if signal := qt.GetSignal(ptr, "childEvent"); signal != nil {
+		signal.(func(*std_core.QChildEvent))(std_core.NewQChildEventFromPointer(event))
+	} else {
+		NewRoomFromPointer(ptr).ChildEventDefault(std_core.NewQChildEventFromPointer(event))
+	}
+}
+
+func (ptr *Room) ChildEventDefault(event std_core.QChildEvent_ITF) {
+	if ptr.Pointer() != nil {
+		C.Room_ChildEventDefault(ptr.Pointer(), std_core.PointerFromQChildEvent(event))
+	}
 }
 
 //export callbackRoom_ConnectNotify
@@ -741,40 +473,4 @@ func (ptr *Room) TimerEventDefault(event std_core.QTimerEvent_ITF) {
 	if ptr.Pointer() != nil {
 		C.Room_TimerEventDefault(ptr.Pointer(), std_core.PointerFromQTimerEvent(event))
 	}
-}
-
-//export callbackRoom_SpacerItem
-func callbackRoom_SpacerItem(ptr unsafe.Pointer) unsafe.Pointer {
-	if signal := qt.GetSignal(ptr, "spacerItem"); signal != nil {
-		return std_widgets.PointerFromQSpacerItem(signal.(func() *std_widgets.QSpacerItem)())
-	}
-
-	return std_widgets.PointerFromQSpacerItem(NewRoomFromPointer(ptr).SpacerItemDefault())
-}
-
-func (ptr *Room) SpacerItemDefault() *std_widgets.QSpacerItem {
-	if ptr.Pointer() != nil {
-		return std_widgets.NewQSpacerItemFromPointer(C.Room_SpacerItemDefault(ptr.Pointer()))
-	}
-	return nil
-}
-
-//export callbackRoom_Widget
-func callbackRoom_Widget(ptr unsafe.Pointer) unsafe.Pointer {
-	if signal := qt.GetSignal(ptr, "widget"); signal != nil {
-		return std_widgets.PointerFromQWidget(signal.(func() *std_widgets.QWidget)())
-	}
-
-	return std_widgets.PointerFromQWidget(NewRoomFromPointer(ptr).WidgetDefault())
-}
-
-func (ptr *Room) WidgetDefault() *std_widgets.QWidget {
-	if ptr.Pointer() != nil {
-		var tmpValue = std_widgets.NewQWidgetFromPointer(C.Room_WidgetDefault(ptr.Pointer()))
-		if !qt.ExistsSignal(tmpValue.Pointer(), "destroyed") {
-			tmpValue.ConnectDestroyed(func(*std_core.QObject) { tmpValue.SetPointer(nil) })
-		}
-		return tmpValue
-	}
-	return nil
 }
