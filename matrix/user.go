@@ -73,7 +73,9 @@ func GetUserAvatar(cli *gomatrix.Client, mxid string, size int) (avatarResp *gui
 	}
 
 	//If cache is empty do a ServerQuery
+	log.Println(len(avatarData))
 	if len(avatarData) <= 0 {
+		log.Println("Download")
 		// Get avatarURL
 		urlPath := cli.BuildURL("profile", mxid, "avatar_url")
 		s := struct {
