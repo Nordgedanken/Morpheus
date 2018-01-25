@@ -139,9 +139,11 @@ func (r *Room) GetRoomAvatar() (avatarResp *gui.QPixmap, err error) {
 		return
 	}
 
+	log.Println(len(roomAvatarData))
 	//If cache is empty do a ServerQuery
 	if len(roomAvatarData) <= 0 {
-		// If avatarURL is not empty (aka. has a avatar set) download it at the size of 100x100. Else make the data string empty
+		log.Println("Empty")
+		// If avatarURL is not empty (aka. has a avatar set) download it at the size of 84x84. Else make the data string empty
 		if r.RoomAvatarURL != "" {
 			hsURL := r.cli.HomeserverURL.String()
 			roomAvatarURLSplits := strings.Split(strings.Replace(r.RoomAvatarURL, "mxc://", "", -1), "/")

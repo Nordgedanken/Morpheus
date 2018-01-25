@@ -3,12 +3,9 @@ package listLayouts
 import (
 	"time"
 
-	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/matrix-org/gomatrix"
 	"github.com/rhinoman/go-commonmark"
-	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
-	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
 )
@@ -52,11 +49,11 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 	if bar.Value() == bar.Maximum() {
 		barAtBottom = true
 	}
-	avatar, AvatarErr := matrix.GetUserAvatar(cli, sender, 61)
+	/*avatar, AvatarErr := matrix.GetUserAvatar(cli, sender, 61)
 	if err != nil {
 		err = AvatarErr
 		return
-	}
+	}*/
 
 	var widget = widgets.NewQWidget(nil, 0)
 
@@ -97,21 +94,21 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 	senderContent.SetText(senderDisplayName)
 	timestampContent.SetText(timestampString)
 
-	avatarNew := gui.NewQPixmap()
-	avatarLogo.ConnectPaintEvent(func(event *gui.QPaintEvent) {
-		log.Println("PaintEventAvatar")
-		painter := gui.NewQPainter2(avatarLogo)
+	/*	avatarNew := gui.NewQPixmap()
+		avatarLogo.ConnectPaintEvent(func(event *gui.QPaintEvent) {
+			log.Println("PaintEventAvatar")
+			painter := gui.NewQPainter2(avatarLogo)
 
-		aWidth := 61 / 2
-		aHeight := 61 / 2
+			aWidth := 61 / 2
+			aHeight := 61 / 2
 
-		painter.DrawEllipse3(aWidth, aHeight, 61.0, 61.0)
-		painter.DrawPixmap2(avatarLogo.Rect(), avatarNew, avatar.Rect())
-		//avatarLogo.Update()
-		avatarLogo.SetPixmap(avatarNew)
-	})
+			painter.DrawEllipse3(aWidth, aHeight, 61.0, 61.0)
+			painter.DrawPixmap2(avatarLogo.Rect(), avatarNew, avatar.Rect())
+			//avatarLogo.Update()
+			avatarLogo.SetPixmap(avatarNew)
+		})
 
-	avatarLogo.SetPixmap(avatar)
+		avatarLogo.SetPixmap(avatar)*/
 
 	var lineLength int
 	lineLength = messageContent.FontMetrics().Width(messageContent.Text(), -1) - 87

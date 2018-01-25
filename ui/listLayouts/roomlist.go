@@ -42,11 +42,11 @@ func NewRoomList(scrollArea *widgets.QScrollArea) (roomViewLayout *QRoomVBoxLayo
 
 // NewRoom adds a new room object to the view
 func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (err error) {
-	roomAvatar, roomAvatarErr := room.GetRoomAvatar()
-	if roomAvatarErr != nil {
-		err = roomAvatarErr
-		return
-	}
+	/*	roomAvatar, roomAvatarErr := room.GetRoomAvatar()
+		if roomAvatarErr != nil {
+			err = roomAvatarErr
+			return
+		}*/
 
 	var widget = widgets.NewQWidget(nil, 0)
 
@@ -80,7 +80,7 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *rooms.Room, 
 		vqp.FromImage(newImage, 0)
 	})
 
-	roomAvatarQLabel.SetPixmap(roomAvatar)
+	/*	roomAvatarQLabel.SetPixmap(roomAvatar)*/
 	roomName.SetText(room.GetRoomName())
 
 	wrapperWidget.Resize2(scrollArea.Widget().Size().Width(), wrapperWidget.Size().Height())
