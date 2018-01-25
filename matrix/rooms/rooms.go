@@ -10,8 +10,8 @@ import (
 	"github.com/matrix-org/gomatrix"
 	"github.com/rhinoman/go-commonmark"
 	log "github.com/sirupsen/logrus"
+	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
-	"github.com/therecipe/qt/widgets"
 )
 
 const mRoomNameEv = "m.room.name"
@@ -19,7 +19,7 @@ const mRoomCanonicalAliasEv = "m.room.canonical_alias"
 
 // Room saves the information of a Room
 type Room struct {
-	widgets.QHBoxLayout
+	core.QObject
 
 	_                 func(roomAvatar *gui.QPixmap) `signal:"SetAvatar"`
 	Cli               *gomatrix.Client

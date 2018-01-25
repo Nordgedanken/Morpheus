@@ -129,7 +129,9 @@ func (s *MorpheusSyncer) getOrCreateRoom(roomID, state string) *gomatrix.Room {
 	// Add new Room to the List if new
 	_, present := s.config.Rooms[roomID]
 	if !present && state == "join" {
-		s.config.Rooms[roomID] = rooms.NewRoom(roomID, s.config.GetCli())
+		s.config.Rooms[roomID] = rooms.NewRoom()
+		s.config.Rooms[roomID].RoomID = roomID
+		s.config.Rooms[roomID].Cli = s.config.GetCli()
 		s.config.RoomListLayout.TriggerRoom(roomID)
 	}
 
