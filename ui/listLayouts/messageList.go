@@ -3,9 +3,11 @@ package listLayouts
 import (
 	"time"
 
-	"github.com/matrix-org/gomatrix"
+	"github.com/Nordgedanken/Morpheus/matrix/messages"
 	"github.com/rhinoman/go-commonmark"
+	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
+	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
 )
@@ -25,7 +27,7 @@ import (
 type QVBoxLayoutWithTriggerSlot struct {
 	widgets.QVBoxLayout
 
-	_ func(messageBody, sender string, timestamp int64) `signal:"TriggerMessage"`
+	_ func(message *messages.Message) `signal:"TriggerMessage"`
 }
 
 // NewMessageList generates a new QVBoxLayoutWithTriggerSlot and adds it to the message scrollArea
@@ -43,17 +45,12 @@ func NewMessageList(scrollArea *widgets.QScrollArea) (messageViewLayout *QVBoxLa
 }
 
 // NewMessage adds a new message object to the view
-func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli *gomatrix.Client, sender string, timestamp int64, scrollArea *widgets.QScrollArea, own bool) (err error) {
+func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(message *messages.Message, scrollArea *widgets.QScrollArea, own bool) (err error) {
 	barAtBottom := false
 	bar := scrollArea.VerticalScrollBar()
 	if bar.Value() == bar.Maximum() {
 		barAtBottom = true
 	}
-	/*avatar, AvatarErr := matrix.GetUserAvatar(cli, sender, 61)
-	if err != nil {
-		err = AvatarErr
-		return
-	}*/
 
 	var widget = widgets.NewQWidget(nil, 0)
 
@@ -69,32 +66,32 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 	var wrapperWidget = loader.Load(file, widget)
 	file.Close()
 
-	timestampFormat := time.Unix(0, int64(timestamp)*int64(time.Millisecond))
+	timestampFormat := time.Unix(0, int64(message.Timestamp)*int64(time.Millisecond))
 	timestampString := timestampFormat.Format("15:04:05 - Mon 2.01.2006")
 
 	messageWidget := widgets.NewQWidgetFromPointer(widget.FindChild("message", core.Qt__FindChildrenRecursively).Pointer())
-	//avatarLogo := widgets.NewQLabelFromPointer(widget.FindChild("avatar", core.Qt__FindChildrenRecursively).Pointer())
+	avatarLogo := widgets.NewQLabelFromPointer(widget.FindChild("avatar", core.Qt__FindChildrenRecursively).Pointer())
 	messageContent := widgets.NewQLabelFromPointer(widget.FindChild("messageContent", core.Qt__FindChildrenRecursively).Pointer())
 	timestampContent := widgets.NewQLabelFromPointer(widget.FindChild("timestamp", core.Qt__FindChildrenRecursively).Pointer())
 	senderContent := widgets.NewQLabelFromPointer(widget.FindChild("sender", core.Qt__FindChildrenRecursively).Pointer())
 
-	markdownMessage := commonmark.Md2Html(body, 0)
+	markdownMessage := commonmark.Md2Html(message.Message, 0)
 
 	messageContent.SetText(markdownMessage)
 
-	senderDisplayNameResp, _ := cli.GetDisplayName(sender)
+	senderDisplayNameResp, _ := message.Cli.GetDisplayName(message.Author)
 	var senderDisplayName string
 	if senderDisplayNameResp == nil {
-		senderDisplayName = sender
+		senderDisplayName = message.Author
 	} else if senderDisplayNameResp.DisplayName == "" {
-		senderDisplayName = sender
+		senderDisplayName = message.Author
 	} else {
 		senderDisplayName = senderDisplayNameResp.DisplayName
 	}
 	senderContent.SetText(senderDisplayName)
 	timestampContent.SetText(timestampString)
-
-	/*	avatarNew := gui.NewQPixmap()
+	message.ConnectSetAvatar(func(avatar *gui.QPixmap) {
+		avatarNew := gui.NewQPixmap()
 		avatarLogo.ConnectPaintEvent(func(event *gui.QPaintEvent) {
 			log.Println("PaintEventAvatar")
 			painter := gui.NewQPainter2(avatarLogo)
@@ -108,7 +105,8 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 			avatarLogo.SetPixmap(avatarNew)
 		})
 
-		avatarLogo.SetPixmap(avatar)*/
+		avatarLogo.SetPixmap(avatar)
+	})
 
 	var lineLength int
 	lineLength = messageContent.FontMetrics().Width(messageContent.Text(), -1) - 87
@@ -129,6 +127,8 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(body string, cli
 	if barAtBottom {
 		bar.SetValue(bar.Maximum())
 	}
+
+	go message.GetUserAvatar()
 
 	return
 }

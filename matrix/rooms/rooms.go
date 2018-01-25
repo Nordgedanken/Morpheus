@@ -6,6 +6,7 @@ import (
 
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
+	"github.com/Nordgedanken/Morpheus/matrix/messages"
 	"github.com/dgraph-io/badger"
 	"github.com/matrix-org/gomatrix"
 	"github.com/rhinoman/go-commonmark"
@@ -28,6 +29,7 @@ type Room struct {
 	RoomNameEventType string
 	RoomAvatarURL     string
 	RoomTopic         string
+	Messages          map[string]*messages.Message
 }
 
 // GetRooms either returns the joinedRoomsList from the Server or the cachedList
@@ -71,6 +73,10 @@ func GetRooms(cli *gomatrix.Client) (rooms []string, err error) {
 		rooms = strings.Split(roomsString, ",")
 	}
 	return
+}
+
+func (r *Room) AddMessage(message *messages.Message) {
+	r.Messages[message.EventID] = message
 }
 
 func (r *Room) crawlRoomAvatarURL() {
@@ -137,10 +143,8 @@ func (r *Room) GetRoomAvatar() {
 		return
 	}
 
-	log.Println(len(roomAvatarData))
 	//If cache is empty do a ServerQuery
 	if len(roomAvatarData) <= 0 {
-		log.Println("Empty")
 		// If avatarURL is not empty (aka. has a avatar set) download it at the size of 84x84. Else make the data string empty
 		if r.RoomAvatarURL != "" {
 			hsURL := r.Cli.HomeserverURL.String()

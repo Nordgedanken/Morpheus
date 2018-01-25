@@ -11,6 +11,7 @@ import (
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
 	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
+	"github.com/Nordgedanken/Morpheus/matrix/messages"
 	"github.com/Nordgedanken/Morpheus/matrix/rooms"
 	"github.com/Nordgedanken/Morpheus/matrix/syncer"
 	"github.com/Nordgedanken/Morpheus/ui/listLayouts"
@@ -87,40 +88,16 @@ func (m *MainUI) NewUI() (err error) {
 
 	m.initScrolls()
 
-	m.MessageListLayout.ConnectTriggerMessage(func(messageBody, sender string, timestamp int64) {
+	m.MessageListLayout.ConnectTriggerMessage(func(message *messages.Message) {
 		log.Println("triggered Message")
 		var own bool
-		if sender == m.Cli.UserID {
+		if message.Author == m.Cli.UserID {
 			own = true
 		} else {
 			own = false
 		}
-		lm := linkify.Links(messageBody)
-		for _, l := range lm {
-			link := messageBody[l.Start:l.End]
-			if l.Start-10 > 0 {
-				log.Println(messageBody[l.Start-10 : l.Start])
-				log.Println(messageBody[l.Start-(1+l.Start+l.End) : l.Start])
-				if !strings.Contains(messageBody[l.Start-10:l.Start], "<a href='") {
-					if l.Start-(1+l.Start+l.End) > 0 {
-						if !strings.Contains(messageBody[l.Start-(1+l.Start+l.End):l.Start], "<a href='"+link+"'>") {
-							messageBody = strings.Replace(messageBody, link, "<a href='"+link+"'>"+link+"</a>", -1)
-						}
-					} else if l.Start-(1+l.Start+l.End) <= 0 {
-						if !strings.Contains(messageBody[0:l.Start], "<a href='"+link+"'>") {
-							messageBody = strings.Replace(messageBody, link, "<a href='"+link+"'>"+link+"</a>", -1)
-						}
-					}
-				}
-			} else if l.Start-9 <= 0 {
-				if !strings.Contains(messageBody[0:l.Start], "<a href='") {
-					if !strings.Contains(messageBody[0:l.Start], "<a href='"+link+"'>") {
-						messageBody = strings.Replace(messageBody, link, "<a href='"+link+"'>"+link+"</a>", -1)
-					}
-				}
-			}
-		}
-		m.MessageListLayout.NewMessage(messageBody, m.Cli, sender, timestamp, m.messageScrollArea, own)
+
+		m.MessageListLayout.NewMessage(message, m.messageScrollArea, own)
 	})
 
 	go m.startSync()
@@ -349,7 +326,15 @@ func (m *MainUI) startSync() (err error) {
 		timestamp := ev.Timestamp
 		go db.CacheMessageEvents(id, sender, room, msg, timestamp)
 		if room == m.CurrentRoom {
-			go m.MessageListLayout.TriggerMessage(msg, sender, timestamp)
+			message := messages.NewMessage(nil)
+			message.EventID = id
+			message.Author = sender
+			message.Message = msg
+			message.Timestamp = timestamp
+			message.Cli = m.Cli
+			m.Rooms[room].AddMessage(message)
+
+			go m.MessageListLayout.TriggerMessage(message)
 		}
 	})
 
@@ -483,7 +468,18 @@ func (m *MainUI) loadCache() (err error) {
 					return errors.WithMessage(ConvErr, "Timestamp String: "+timestamp)
 				}
 
-				go m.MessageListLayout.TriggerMessage(msg, sender, timestampInt)
+				//TODO Use for better/faster cache loading
+				currentRoomMem := m.Rooms[m.CurrentRoom]
+
+				message := messages.NewMessage(nil)
+				message.EventID = idValue
+				message.Author = sender
+				message.Message = msg
+				message.Timestamp = timestampInt
+				message.Cli = m.Cli
+				currentRoomMem.AddMessage(message)
+
+				go m.MessageListLayout.TriggerMessage(message)
 			}
 		}
 
