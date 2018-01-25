@@ -98,8 +98,8 @@ func (m *MainUI) NewUI() (err error) {
 		lm := linkify.Links(messageBody)
 		for _, l := range lm {
 			link := messageBody[l.Start:l.End]
-			if l.Start-9 > 0 {
-				if !strings.Contains(messageBody[l.Start-9:l.Start], "<a href='") {
+			if l.Start-10 > 0 {
+				if !strings.Contains(messageBody[l.Start-10:l.Start], "<a href='") {
 					if l.Start-(1+l.Start+l.End) > 0 {
 						if !strings.Contains(messageBody[l.Start-(1+l.Start+l.End):l.Start], "<a href='"+link+"'>") {
 							messageBody = strings.Replace(messageBody, link, "<a href='"+link+"'>"+link+"</a>", -1)
