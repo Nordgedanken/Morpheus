@@ -136,15 +136,22 @@ func (m *MainUI) NewUI() (err error) {
 	})
 
 	m.RoomListLayout.ConnectChangeRoom(func(roomID string) {
+		log.Println("Change Room")
 		room := m.Rooms[roomID]
 
 		if m.CurrentRoom != room.RoomID {
 			m.SetCurrentRoom(room.RoomID)
 			m.MainWidget.SetWindowTitle("Morpheus - " + room.GetRoomTopic())
 
-			room.ConnectSetAvatar(func(roomAvatar *gui.QPixmap) {
-				m.RoomAvatar.SetPixmap(roomAvatar)
+			room.ConnectSetAvatar(func(IMGdata []byte) {
+				avatar := gui.NewQPixmap()
+
+				str := string(IMGdata[:])
+				avatar.LoadFromData(str, uint(len(str)), "", 0)
+				m.RoomAvatar.SetPixmap(avatar)
 			})
+
+			go room.GetRoomAvatar()
 
 			m.RoomTitle.SetText(room.GetRoomName())
 
@@ -156,7 +163,7 @@ func (m *MainUI) NewUI() (err error) {
 			}
 
 			log.Println("next loadCache")
-			go room.GetRoomAvatar()
+
 			go m.loadCache()
 		}
 	})
