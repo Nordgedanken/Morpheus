@@ -335,7 +335,7 @@ func (m *MainUI) startSync() (err error) {
 		timestamp := ev.Timestamp
 		go db.CacheMessageEvents(id, sender, room, msg, timestamp)
 		if room == m.CurrentRoom {
-			message := messages.NewMessage(nil)
+			message := messages.NewMessage()
 			message.EventID = id
 			message.Author = sender
 			message.Message = msg
@@ -390,7 +390,7 @@ func (m *MainUI) initRoomList() (err error) {
 
 	first := true
 	for _, roomID := range roomsStruct {
-		m.Rooms[roomID] = rooms.NewRoom(nil)
+		m.Rooms[roomID] = rooms.NewRoom()
 		m.Rooms[roomID].Cli = m.Cli
 		m.Rooms[roomID].RoomID = roomID
 		m.RoomListLayout.TriggerRoom(roomID)
@@ -480,7 +480,7 @@ func (m *MainUI) loadCache() (err error) {
 				//TODO Use for better/faster cache loading
 				currentRoomMem := m.Rooms[m.CurrentRoom]
 
-				message := messages.NewMessage(nil)
+				message := messages.NewMessage()
 				message.EventID = idValue
 				message.Author = sender
 				message.Message = msg

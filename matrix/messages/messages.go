@@ -23,6 +23,10 @@ type Message struct {
 	Timestamp     int64
 }
 
+func NewMessage() *Message {
+	return &Message{}
+}
+
 func (m *Message) crawlAvatarURL() (err error) {
 	// Get avatarURL
 	urlPath := m.Cli.BuildURL("profile", m.Author, "avatar_url")

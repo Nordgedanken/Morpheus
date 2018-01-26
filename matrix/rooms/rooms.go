@@ -71,6 +71,10 @@ func GetRooms(cli *gomatrix.Client) (rooms []string, err error) {
 	return
 }
 
+func NewRoom() *Room {
+	return &Room{}
+}
+
 func (r *Room) AddMessage(message *messages.Message) {
 	if r.Messages == nil {
 		r.Messages = make(map[string]*messages.Message)
