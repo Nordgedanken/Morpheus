@@ -130,7 +130,6 @@ func (m *MessageList) NewMessage(message *messages.Message, own bool) (err error
 	})
 
 	message.ConnectSetAvatar(func(IMGdata []byte) {
-		log.Println("Set Avatar")
 		avatar := gui.NewQPixmap()
 
 		str := string(IMGdata[:])
