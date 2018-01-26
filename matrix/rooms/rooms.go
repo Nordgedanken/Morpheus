@@ -11,7 +11,6 @@ import (
 	"github.com/matrix-org/gomatrix"
 	"github.com/rhinoman/go-commonmark"
 	log "github.com/sirupsen/logrus"
-	"github.com/therecipe/qt/core"
 )
 
 const mRoomNameEv = "m.room.name"
@@ -19,9 +18,7 @@ const mRoomCanonicalAliasEv = "m.room.canonical_alias"
 
 // Room saves the information of a Room
 type Room struct {
-	core.QObject
-
-	_                 func(IMGdata []byte) `signal:"SetAvatar"`
+	setAvatarFunc     func(IMGdata []byte)
 	Cli               *gomatrix.Client
 	RoomID            string
 	RoomName          string
@@ -195,6 +192,16 @@ func (r *Room) GetRoomAvatar() {
 	log.Println("Before triggering the new Avatar")
 
 	r.SetAvatar(IMGdata)
+	return
+}
+
+func (r *Room) ConnectSetAvatar(f func(IMGdata []byte)) {
+	r.setAvatarFunc = f
+	return
+}
+
+func (r *Room) SetAvatar(IMGdata []byte) {
+	r.setAvatarFunc(IMGdata)
 	return
 }
 
