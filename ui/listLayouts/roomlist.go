@@ -110,6 +110,7 @@ func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (e
 
 	wrapperWidget.InstallEventFilter(filterObject)
 
+	log.Println(wrapperWidget)
 	r.RoomViewLayout.InsertWidget(r.RoomViewLayout.Count(), wrapperWidget, 0, 0)
 	scrollArea.SetWidgetResizable(true)
 	scrollArea.Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
