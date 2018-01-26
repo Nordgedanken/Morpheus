@@ -157,6 +157,8 @@ func (m *MessageList) NewMessage(message *messages.Message, own bool) (err error
 		bar.SetValue(bar.Maximum())
 	}
 
+	log.Println(m.MessageViewLayout.Count())
+
 	go message.GetUserAvatar()
 
 	return
