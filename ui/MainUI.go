@@ -175,10 +175,10 @@ func (m *MainUI) NewUI() (err error) {
 
 func (m *MainUI) initScrolls() {
 	// Init Message View
-	m.MessageList.InitMessageListLayout(m.messageScrollArea)
+	//m.MessageList.InitMessageListLayout(m.messageScrollArea)
 
 	// Init Room View
-	//m.RoomList.InitRoomListLayout(m.roomScrollArea)
+	m.RoomList.InitRoomListLayout(m.roomScrollArea)
 
 	m.roomScrollArea.SetWidgetResizable(true)
 	m.roomScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
@@ -199,7 +199,7 @@ func (m *MainUI) loadChatUIDefaults() {
 	m.MainWidget = loader.Load(file, m.widget)
 	file.Close()
 
-	m.MessageList = listLayouts.NewMessageList()
+	//m.MessageList = listLayouts.NewMessageList()
 	m.RoomList = listLayouts.NewRoomList()
 
 	m.messageScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
@@ -348,7 +348,7 @@ func (m *MainUI) startSync() (err error) {
 			message.Cli = m.Cli
 			m.Rooms[room].AddMessage(message)
 
-			go m.MessageList.TriggerMessage(message)
+			//go m.MessageList.TriggerMessage(message)
 		}
 	})
 
@@ -398,9 +398,9 @@ func (m *MainUI) initRoomList() (err error) {
 		m.Rooms[roomID] = rooms.NewRoom()
 		m.Rooms[roomID].Cli = m.Cli
 		m.Rooms[roomID].RoomID = roomID
-		//m.RoomList.TriggerRoom(roomID)
+		m.RoomList.TriggerRoom(roomID)
 		if first {
-			//m.RoomList.ChangeRoom(roomID)
+			m.RoomList.ChangeRoom(roomID)
 		}
 		first = false
 	}
@@ -493,7 +493,7 @@ func (m *MainUI) loadCache() (err error) {
 				message.Cli = m.Cli
 				currentRoomMem.AddMessage(message)
 
-				go m.MessageList.TriggerMessage(message)
+				//go m.MessageList.TriggerMessage(message)
 			}
 		}
 
