@@ -48,9 +48,7 @@ func (m *MessageList) TriggerMessage(message *messages.Message) {
 
 // InitMessageListLayout generates a new widgets.QVBoxLayout and adds it to the message scrollArea
 func (m *MessageList) InitMessageListLayout() {
-	log.Println(m.ScrollArea.Widget())
 	messageViewLayout := widgets.NewQVBoxLayout()
-	log.Println(messageViewLayout)
 
 	messageViewLayout.SetSpacing(0)
 	messageViewLayout.SetContentsMargins(15, 0, 15, 15)
@@ -153,7 +151,7 @@ func (m *MessageList) NewMessage(message *messages.Message, own bool) (err error
 	m.MessageViewLayout.SetSpacing(1)
 	m.MessageViewLayout.SetContentsMargins(0, 0, 0, 0)
 
-	m.MessageViewLayout.InsertWidget(m.MessageViewLayout.Count()+1, messageWidget, 0, core.Qt__AlignBottom)
+	m.MessageViewLayout.InsertWidget(m.MessageViewLayout.Count(), messageWidget, 0, core.Qt__AlignBottom)
 
 	if barAtBottom {
 		bar.SetValue(bar.Maximum())
