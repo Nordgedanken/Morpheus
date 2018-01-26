@@ -55,7 +55,6 @@ func (m *MessageList) InitMessageListLayout(scrollArea *widgets.QScrollArea) {
 	scrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
 	scrollArea.SetAlignment(core.Qt__AlignLeading | core.Qt__AlignLeft | core.Qt__AlignVCenter)
 	scrollArea.Widget().SetLayout(messageViewLayout)
-	scrollArea.SetLayout(messageViewLayout)
 
 	m.MessageViewLayout = messageViewLayout
 
