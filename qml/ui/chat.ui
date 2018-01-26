@@ -449,7 +449,7 @@
                   <string/>
                  </property>
                  <property name="icon">
-                  <iconset resource="../../rcc.qrc">
+                  <iconset>
                    <normaloff>:/qml/icons/sign-out.svg</normaloff>:/qml/icons/sign-out.svg</iconset>
                  </property>
                  <property name="iconSize">
@@ -659,6 +659,21 @@ border-radius: 5px;</string>
 border-radius: 2px;</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_7">
+         <property name="leftMargin">
+          <number>9</number>
+         </property>
+         <property name="topMargin">
+          <number>9</number>
+         </property>
+         <property name="rightMargin">
+          <number>9</number>
+         </property>
+         <property name="bottomMargin">
+          <number>9</number>
+         </property>
+         <property name="horizontalSpacing">
+          <number>6</number>
+         </property>
          <item row="0" column="0">
           <widget class="QLabel" name="roomAvatar">
            <property name="sizePolicy">
