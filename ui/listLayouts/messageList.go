@@ -71,7 +71,7 @@ func (m *MessageList) NewMessage(message *messages.Message, own bool) (err error
 		barAtBottom = true
 	}
 
-	var widget = widgets.NewQWidget(m.ScrollArea, 0)
+	var widget = widgets.NewQWidget(nil, 0)
 
 	var loader = uitools.NewQUiLoader(nil)
 	var file *core.QFile

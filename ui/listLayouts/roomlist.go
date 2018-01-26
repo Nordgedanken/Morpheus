@@ -73,8 +73,7 @@ func (r *RoomList) InitRoomListLayout() {
 
 // NewRoom adds a new room object to the view
 func (r *RoomList) NewRoom(room *rooms.Room) (err error) {
-	log.Println("New Room")
-	var widget = widgets.NewQWidget(r.ScrollArea, 0)
+	var widget = widgets.NewQWidget(nil, 0)
 
 	var loader = uitools.NewQUiLoader(nil)
 	var file = core.NewQFile2(":/qml/ui/room.ui")
@@ -113,8 +112,6 @@ func (r *RoomList) NewRoom(room *rooms.Room) (err error) {
 
 	wrapperWidget.InstallEventFilter(filterObject)
 
-	log.Println("r.RoomViewLayout")
-	log.Println(r.RoomViewLayout)
 	r.RoomViewLayout.InsertWidget(r.RoomViewLayout.Count()+1, wrapperWidget, 0, 0)
 	r.ScrollArea.SetWidgetResizable(true)
 	r.ScrollArea.Resize2(wrapperWidget.Size().Width(), r.ScrollArea.Widget().Size().Height())
