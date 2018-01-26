@@ -149,6 +149,8 @@ func (m *MainUI) NewUI() (err error) {
 				str := string(IMGdata[:])
 				avatar.LoadFromData(str, uint(len(str)), "", 0)
 				m.RoomAvatar.SetPixmap(avatar)
+
+				return
 			})
 
 			go room.GetRoomAvatar()

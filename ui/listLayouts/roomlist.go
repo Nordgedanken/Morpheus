@@ -86,6 +86,25 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *rooms.Room, 
 	scrollArea.Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
 	scrollArea.Widget().Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
 
+	roomAvatarQLabel.ConnectSetPixmap(func(vqp *gui.QPixmap) {
+		log.Println("SetPixmapEventRoomAvatar")
+
+		vqp.Scaled2(roomAvatarQLabel.Width(), roomAvatarQLabel.Height(), 0, 0)
+
+		newPixmap := gui.NewQPixmap3(2*roomAvatarQLabel.Width(), 2*roomAvatarQLabel.Height())
+		newPixmap.Fill(nil)
+
+		painter := gui.NewQPainter2(newPixmap)
+
+		r := gui.NewQRegion2(roomAvatarQLabel.Width()/2, roomAvatarQLabel.Height()/2, roomAvatarQLabel.Width(), roomAvatarQLabel.Height(), gui.QRegion__Ellipse)
+
+		painter.SetClipRegion(r, 0)
+
+		painter.DrawPixmap10(roomAvatarQLabel.Rect(), vqp)
+		newImage := newPixmap.ToImage()
+		vqp.FromImage(newImage, 0)
+	})
+
 	room.ConnectSetAvatar(func(IMGdata []byte) {
 		log.Println("Set RoomAvatar")
 
@@ -94,26 +113,9 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *rooms.Room, 
 		str := string(IMGdata[:])
 		avatar.LoadFromData(str, uint(len(str)), "", 0)
 
-		roomAvatarQLabel.ConnectSetPixmap(func(vqp *gui.QPixmap) {
-			log.Println("SetPixmapEventRoomAvatar")
-
-			vqp.Scaled2(roomAvatarQLabel.Width(), roomAvatarQLabel.Height(), 0, 0)
-
-			newPixmap := gui.NewQPixmap3(2*roomAvatarQLabel.Width(), 2*roomAvatarQLabel.Height())
-			newPixmap.Fill(nil)
-
-			painter := gui.NewQPainter2(newPixmap)
-
-			r := gui.NewQRegion2(roomAvatarQLabel.Width()/2, roomAvatarQLabel.Height()/2, roomAvatarQLabel.Width(), roomAvatarQLabel.Height(), gui.QRegion__Ellipse)
-
-			painter.SetClipRegion(r, 0)
-
-			painter.DrawPixmap10(roomAvatarQLabel.Rect(), vqp)
-			newImage := newPixmap.ToImage()
-			vqp.FromImage(newImage, 0)
-		})
-
 		roomAvatarQLabel.SetPixmap(avatar)
+
+		return
 	})
 
 	go room.GetRoomAvatar()
