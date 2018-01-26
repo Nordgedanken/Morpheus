@@ -90,21 +90,33 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(message *message
 	}
 	senderContent.SetText(senderDisplayName)
 	timestampContent.SetText(timestampString)
-	message.ConnectSetAvatar(func(avatar *gui.QPixmap) {
+
+	avatarLogo.ConnectSetPixmap(func(vqp *gui.QPixmap) {
+		log.Println("SetPixmapEventRoomAvatar")
+
+		vqp.Scaled2(avatarLogo.Width(), avatarLogo.Height(), 0, 0)
+
+		newPixmap := gui.NewQPixmap3(2*avatarLogo.Width(), 2*avatarLogo.Height())
+		newPixmap.Fill(nil)
+
+		painter := gui.NewQPainter2(newPixmap)
+
+		r := gui.NewQRegion2(avatarLogo.Width()/2, avatarLogo.Height()/2, avatarLogo.Width(), avatarLogo.Height(), gui.QRegion__Ellipse)
+
+		painter.SetClipRegion(r, 0)
+
+		painter.DrawPixmap10(avatarLogo.Rect(), vqp)
+		newImage := newPixmap.ToImage()
+		vqp.FromImage(newImage, 0)
+	})
+
+	message.ConnectSetAvatar(func(IMGdata []byte) {
 		log.Println("Set Avatar")
-		avatarNew := gui.NewQPixmap()
-		avatarLogo.ConnectPaintEvent(func(event *gui.QPaintEvent) {
-			log.Println("PaintEventAvatar")
-			painter := gui.NewQPainter2(avatarLogo)
+		avatar := gui.NewQPixmap()
 
-			aWidth := 61 / 2
-			aHeight := 61 / 2
+		str := string(IMGdata[:])
 
-			painter.DrawEllipse3(aWidth, aHeight, 61.0, 61.0)
-			painter.DrawPixmap2(avatarLogo.Rect(), avatarNew, avatar.Rect())
-			//avatarLogo.Update()
-			avatarLogo.SetPixmap(avatarNew)
-		})
+		avatar.LoadFromData(string(str[:]), uint(len(str)), "", 0)
 
 		avatarLogo.SetPixmap(avatar)
 	})

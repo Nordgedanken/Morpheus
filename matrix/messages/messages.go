@@ -9,22 +9,18 @@ import (
 	"github.com/matrix-org/gomatrix"
 	"github.com/opennota/linkify"
 	log "github.com/sirupsen/logrus"
-	"github.com/therecipe/qt/core"
-	"github.com/therecipe/qt/gui"
 )
 
 // Message saves the information of a Message
 type Message struct {
-	core.QObject
-
-	_         func(avatar *gui.QPixmap) `signal:"SetAvatar"`
-	Cli       *gomatrix.Client
-	EventID   string
-	Author    string
-	EventType string
-	AvatarURL string
-	Message   string
-	Timestamp int64
+	setAvatarFunc func(IMGdata []byte)
+	Cli           *gomatrix.Client
+	EventID       string
+	Author        string
+	EventType     string
+	AvatarURL     string
+	Message       string
+	Timestamp     int64
 }
 
 func (m *Message) crawlAvatarURL() (err error) {
@@ -142,11 +138,16 @@ func (m *Message) GetUserAvatar() {
 		IMGdata = avatarData
 	}
 
-	avatar := gui.NewQPixmap()
+	m.SetAvatar(IMGdata)
+	return
+}
 
-	str := string(IMGdata[:])
+func (m *Message) ConnectSetAvatar(f func(IMGdata []byte)) {
+	m.setAvatarFunc = f
+	return
+}
 
-	avatar.LoadFromData(string(str[:]), uint(len(str)), "", 0)
-	m.SetAvatar(avatar)
+func (m *Message) SetAvatar(IMGdata []byte) {
+	m.setAvatarFunc(IMGdata)
 	return
 }
