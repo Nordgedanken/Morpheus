@@ -116,9 +116,7 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *rooms.Room, 
 		roomAvatarQLabel.SetPixmap(avatar)
 	})
 
-	log.Println("Before GetRoomAvatar")
 	go room.GetRoomAvatar()
-	log.Println("After GetRoomAvatar")
 
 	return
 }

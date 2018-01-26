@@ -192,6 +192,7 @@ func (r *Room) GetRoomAvatar() {
 	} else {
 		IMGdata = roomAvatarData
 	}
+	log.Println("Before triggering the new Avatar")
 
 	r.SetAvatar(IMGdata)
 	return
