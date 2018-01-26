@@ -175,11 +175,9 @@ func (m *MainUI) NewUI() (err error) {
 
 func (m *MainUI) initScrolls() {
 	// Init Message View
-	m.MessageList = listLayouts.NewMessageList()
 	m.MessageList.InitMessageListLayout()
 
 	// Init Room View
-	m.RoomList = listLayouts.NewRoomList()
 	m.RoomList.InitRoomListLayout()
 
 	m.MessageList.ScrollArea.SetWidgetResizable(true)
@@ -200,6 +198,9 @@ func (m *MainUI) loadChatUIDefaults() {
 	file.Open(core.QIODevice__ReadOnly)
 	m.MainWidget = loader.Load(file, m.widget)
 	file.Close()
+
+	m.MessageList = listLayouts.NewMessageList()
+	m.RoomList = listLayouts.NewRoomList()
 
 	m.MessageList.ScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
 	m.RoomList.ScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("roomScroll", core.Qt__FindChildrenRecursively).Pointer())
