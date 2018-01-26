@@ -26,7 +26,6 @@ import (
 // messageList defines the TriggerMessage method to add messages to the View
 type MessageList struct {
 	MessageViewLayout   *widgets.QVBoxLayout
-	ScrollArea          *widgets.QScrollArea
 	triggerMessageFuncs []func(message *messages.Message)
 }
 
@@ -48,7 +47,6 @@ func (m *MessageList) TriggerMessage(message *messages.Message) {
 
 // InitMessageListLayout generates a new widgets.QVBoxLayout and adds it to the message scrollArea
 func (m *MessageList) InitMessageListLayout(scrollArea *widgets.QScrollArea) {
-	m.ScrollArea = scrollArea
 	messageViewLayout := widgets.NewQVBoxLayout()
 
 	messageViewLayout.AddStretch(1)
@@ -64,9 +62,9 @@ func (m *MessageList) InitMessageListLayout(scrollArea *widgets.QScrollArea) {
 }
 
 // NewMessage adds a new message object to the view
-func (m *MessageList) NewMessage(message *messages.Message, own bool) (err error) {
+func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.QScrollArea, own bool) (err error) {
 	barAtBottom := false
-	bar := m.ScrollArea.VerticalScrollBar()
+	bar := scrollArea.VerticalScrollBar()
 	if bar.Value() == bar.Maximum() {
 		barAtBottom = true
 	}
@@ -141,8 +139,8 @@ func (m *MessageList) NewMessage(message *messages.Message, own bool) (err error
 
 	var lineLength int
 	lineLength = messageContent.FontMetrics().Width(messageContent.Text(), -1) - 87
-	if lineLength >= m.ScrollArea.Widget().Size().Width() {
-		lineLength = m.ScrollArea.Widget().Size().Width() - 20 - 87
+	if lineLength >= scrollArea.Widget().Size().Width() {
+		lineLength = scrollArea.Widget().Size().Width() - 20 - 87
 	}
 
 	messageContent.SetMinimumWidth(lineLength + 10)

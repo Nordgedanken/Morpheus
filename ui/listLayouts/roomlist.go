@@ -22,7 +22,6 @@ import (
 // RoomList defines the TriggerRoom and ChangeRoom method to add messages to the View
 type RoomList struct {
 	RoomViewLayout   *widgets.QVBoxLayout
-	ScrollArea       *widgets.QScrollArea
 	triggerRoomFuncs []func(roomID string)
 	changeRoomFuncs  []func(roomID string)
 }
@@ -71,7 +70,7 @@ func (r *RoomList) InitRoomListLayout(scrollArea *widgets.QScrollArea) {
 }
 
 // NewRoom adds a new room object to the view
-func (r *RoomList) NewRoom(room *rooms.Room) (err error) {
+func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (err error) {
 	var widget = widgets.NewQWidget(nil, 0)
 
 	var loader = uitools.NewQUiLoader(nil)
@@ -87,8 +86,8 @@ func (r *RoomList) NewRoom(room *rooms.Room) (err error) {
 
 	roomName.SetText(room.GetRoomName())
 
-	wrapperWidget.Resize2(r.ScrollArea.Widget().Size().Width(), wrapperWidget.Size().Height())
-	widget.Resize2(r.ScrollArea.Widget().Size().Width(), wrapperWidget.Size().Height())
+	wrapperWidget.Resize2(scrollArea.Widget().Size().Width(), wrapperWidget.Size().Height())
+	widget.Resize2(scrollArea.Widget().Size().Width(), wrapperWidget.Size().Height())
 
 	var filterObject = core.NewQObject(nil)
 	filterObject.ConnectEventFilter(func(watched *core.QObject, event *core.QEvent) bool {
@@ -112,9 +111,9 @@ func (r *RoomList) NewRoom(room *rooms.Room) (err error) {
 	wrapperWidget.InstallEventFilter(filterObject)
 
 	r.RoomViewLayout.InsertWidget(r.RoomViewLayout.Count(), wrapperWidget, 0, 0)
-	r.ScrollArea.SetWidgetResizable(true)
-	r.ScrollArea.Resize2(wrapperWidget.Size().Width(), r.ScrollArea.Widget().Size().Height())
-	r.ScrollArea.Widget().Resize2(wrapperWidget.Size().Width(), r.ScrollArea.Widget().Size().Height())
+	scrollArea.SetWidgetResizable(true)
+	scrollArea.Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
+	scrollArea.Widget().Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
 
 	roomAvatarQLabel.ConnectSetPixmap(func(vqp *gui.QPixmap) {
 		log.Println("SetPixmapEventRoomAvatar")

@@ -97,7 +97,7 @@ func (m *MainUI) NewUI() (err error) {
 			own = false
 		}
 
-		m.MessageList.NewMessage(message, own)
+		m.MessageList.NewMessage(message, m.messageScrollArea, own)
 	})
 
 	go m.startSync()
@@ -107,7 +107,7 @@ func (m *MainUI) NewUI() (err error) {
 	m.RoomList.ConnectTriggerRoom(func(roomID string) {
 		room := m.Rooms[roomID]
 
-		NewRoomErr := m.RoomList.NewRoom(room)
+		NewRoomErr := m.RoomList.NewRoom(room, m.roomScrollArea)
 		if NewRoomErr != nil {
 			err = NewRoomErr
 			return
@@ -290,7 +290,7 @@ func (m *MainUI) logout() (err error) {
 			m.window.DisconnectKeyPressEvent()
 			m.window.DisconnectResizeEvent()
 			m.widget.DisconnectResizeEvent()
-			m.MessageList.ScrollArea.DisconnectResizeEvent()
+			m.messageScrollArea.DisconnectResizeEvent()
 
 			LoginUIStruct := NewLoginUIStructWithExistingConfig(m.Config, m.window)
 			loginUIErr := LoginUIStruct.NewUI()
@@ -418,7 +418,7 @@ func contains(slice []string, item string) bool {
 
 func (m *MainUI) loadCache() (err error) {
 	barAtBottom := false
-	bar := m.MessageList.ScrollArea.VerticalScrollBar()
+	bar := m.messageScrollArea.VerticalScrollBar()
 	if bar.Value() == bar.Maximum() {
 		barAtBottom = true
 	}
