@@ -112,7 +112,7 @@ func (r *RoomList) NewRoom(room *rooms.Room) (err error) {
 
 	wrapperWidget.InstallEventFilter(filterObject)
 
-	r.RoomViewLayout.InsertWidget(r.RoomViewLayout.Count()+1, wrapperWidget, 0, 0)
+	r.RoomViewLayout.InsertWidget(r.RoomViewLayout.Count()+1, widget, 0, 0)
 	r.ScrollArea.SetWidgetResizable(true)
 	r.ScrollArea.Resize2(wrapperWidget.Size().Width(), r.ScrollArea.Widget().Size().Height())
 	r.ScrollArea.Widget().Resize2(wrapperWidget.Size().Width(), r.ScrollArea.Widget().Size().Height())

@@ -153,8 +153,7 @@ func (m *MessageList) NewMessage(message *messages.Message, own bool) (err error
 	m.MessageViewLayout.SetSpacing(1)
 	m.MessageViewLayout.SetContentsMargins(0, 0, 0, 0)
 
-	log.Println(m.MessageViewLayout)
-	m.MessageViewLayout.InsertWidget(m.MessageViewLayout.Count()+1, messageWidget, 0, core.Qt__AlignBottom)
+	m.MessageViewLayout.InsertWidget(m.MessageViewLayout.Count()+1, widget, 0, core.Qt__AlignBottom)
 
 	if barAtBottom {
 		bar.SetValue(bar.Maximum())
