@@ -55,6 +55,7 @@ func (m *MessageList) InitMessageListLayout(scrollArea *widgets.QScrollArea) {
 	scrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
 	scrollArea.SetAlignment(core.Qt__AlignLeading | core.Qt__AlignLeft | core.Qt__AlignVCenter)
 	scrollArea.Widget().SetLayout(messageViewLayout)
+	scrollArea.SetLayout(messageViewLayout)
 
 	m.MessageViewLayout = messageViewLayout
 
@@ -151,8 +152,7 @@ func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.
 	m.MessageViewLayout.SetSpacing(1)
 	m.MessageViewLayout.SetContentsMargins(0, 0, 0, 0)
 
-	log.Println(messageWidget)
-	m.MessageViewLayout.InsertWidget(m.MessageViewLayout.Count(), messageWidget, 0, core.Qt__AlignBottom)
+	m.MessageViewLayout.InsertWidget(m.MessageViewLayout.Count()+1, messageWidget, 0, core.Qt__AlignBottom)
 
 	if barAtBottom {
 		bar.SetValue(bar.Maximum())
