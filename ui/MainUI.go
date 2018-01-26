@@ -199,7 +199,7 @@ func (m *MainUI) loadChatUIDefaults() {
 	m.MainWidget = loader.Load(file, m.widget)
 	file.Close()
 
-	//m.MessageList = listLayouts.NewMessageList()
+	m.MessageList = listLayouts.NewMessageList()
 	m.RoomList = listLayouts.NewRoomList()
 
 	m.messageScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
