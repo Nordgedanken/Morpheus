@@ -175,18 +175,18 @@ func (m *MainUI) NewUI() (err error) {
 
 func (m *MainUI) initScrolls() {
 	// Init Message View
-	m.MessageList.InitMessageListLayout()
+	m.MessageList.InitMessageListLayout(m.messageScrollArea)
 
 	// Init Room View
-	m.RoomList.InitRoomListLayout()
+	m.RoomList.InitRoomListLayout(m.roomScrollArea)
 
-	m.MessageList.ScrollArea.SetWidgetResizable(true)
-	m.MessageList.ScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
-	m.MessageList.ScrollArea.SetContentsMargins(0, 0, 0, 0)
+	m.roomScrollArea.SetWidgetResizable(true)
+	m.roomScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
+	m.roomScrollArea.SetContentsMargins(0, 0, 0, 0)
 
-	m.RoomList.ScrollArea.SetWidgetResizable(true)
-	m.RoomList.ScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
-	m.RoomList.ScrollArea.SetContentsMargins(0, 0, 0, 0)
+	m.messageScrollArea.SetWidgetResizable(true)
+	m.messageScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
+	m.messageScrollArea.SetContentsMargins(0, 0, 0, 0)
 }
 
 func (m *MainUI) loadChatUIDefaults() {
@@ -202,8 +202,8 @@ func (m *MainUI) loadChatUIDefaults() {
 	m.MessageList = listLayouts.NewMessageList()
 	m.RoomList = listLayouts.NewRoomList()
 
-	m.MessageList.ScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
-	m.RoomList.ScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("roomScroll", core.Qt__FindChildrenRecursively).Pointer())
+	m.messageScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
+	m.roomScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("roomScroll", core.Qt__FindChildrenRecursively).Pointer())
 
 	m.RoomAvatar = widgets.NewQLabelFromPointer(m.widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
 	m.RoomTitle = widgets.NewQLabelFromPointer(m.widget.FindChild("RoomTitle", core.Qt__FindChildrenRecursively).Pointer())

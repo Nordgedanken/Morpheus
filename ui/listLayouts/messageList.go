@@ -47,14 +47,16 @@ func (m *MessageList) TriggerMessage(message *messages.Message) {
 }
 
 // InitMessageListLayout generates a new widgets.QVBoxLayout and adds it to the message scrollArea
-func (m *MessageList) InitMessageListLayout() {
+func (m *MessageList) InitMessageListLayout(scrollArea *widgets.QScrollArea) {
+	m.ScrollArea = scrollArea
 	messageViewLayout := widgets.NewQVBoxLayout()
 
+	messageViewLayout.AddStretch(1)
 	messageViewLayout.SetSpacing(0)
 	messageViewLayout.SetContentsMargins(15, 0, 15, 15)
-	m.ScrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
-	m.ScrollArea.SetAlignment(core.Qt__AlignLeading | core.Qt__AlignLeft | core.Qt__AlignVCenter)
-	m.ScrollArea.Widget().SetLayout(messageViewLayout)
+	scrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
+	scrollArea.SetAlignment(core.Qt__AlignLeading | core.Qt__AlignLeft | core.Qt__AlignVCenter)
+	scrollArea.Widget().SetLayout(messageViewLayout)
 
 	m.MessageViewLayout = messageViewLayout
 
