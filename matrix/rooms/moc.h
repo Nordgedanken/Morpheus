@@ -17,7 +17,7 @@ struct Moc_PackedString { char* data; long long len; };
 struct Moc_PackedList { void* data; long long len; };
 void Room_ConnectSetAvatar(void* ptr);
 void Room_DisconnectSetAvatar(void* ptr);
-void Room_SetAvatar(void* ptr, void* roomAvatar);
+void Room_SetAvatar(void* ptr, uintptr_t IMGdata);
 int Room_Room_QRegisterMetaType();
 int Room_Room_QRegisterMetaType2(char* typeName);
 int Room_Room_QmlRegisterType();

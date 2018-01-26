@@ -86,8 +86,14 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *rooms.Room, 
 	scrollArea.Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
 	scrollArea.Widget().Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
 
-	room.ConnectSetAvatar(func(roomAvatar *gui.QPixmap) {
+	room.ConnectSetAvatar(func(IMGdata []byte) {
 		log.Println("Set RoomAvatar")
+
+		avatar := gui.NewQPixmap()
+
+		str := string(IMGdata[:])
+		avatar.LoadFromData(str, uint(len(str)), "", 0)
+
 		roomAvatarQLabel.ConnectSetPixmap(func(vqp *gui.QPixmap) {
 			log.Println("SetPixmapEventRoomAvatar")
 
@@ -107,10 +113,12 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *rooms.Room, 
 			vqp.FromImage(newImage, 0)
 		})
 
-		roomAvatarQLabel.SetPixmap(roomAvatar)
+		roomAvatarQLabel.SetPixmap(avatar)
 	})
 
+	log.Println("Before GetRoomAvatar")
 	go room.GetRoomAvatar()
+	log.Println("After GetRoomAvatar")
 
 	return
 }

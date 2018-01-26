@@ -11,7 +11,6 @@ import (
 
 	"github.com/therecipe/qt"
 	std_core "github.com/therecipe/qt/core"
-	std_gui "github.com/therecipe/qt/gui"
 )
 
 func cGoUnpackString(s C.struct_Moc_PackedString) string {
@@ -78,14 +77,19 @@ func callbackRoom_Constructor(ptr unsafe.Pointer) {
 }
 
 //export callbackRoom_SetAvatar
-func callbackRoom_SetAvatar(ptr unsafe.Pointer, roomAvatar unsafe.Pointer) {
+func callbackRoom_SetAvatar(ptr unsafe.Pointer, IMGdata C.uintptr_t) {
+	var IMGdataD []byte
+	if IMGdataI, ok := qt.ReceiveTemp(unsafe.Pointer(uintptr(IMGdata))); ok {
+		qt.UnregisterTemp(unsafe.Pointer(uintptr(IMGdata)))
+		IMGdataD = IMGdataI.([]byte)
+	}
 	if signal := qt.GetSignal(ptr, "SetAvatar"); signal != nil {
-		signal.(func(*std_gui.QPixmap))(std_gui.NewQPixmapFromPointer(roomAvatar))
+		signal.(func([]byte))(IMGdataD)
 	}
 
 }
 
-func (ptr *Room) ConnectSetAvatar(f func(roomAvatar *std_gui.QPixmap)) {
+func (ptr *Room) ConnectSetAvatar(f func(IMGdata []byte)) {
 	if ptr.Pointer() != nil {
 
 		if !qt.ExistsSignal(ptr.Pointer(), "SetAvatar") {
@@ -93,9 +97,9 @@ func (ptr *Room) ConnectSetAvatar(f func(roomAvatar *std_gui.QPixmap)) {
 		}
 
 		if signal := qt.LendSignal(ptr.Pointer(), "SetAvatar"); signal != nil {
-			qt.ConnectSignal(ptr.Pointer(), "SetAvatar", func(roomAvatar *std_gui.QPixmap) {
-				signal.(func(*std_gui.QPixmap))(roomAvatar)
-				f(roomAvatar)
+			qt.ConnectSignal(ptr.Pointer(), "SetAvatar", func(IMGdata []byte) {
+				signal.(func([]byte))(IMGdata)
+				f(IMGdata)
 			})
 		} else {
 			qt.ConnectSignal(ptr.Pointer(), "SetAvatar", f)
@@ -110,9 +114,10 @@ func (ptr *Room) DisconnectSetAvatar() {
 	}
 }
 
-func (ptr *Room) SetAvatar(roomAvatar std_gui.QPixmap_ITF) {
+func (ptr *Room) SetAvatar(IMGdata []byte) {
 	if ptr.Pointer() != nil {
-		C.Room_SetAvatar(ptr.Pointer(), std_gui.PointerFromQPixmap(roomAvatar))
+		qt.RegisterTemp(unsafe.Pointer(&IMGdata), IMGdata)
+		C.Room_SetAvatar(ptr.Pointer(), C.uintptr_t(uintptr(unsafe.Pointer(&IMGdata))))
 	}
 }
 

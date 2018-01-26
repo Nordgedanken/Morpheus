@@ -20,8 +20,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Room_t {
-    QByteArrayData data[4];
-    char stringdata0[27];
+    QByteArrayData data[5];
+    char stringdata0[33];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -33,10 +33,11 @@ static const qt_meta_stringdata_Room_t qt_meta_stringdata_Room = {
 QT_MOC_LITERAL(0, 0, 4), // "Room"
 QT_MOC_LITERAL(1, 5, 9), // "SetAvatar"
 QT_MOC_LITERAL(2, 15, 0), // ""
-QT_MOC_LITERAL(3, 16, 10) // "roomAvatar"
+QT_MOC_LITERAL(3, 16, 8), // "quintptr"
+QT_MOC_LITERAL(4, 25, 7) // "IMGdata"
 
     },
-    "Room\0SetAvatar\0\0roomAvatar"
+    "Room\0SetAvatar\0\0quintptr\0IMGdata"
 };
 #undef QT_MOC_LITERAL
 
@@ -57,7 +58,7 @@ static const uint qt_meta_data_Room[] = {
        1,    1,   19,    2, 0x06 /* Public */,
 
  // signals: parameters
-    QMetaType::Void, QMetaType::QPixmap,    3,
+    QMetaType::Void, 0x80000000 | 3,    4,
 
        0        // eod
 };
@@ -68,13 +69,13 @@ void Room::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void *
         Room *_t = static_cast<Room *>(_o);
         Q_UNUSED(_t)
         switch (_id) {
-        case 0: _t->SetAvatar((*reinterpret_cast< QPixmap(*)>(_a[1]))); break;
+        case 0: _t->SetAvatar((*reinterpret_cast< quintptr(*)>(_a[1]))); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
         int *result = reinterpret_cast<int *>(_a[0]);
         {
-            typedef void (Room::*_t)(QPixmap );
+            typedef void (Room::*_t)(quintptr );
             if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&Room::SetAvatar)) {
                 *result = 0;
                 return;
@@ -120,7 +121,7 @@ int Room::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
 }
 
 // SIGNAL 0
-void Room::SetAvatar(QPixmap _t1)
+void Room::SetAvatar(quintptr _t1)
 {
     void *_a[] = { nullptr, const_cast<void*>(reinterpret_cast<const void*>(&_t1)) };
     QMetaObject::activate(this, &staticMetaObject, 0, _a);

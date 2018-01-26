@@ -12,7 +12,6 @@ import (
 	"github.com/rhinoman/go-commonmark"
 	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
-	"github.com/therecipe/qt/gui"
 )
 
 const mRoomNameEv = "m.room.name"
@@ -22,7 +21,7 @@ const mRoomCanonicalAliasEv = "m.room.canonical_alias"
 type Room struct {
 	core.QObject
 
-	_                 func(roomAvatar *gui.QPixmap) `signal:"SetAvatar"`
+	_                 func(IMGdata []byte) `signal:"SetAvatar"`
 	Cli               *gomatrix.Client
 	RoomID            string
 	RoomName          string
@@ -194,11 +193,7 @@ func (r *Room) GetRoomAvatar() {
 		IMGdata = roomAvatarData
 	}
 
-	avatar := gui.NewQPixmap()
-
-	str := string(IMGdata[:])
-	avatar.LoadFromData(str, uint(len(str)), "", 0)
-	r.SetAvatar(avatar)
+	r.SetAvatar(IMGdata)
 	return
 }
 

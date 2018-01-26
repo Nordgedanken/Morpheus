@@ -27,7 +27,6 @@
 #include <QPaintDevice>
 #include <QPaintDeviceWindow>
 #include <QPdfWriter>
-#include <QPixmap>
 #include <QQuickItem>
 #include <QRadioData>
 #include <QSignalSpy>
@@ -44,7 +43,7 @@ class Room: public QObject
 Q_OBJECT
 public:
 	Room(QObject *parent = Q_NULLPTR) : QObject(parent) {qRegisterMetaType<quintptr>("quintptr");Room_Room_QRegisterMetaType();Room_Room_QRegisterMetaTypes();callbackRoom_Constructor(this);};
-	void Signal_SetAvatar(QPixmap roomAvatar) { callbackRoom_SetAvatar(this, new QPixmap(roomAvatar)); };
+	void Signal_SetAvatar(quintptr IMGdata) { callbackRoom_SetAvatar(this, IMGdata); };
 	 ~Room() { callbackRoom_DestroyRoom(this); };
 	bool event(QEvent * e) { return callbackRoom_Event(this, e) != 0; };
 	bool eventFilter(QObject * watched, QEvent * event) { return callbackRoom_EventFilter(this, watched, event) != 0; };
@@ -58,7 +57,7 @@ public:
 	void timerEvent(QTimerEvent * event) { callbackRoom_TimerEvent(this, event); };
 	
 signals:
-	void SetAvatar(QPixmap roomAvatar);
+	void SetAvatar(quintptr IMGdata);
 public slots:
 private:
 };
@@ -71,17 +70,17 @@ void Room_Room_QRegisterMetaTypes() {
 
 void Room_ConnectSetAvatar(void* ptr)
 {
-	QObject::connect(static_cast<Room*>(ptr), static_cast<void (Room::*)(QPixmap)>(&Room::SetAvatar), static_cast<Room*>(ptr), static_cast<void (Room::*)(QPixmap)>(&Room::Signal_SetAvatar));
+	QObject::connect(static_cast<Room*>(ptr), static_cast<void (Room::*)(quintptr)>(&Room::SetAvatar), static_cast<Room*>(ptr), static_cast<void (Room::*)(quintptr)>(&Room::Signal_SetAvatar));
 }
 
 void Room_DisconnectSetAvatar(void* ptr)
 {
-	QObject::disconnect(static_cast<Room*>(ptr), static_cast<void (Room::*)(QPixmap)>(&Room::SetAvatar), static_cast<Room*>(ptr), static_cast<void (Room::*)(QPixmap)>(&Room::Signal_SetAvatar));
+	QObject::disconnect(static_cast<Room*>(ptr), static_cast<void (Room::*)(quintptr)>(&Room::SetAvatar), static_cast<Room*>(ptr), static_cast<void (Room::*)(quintptr)>(&Room::Signal_SetAvatar));
 }
 
-void Room_SetAvatar(void* ptr, void* roomAvatar)
+void Room_SetAvatar(void* ptr, uintptr_t IMGdata)
 {
-	static_cast<Room*>(ptr)->SetAvatar(*static_cast<QPixmap*>(roomAvatar));
+	static_cast<Room*>(ptr)->SetAvatar(IMGdata);
 }
 
 int Room_Room_QRegisterMetaType()
