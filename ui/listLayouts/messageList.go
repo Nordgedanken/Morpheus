@@ -26,6 +26,7 @@ import (
 // messageList defines the TriggerMessage method to add messages to the View
 type MessageList struct {
 	MessageViewLayout   *widgets.QVBoxLayout
+	ScrollArea          *widgets.QScrollArea
 	triggerMessageFuncs []func(message *messages.Message)
 }
 
@@ -45,24 +46,27 @@ func (m *MessageList) TriggerMessage(message *messages.Message) {
 	return
 }
 
-// NewMessageListLayout generates a new widgets.QVBoxLayout and adds it to the message scrollArea
-func NewMessageListLayout(scrollArea *widgets.QScrollArea) (messageViewLayout *widgets.QVBoxLayout) {
-	messageViewLayout = widgets.NewQVBoxLayout2(scrollArea.Widget())
+// InitMessageListLayout generates a new widgets.QVBoxLayout and adds it to the message scrollArea
+func (m *MessageList) InitMessageListLayout() {
+	log.Println(m.ScrollArea.Widget())
+	messageViewLayout := widgets.NewQVBoxLayout()
+	log.Println(messageViewLayout)
 
 	messageViewLayout.SetSpacing(0)
-	messageViewLayout.AddStretch(1)
 	messageViewLayout.SetContentsMargins(15, 0, 15, 15)
-	scrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
-	scrollArea.SetAlignment(core.Qt__AlignLeading | core.Qt__AlignLeft | core.Qt__AlignVCenter)
-	scrollArea.Widget().SetLayout(messageViewLayout)
+	m.ScrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
+	m.ScrollArea.SetAlignment(core.Qt__AlignLeading | core.Qt__AlignLeft | core.Qt__AlignVCenter)
+	m.ScrollArea.Widget().SetLayout(messageViewLayout)
+
+	m.MessageViewLayout = messageViewLayout
 
 	return
 }
 
 // NewMessage adds a new message object to the view
-func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.QScrollArea, own bool) (err error) {
+func (m *MessageList) NewMessage(message *messages.Message, own bool) (err error) {
 	barAtBottom := false
-	bar := scrollArea.VerticalScrollBar()
+	bar := m.ScrollArea.VerticalScrollBar()
 	if bar.Value() == bar.Maximum() {
 		barAtBottom = true
 	}
@@ -138,8 +142,8 @@ func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.
 
 	var lineLength int
 	lineLength = messageContent.FontMetrics().Width(messageContent.Text(), -1) - 87
-	if lineLength >= scrollArea.Widget().Size().Width() {
-		lineLength = scrollArea.Widget().Size().Width() - 20 - 87
+	if lineLength >= m.ScrollArea.Widget().Size().Width() {
+		lineLength = m.ScrollArea.Widget().Size().Width() - 20 - 87
 	}
 
 	messageContent.SetMinimumWidth(lineLength + 10)

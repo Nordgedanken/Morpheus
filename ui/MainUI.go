@@ -79,7 +79,7 @@ func (m *MainUI) NewUI() (err error) {
 	//Handle LogoutButton
 	logoutButton := widgets.NewQPushButtonFromPointer(m.widget.FindChild("LogoutButton", core.Qt__FindChildrenRecursively).Pointer())
 	logoutButton.ConnectClicked(func(_ bool) {
-		LogoutErr := m.logout(m.widget, m.messageScrollArea)
+		LogoutErr := m.logout()
 		if LogoutErr != nil {
 			err = LogoutErr
 			return
@@ -97,7 +97,7 @@ func (m *MainUI) NewUI() (err error) {
 			own = false
 		}
 
-		m.MessageList.NewMessage(message, m.messageScrollArea, own)
+		m.MessageList.NewMessage(message, own)
 	})
 
 	go m.startSync()
@@ -107,7 +107,7 @@ func (m *MainUI) NewUI() (err error) {
 	m.RoomList.ConnectTriggerRoom(func(roomID string) {
 		room := m.Rooms[roomID]
 
-		NewRoomErr := m.RoomList.NewRoom(room, m.roomScrollArea)
+		NewRoomErr := m.RoomList.NewRoom(room)
 		if NewRoomErr != nil {
 			err = NewRoomErr
 			return
@@ -176,19 +176,19 @@ func (m *MainUI) NewUI() (err error) {
 func (m *MainUI) initScrolls() {
 	// Init Message View
 	m.MessageList = listLayouts.NewMessageList()
-	m.MessageList.MessageViewLayout = listLayouts.NewMessageListLayout(m.messageScrollArea)
+	m.MessageList.InitMessageListLayout()
 
 	// Init Room View
 	m.RoomList = listLayouts.NewRoomList()
-	m.RoomList.RoomViewLayout = listLayouts.NewRoomListLayout(m.roomScrollArea)
+	m.RoomList.InitRoomListLayout()
 
-	m.messageScrollArea.SetWidgetResizable(true)
-	m.messageScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
-	m.messageScrollArea.SetContentsMargins(0, 0, 0, 0)
+	m.MessageList.ScrollArea.SetWidgetResizable(true)
+	m.MessageList.ScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
+	m.MessageList.ScrollArea.SetContentsMargins(0, 0, 0, 0)
 
-	m.roomScrollArea.SetWidgetResizable(true)
-	m.roomScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
-	m.roomScrollArea.SetContentsMargins(0, 0, 0, 0)
+	m.RoomList.ScrollArea.SetWidgetResizable(true)
+	m.RoomList.ScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
+	m.RoomList.ScrollArea.SetContentsMargins(0, 0, 0, 0)
 }
 
 func (m *MainUI) loadChatUIDefaults() {
@@ -201,8 +201,8 @@ func (m *MainUI) loadChatUIDefaults() {
 	m.MainWidget = loader.Load(file, m.widget)
 	file.Close()
 
-	m.messageScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
-	m.roomScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("roomScroll", core.Qt__FindChildrenRecursively).Pointer())
+	m.MessageList.ScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
+	m.RoomList.ScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("roomScroll", core.Qt__FindChildrenRecursively).Pointer())
 
 	m.RoomAvatar = widgets.NewQLabelFromPointer(m.widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
 	m.RoomTitle = widgets.NewQLabelFromPointer(m.widget.FindChild("RoomTitle", core.Qt__FindChildrenRecursively).Pointer())
@@ -245,7 +245,7 @@ func (m *MainUI) sendMessage(message string) (err error) {
 	return
 }
 
-func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScrollArea) (err error) {
+func (m *MainUI) logout() (err error) {
 	log.Infoln("Starting Logout Sequence in background")
 	var wg sync.WaitGroup
 	results := make(chan bool)
@@ -288,8 +288,8 @@ func (m *MainUI) logout(widget *widgets.QWidget, messageScrollArea *widgets.QScr
 		if result {
 			m.window.DisconnectKeyPressEvent()
 			m.window.DisconnectResizeEvent()
-			widget.DisconnectResizeEvent()
-			messageScrollArea.DisconnectResizeEvent()
+			m.widget.DisconnectResizeEvent()
+			m.MessageList.ScrollArea.DisconnectResizeEvent()
 
 			LoginUIStruct := NewLoginUIStructWithExistingConfig(m.Config, m.window)
 			loginUIErr := LoginUIStruct.NewUI()
@@ -417,7 +417,7 @@ func contains(slice []string, item string) bool {
 
 func (m *MainUI) loadCache() (err error) {
 	barAtBottom := false
-	bar := m.messageScrollArea.VerticalScrollBar()
+	bar := m.MessageList.ScrollArea.VerticalScrollBar()
 	if bar.Value() == bar.Maximum() {
 		barAtBottom = true
 	}

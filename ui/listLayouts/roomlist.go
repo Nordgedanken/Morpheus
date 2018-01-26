@@ -22,6 +22,7 @@ import (
 // RoomList defines the TriggerRoom and ChangeRoom method to add messages to the View
 type RoomList struct {
 	RoomViewLayout   *widgets.QVBoxLayout
+	ScrollArea       *widgets.QScrollArea
 	triggerRoomFuncs []func(roomID string)
 	changeRoomFuncs  []func(roomID string)
 }
@@ -54,20 +55,22 @@ func (r *RoomList) ChangeRoom(roomID string) {
 	return
 }
 
-// NewRoomList generates a new QRoomVBoxLayoutWithTriggerSlot and adds it to the room scrollArea
-func NewRoomListLayout(scrollArea *widgets.QScrollArea) (roomViewLayout *widgets.QVBoxLayout) {
-	roomViewLayout = widgets.NewQVBoxLayout2(scrollArea.Widget())
+// InitRoomListLayout generates a new QRoomVBoxLayoutWithTriggerSlot and adds it to the room scrollArea
+func (r *RoomList) InitRoomListLayout() {
+	roomViewLayout := widgets.NewQVBoxLayout2(r.ScrollArea.Widget())
 
 	roomViewLayout.SetSpacing(0)
 	roomViewLayout.SetContentsMargins(0, 0, 0, 0)
-	scrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
-	scrollArea.Widget().SetLayout(roomViewLayout)
+	r.ScrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
+	r.ScrollArea.Widget().SetLayout(roomViewLayout)
+
+	r.RoomViewLayout = roomViewLayout
 
 	return
 }
 
 // NewRoom adds a new room object to the view
-func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (err error) {
+func (r *RoomList) NewRoom(room *rooms.Room) (err error) {
 	var widget = widgets.NewQWidget(nil, 0)
 
 	var loader = uitools.NewQUiLoader(nil)
@@ -83,8 +86,8 @@ func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (e
 
 	roomName.SetText(room.GetRoomName())
 
-	wrapperWidget.Resize2(scrollArea.Widget().Size().Width(), wrapperWidget.Size().Height())
-	widget.Resize2(scrollArea.Widget().Size().Width(), wrapperWidget.Size().Height())
+	wrapperWidget.Resize2(r.ScrollArea.Widget().Size().Width(), wrapperWidget.Size().Height())
+	widget.Resize2(r.ScrollArea.Widget().Size().Width(), wrapperWidget.Size().Height())
 
 	var filterObject = core.NewQObject(nil)
 	filterObject.ConnectEventFilter(func(watched *core.QObject, event *core.QEvent) bool {
@@ -108,9 +111,9 @@ func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (e
 	wrapperWidget.InstallEventFilter(filterObject)
 
 	r.RoomViewLayout.InsertWidget(r.RoomViewLayout.Count()+1, wrapperWidget, 0, 0)
-	scrollArea.SetWidgetResizable(true)
-	scrollArea.Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
-	scrollArea.Widget().Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
+	r.ScrollArea.SetWidgetResizable(true)
+	r.ScrollArea.Resize2(wrapperWidget.Size().Width(), r.ScrollArea.Widget().Size().Height())
+	r.ScrollArea.Widget().Resize2(wrapperWidget.Size().Width(), r.ScrollArea.Widget().Size().Height())
 
 	roomAvatarQLabel.ConnectSetPixmap(func(vqp *gui.QPixmap) {
 		log.Println("SetPixmapEventRoomAvatar")
