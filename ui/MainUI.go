@@ -158,11 +158,11 @@ func (m *MainUI) NewUI() (err error) {
 			m.RoomTitle.SetText(room.GetRoomName())
 
 			m.RoomTopic.SetText(room.GetRoomTopic())
-			count := m.MessageList.MessageViewLayout.Count()
+			/*count := m.MessageList.MessageViewLayout.Count()
 			for i := 0; i < count; i++ {
 				widgetScroll := m.MessageList.MessageViewLayout.ItemAt(i).Widget()
 				widgetScroll.DeleteLater()
-			}
+			}*/
 
 			log.Println("next loadCache")
 
