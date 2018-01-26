@@ -83,12 +83,10 @@ func (r *RoomList) NewRoom(room *rooms.Room) (err error) {
 	file.Open(core.QIODevice__ReadOnly)
 	var wrapperWidget = loader.Load(file, widget)
 	file.Close()
-	log.Println("Loaded File")
 
 	roomAvatarQLabel := widgets.NewQLabelFromPointer(widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
 	roomName := widgets.NewQLabelFromPointer(widget.FindChild("roomName", core.Qt__FindChildrenRecursively).Pointer())
 	/*lastMessageContent := widgets.NewQLabelFromPointer(widget.FindChild("lastMessage", core.Qt__FindChildrenRecursively).Pointer())*/
-	log.Println("Loaded Ptr")
 
 	roomName.SetText(room.GetRoomName())
 
@@ -101,7 +99,7 @@ func (r *RoomList) NewRoom(room *rooms.Room) (err error) {
 			var mouseEvent = gui.NewQMouseEventFromPointer(event.Pointer())
 
 			if mouseEvent.Button() == core.Qt__LeftButton {
-				go r.ChangeRoom(room.RoomID)
+				r.ChangeRoom(room.RoomID)
 				return true
 			}
 
@@ -110,21 +108,13 @@ func (r *RoomList) NewRoom(room *rooms.Room) (err error) {
 
 		return false
 	})
-	log.Println("Loaded Filter")
 
 	r.RoomViewLayout.SetSpacing(0)
 	r.RoomViewLayout.SetContentsMargins(0, 0, 0, 0)
 
 	wrapperWidget.InstallEventFilter(filterObject)
 
-	log.Println("Before insert")
-	log.Println(r.ScrollArea)
-	log.Println(r.RoomViewLayout)
-	log.Println(r.ScrollArea.Widget().Layout())
-	log.Println(r.roomViewAreaWidget)
-	log.Println(r.ScrollArea.Widget())
 	r.RoomViewLayout.InsertWidget(r.RoomViewLayout.Count(), wrapperWidget, 0, 0)
-	log.Println("After insert")
 	r.ScrollArea.SetWidgetResizable(true)
 	r.ScrollArea.Resize2(wrapperWidget.Size().Width(), r.ScrollArea.Widget().Size().Height())
 	r.ScrollArea.Widget().Resize2(wrapperWidget.Size().Width(), r.ScrollArea.Widget().Size().Height())

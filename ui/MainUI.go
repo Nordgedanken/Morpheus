@@ -398,7 +398,7 @@ func (m *MainUI) initRoomList() (err error) {
 		m.Rooms[roomID].RoomID = roomID
 		m.RoomList.TriggerRoom(roomID)
 		if first {
-			go m.RoomList.ChangeRoom(roomID)
+			m.RoomList.ChangeRoom(roomID)
 		}
 		first = false
 	}
