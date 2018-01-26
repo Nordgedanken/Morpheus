@@ -21,10 +21,11 @@ import (
 ////////////////////////////////////////////////////
 // RoomList defines the TriggerRoom and ChangeRoom method to add messages to the View
 type RoomList struct {
-	RoomViewLayout   *widgets.QVBoxLayout
-	ScrollArea       *widgets.QScrollArea
-	triggerRoomFuncs []func(roomID string)
-	changeRoomFuncs  []func(roomID string)
+	RoomViewLayout     *widgets.QVBoxLayout
+	roomViewAreaWidget *widgets.QWidget
+	ScrollArea         *widgets.QScrollArea
+	triggerRoomFuncs   []func(roomID string)
+	changeRoomFuncs    []func(roomID string)
 }
 
 func NewRoomList() *RoomList {
@@ -58,12 +59,14 @@ func (r *RoomList) ChangeRoom(roomID string) {
 
 // InitRoomListLayout generates a new QRoomVBoxLayoutWithTriggerSlot and adds it to the room scrollArea
 func (r *RoomList) InitRoomListLayout() {
-	roomViewLayout := widgets.NewQVBoxLayout2(r.ScrollArea.Widget())
+	r.roomViewAreaWidget = widgets.NewQWidget(nil, 0)
+	roomViewLayout := widgets.NewQVBoxLayout2(r.roomViewAreaWidget)
 
 	roomViewLayout.SetSpacing(0)
 	roomViewLayout.SetContentsMargins(0, 0, 0, 0)
-	r.ScrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
-	r.ScrollArea.Widget().SetLayout(roomViewLayout)
+	r.roomViewAreaWidget.SetContentsMargins(0, 0, 0, 0)
+	r.roomViewAreaWidget.SetLayout(roomViewLayout)
+	r.ScrollArea.SetWidget(r.roomViewAreaWidget)
 
 	r.RoomViewLayout = roomViewLayout
 
