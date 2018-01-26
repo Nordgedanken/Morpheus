@@ -178,7 +178,7 @@ func (m *MainUI) initScrolls() {
 	m.MessageList.InitMessageListLayout(m.messageScrollArea)
 
 	// Init Room View
-	m.RoomList.InitRoomListLayout(m.roomScrollArea)
+	//m.RoomList.InitRoomListLayout(m.roomScrollArea)
 
 	m.roomScrollArea.SetWidgetResizable(true)
 	m.roomScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
@@ -398,9 +398,9 @@ func (m *MainUI) initRoomList() (err error) {
 		m.Rooms[roomID] = rooms.NewRoom()
 		m.Rooms[roomID].Cli = m.Cli
 		m.Rooms[roomID].RoomID = roomID
-		m.RoomList.TriggerRoom(roomID)
+		//m.RoomList.TriggerRoom(roomID)
 		if first {
-			m.RoomList.ChangeRoom(roomID)
+			//m.RoomList.ChangeRoom(roomID)
 		}
 		first = false
 	}
