@@ -19,8 +19,8 @@ type Config struct {
 	Rooms       map[string]*rooms.Room
 	CurrentRoom string
 
-	MessageListLayout *listLayouts.QVBoxLayoutWithTriggerSlot
-	RoomListLayout    *listLayouts.QRoomVBoxLayoutWithTriggerSlot
+	MessageList *listLayouts.MessageList
+	RoomList    *listLayouts.RoomList
 
 	matrixClient
 }

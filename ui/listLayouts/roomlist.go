@@ -19,18 +19,44 @@ import (
 //                                                //
 //                                                //
 ////////////////////////////////////////////////////
+// RoomList defines the TriggerRoom and ChangeRoom method to add messages to the View
+type RoomList struct {
+	RoomViewLayout   *widgets.QVBoxLayout
+	triggerRoomFuncs []func(roomID string)
+	changeRoomFuncs  []func(roomID string)
+}
 
-// QRoomVBoxLayoutWithTriggerSlot defines the QVBoxLayout with TriggerMessage slot to add messages to the View
-type QRoomVBoxLayoutWithTriggerSlot struct {
-	widgets.QVBoxLayout
+func NewRoomList() *RoomList {
+	return &RoomList{}
+}
 
-	_ func(roomID string) `signal:"TriggerRoom"`
-	_ func(roomID string) `signal:"ChangeRoom"`
+func (r *RoomList) ConnectTriggerRoom(f func(roomID string)) {
+	r.triggerRoomFuncs = append(r.triggerRoomFuncs, f)
+	return
+}
+
+func (r *RoomList) TriggerRoom(roomID string) {
+	for _, f := range r.triggerRoomFuncs {
+		f(roomID)
+	}
+	return
+}
+
+func (r *RoomList) ConnectChangeRoom(f func(roomID string)) {
+	r.changeRoomFuncs = append(r.changeRoomFuncs, f)
+	return
+}
+
+func (r *RoomList) ChangeRoom(roomID string) {
+	for _, f := range r.changeRoomFuncs {
+		f(roomID)
+	}
+	return
 }
 
 // NewRoomList generates a new QRoomVBoxLayoutWithTriggerSlot and adds it to the room scrollArea
-func NewRoomList(scrollArea *widgets.QScrollArea) (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) {
-	roomViewLayout = NewQRoomVBoxLayoutWithTriggerSlot2(scrollArea.Widget())
+func NewRoomListLayout(scrollArea *widgets.QScrollArea) (roomViewLayout *widgets.QVBoxLayout) {
+	roomViewLayout = widgets.NewQVBoxLayout2(scrollArea.Widget())
 
 	roomViewLayout.SetSpacing(0)
 	roomViewLayout.SetContentsMargins(0, 0, 0, 0)
@@ -41,7 +67,7 @@ func NewRoomList(scrollArea *widgets.QScrollArea) (roomViewLayout *QRoomVBoxLayo
 }
 
 // NewRoom adds a new room object to the view
-func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (err error) {
+func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (err error) {
 	var widget = widgets.NewQWidget(nil, 0)
 
 	var loader = uitools.NewQUiLoader(nil)
@@ -66,7 +92,7 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *rooms.Room, 
 			var mouseEvent = gui.NewQMouseEventFromPointer(event.Pointer())
 
 			if mouseEvent.Button() == core.Qt__LeftButton {
-				go roomViewLayout.ChangeRoom(room.RoomID)
+				go r.ChangeRoom(room.RoomID)
 				return true
 			}
 
@@ -76,12 +102,12 @@ func (roomViewLayout *QRoomVBoxLayoutWithTriggerSlot) NewRoom(room *rooms.Room, 
 		return false
 	})
 
-	roomViewLayout.SetSpacing(0)
-	roomViewLayout.SetContentsMargins(0, 0, 0, 0)
+	r.RoomViewLayout.SetSpacing(0)
+	r.RoomViewLayout.SetContentsMargins(0, 0, 0, 0)
 
 	wrapperWidget.InstallEventFilter(filterObject)
 
-	roomViewLayout.InsertWidget(roomViewLayout.Count()+1, wrapperWidget, 0, 0)
+	r.RoomViewLayout.InsertWidget(r.RoomViewLayout.Count()+1, wrapperWidget, 0, 0)
 	scrollArea.SetWidgetResizable(true)
 	scrollArea.Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
 	scrollArea.Widget().Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())

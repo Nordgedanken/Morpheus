@@ -13,14 +13,14 @@ import (
 
 // Message saves the information of a Message
 type Message struct {
-	setAvatarFunc func(IMGdata []byte)
-	Cli           *gomatrix.Client
-	EventID       string
-	Author        string
-	EventType     string
-	AvatarURL     string
-	Message       string
-	Timestamp     int64
+	setAvatarFuncs []func(IMGdata []byte)
+	Cli            *gomatrix.Client
+	EventID        string
+	Author         string
+	EventType      string
+	AvatarURL      string
+	Message        string
+	Timestamp      int64
 }
 
 func NewMessage() *Message {
@@ -147,11 +147,13 @@ func (m *Message) GetUserAvatar() {
 }
 
 func (m *Message) ConnectSetAvatar(f func(IMGdata []byte)) {
-	m.setAvatarFunc = f
+	m.setAvatarFuncs = append(m.setAvatarFuncs, f)
 	return
 }
 
 func (m *Message) SetAvatar(IMGdata []byte) {
-	m.setAvatarFunc(IMGdata)
+	for _, f := range m.setAvatarFuncs {
+		f(IMGdata)
+	}
 	return
 }

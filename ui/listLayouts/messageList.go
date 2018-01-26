@@ -23,16 +23,31 @@ import (
 //                                                //
 ////////////////////////////////////////////////////
 
-// QVBoxLayoutWithTriggerSlot defines the QVBoxLayout with TriggerMessage slot to add messages to the View
-type QVBoxLayoutWithTriggerSlot struct {
-	widgets.QVBoxLayout
-
-	_ func(message *messages.Message) `signal:"TriggerMessage"`
+// messageList defines the TriggerMessage method to add messages to the View
+type MessageList struct {
+	MessageViewLayout   *widgets.QVBoxLayout
+	triggerMessageFuncs []func(message *messages.Message)
 }
 
-// NewMessageList generates a new QVBoxLayoutWithTriggerSlot and adds it to the message scrollArea
-func NewMessageList(scrollArea *widgets.QScrollArea) (messageViewLayout *QVBoxLayoutWithTriggerSlot) {
-	messageViewLayout = NewQVBoxLayoutWithTriggerSlot2(scrollArea.Widget())
+func NewMessageList() *MessageList {
+	return &MessageList{}
+}
+
+func (m *MessageList) ConnectTriggerMessage(f func(message *messages.Message)) {
+	m.triggerMessageFuncs = append(m.triggerMessageFuncs, f)
+	return
+}
+
+func (m *MessageList) TriggerMessage(message *messages.Message) {
+	for _, f := range m.triggerMessageFuncs {
+		f(message)
+	}
+	return
+}
+
+// NewMessageListLayout generates a new widgets.QVBoxLayout and adds it to the message scrollArea
+func NewMessageListLayout(scrollArea *widgets.QScrollArea) (messageViewLayout *widgets.QVBoxLayout) {
+	messageViewLayout = widgets.NewQVBoxLayout2(scrollArea.Widget())
 
 	messageViewLayout.SetSpacing(0)
 	messageViewLayout.AddStretch(1)
@@ -45,7 +60,7 @@ func NewMessageList(scrollArea *widgets.QScrollArea) (messageViewLayout *QVBoxLa
 }
 
 // NewMessage adds a new message object to the view
-func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(message *messages.Message, scrollArea *widgets.QScrollArea, own bool) (err error) {
+func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.QScrollArea, own bool) (err error) {
 	barAtBottom := false
 	bar := scrollArea.VerticalScrollBar()
 	if bar.Value() == bar.Maximum() {
@@ -132,10 +147,10 @@ func (messageViewLayout *QVBoxLayoutWithTriggerSlot) NewMessage(message *message
 	messageWidget.SetMinimumWidth(lineLength)
 	messageWidget.Resize2(lineLength, wrapperWidget.Size().Height())
 
-	messageViewLayout.SetSpacing(1)
-	messageViewLayout.SetContentsMargins(0, 0, 0, 0)
+	m.MessageViewLayout.SetSpacing(1)
+	m.MessageViewLayout.SetContentsMargins(0, 0, 0, 0)
 
-	messageViewLayout.InsertWidget(messageViewLayout.Count()+1, messageWidget, 0, core.Qt__AlignBottom)
+	m.MessageViewLayout.InsertWidget(m.MessageViewLayout.Count()+1, messageWidget, 0, core.Qt__AlignBottom)
 
 	if barAtBottom {
 		bar.SetValue(bar.Maximum())

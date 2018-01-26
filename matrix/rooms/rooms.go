@@ -18,7 +18,7 @@ const mRoomCanonicalAliasEv = "m.room.canonical_alias"
 
 // Room saves the information of a Room
 type Room struct {
-	setAvatarFunc     func(IMGdata []byte)
+	setAvatarFuncs    []func(IMGdata []byte)
 	Cli               *gomatrix.Client
 	RoomID            string
 	RoomName          string
@@ -200,12 +200,14 @@ func (r *Room) GetRoomAvatar() {
 }
 
 func (r *Room) ConnectSetAvatar(f func(IMGdata []byte)) {
-	r.setAvatarFunc = f
+	r.setAvatarFuncs = append(r.setAvatarFuncs, f)
 	return
 }
 
 func (r *Room) SetAvatar(IMGdata []byte) {
-	r.setAvatarFunc(IMGdata)
+	for _, f := range r.setAvatarFuncs {
+		f(IMGdata)
+	}
 	return
 }
 

@@ -88,7 +88,7 @@ func (m *MainUI) NewUI() (err error) {
 
 	m.initScrolls()
 
-	m.MessageListLayout.ConnectTriggerMessage(func(message *messages.Message) {
+	m.MessageList.ConnectTriggerMessage(func(message *messages.Message) {
 		log.Println("triggered Message")
 		var own bool
 		if message.Author == m.Cli.UserID {
@@ -97,17 +97,17 @@ func (m *MainUI) NewUI() (err error) {
 			own = false
 		}
 
-		m.MessageListLayout.NewMessage(message, m.messageScrollArea, own)
+		m.MessageList.NewMessage(message, m.messageScrollArea, own)
 	})
 
 	go m.startSync()
 	m.widget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 	m.MainWidget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 
-	m.RoomListLayout.ConnectTriggerRoom(func(roomID string) {
+	m.RoomList.ConnectTriggerRoom(func(roomID string) {
 		room := m.Rooms[roomID]
 
-		NewRoomErr := m.RoomListLayout.NewRoom(room, m.roomScrollArea)
+		NewRoomErr := m.RoomList.NewRoom(room, m.roomScrollArea)
 		if NewRoomErr != nil {
 			err = NewRoomErr
 			return
@@ -135,7 +135,7 @@ func (m *MainUI) NewUI() (err error) {
 		return
 	})
 
-	m.RoomListLayout.ConnectChangeRoom(func(roomID string) {
+	m.RoomList.ConnectChangeRoom(func(roomID string) {
 		log.Println("Change Room")
 		room := m.Rooms[roomID]
 
@@ -158,9 +158,9 @@ func (m *MainUI) NewUI() (err error) {
 			m.RoomTitle.SetText(room.GetRoomName())
 
 			m.RoomTopic.SetText(room.GetRoomTopic())
-			count := m.MessageListLayout.Count()
+			count := m.MessageList.MessageViewLayout.Count()
 			for i := 0; i < count; i++ {
-				widgetScroll := m.MessageListLayout.ItemAt(i).Widget()
+				widgetScroll := m.MessageList.MessageViewLayout.ItemAt(i).Widget()
 				widgetScroll.DeleteLater()
 			}
 
@@ -175,10 +175,12 @@ func (m *MainUI) NewUI() (err error) {
 
 func (m *MainUI) initScrolls() {
 	// Init Message View
-	m.MessageListLayout = listLayouts.NewMessageList(m.messageScrollArea)
+	m.MessageList = listLayouts.NewMessageList()
+	m.MessageList.MessageViewLayout = listLayouts.NewMessageListLayout(m.messageScrollArea)
 
 	// Init Room View
-	m.RoomListLayout = listLayouts.NewRoomList(m.roomScrollArea)
+	m.RoomList = listLayouts.NewRoomList()
+	m.RoomList.RoomViewLayout = listLayouts.NewRoomListLayout(m.roomScrollArea)
 
 	m.messageScrollArea.SetWidgetResizable(true)
 	m.messageScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
@@ -343,7 +345,7 @@ func (m *MainUI) startSync() (err error) {
 			message.Cli = m.Cli
 			m.Rooms[room].AddMessage(message)
 
-			go m.MessageListLayout.TriggerMessage(message)
+			go m.MessageList.TriggerMessage(message)
 		}
 	})
 
@@ -393,9 +395,9 @@ func (m *MainUI) initRoomList() (err error) {
 		m.Rooms[roomID] = rooms.NewRoom()
 		m.Rooms[roomID].Cli = m.Cli
 		m.Rooms[roomID].RoomID = roomID
-		m.RoomListLayout.TriggerRoom(roomID)
+		m.RoomList.TriggerRoom(roomID)
 		if first {
-			go m.RoomListLayout.ChangeRoom(roomID)
+			go m.RoomList.ChangeRoom(roomID)
 		}
 		first = false
 	}
@@ -488,7 +490,7 @@ func (m *MainUI) loadCache() (err error) {
 				message.Cli = m.Cli
 				currentRoomMem.AddMessage(message)
 
-				go m.MessageListLayout.TriggerMessage(message)
+				go m.MessageList.TriggerMessage(message)
 			}
 		}
 
