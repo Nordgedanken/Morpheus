@@ -13,7 +13,7 @@ apps:
 
 
 parts:
-  qmake_morpheus:
+  morpheus:
     source: https://github.com/Nordgedanken/Morpheus.git
     plugin: nil
     build-packages:
