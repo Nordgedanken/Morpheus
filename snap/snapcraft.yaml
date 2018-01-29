@@ -17,8 +17,6 @@ parts:
     plugin: nil
     build-packages:
       - golang-go
-      - qt5-qmake
-      - qtbase5-dev
       - build-essential
       - libgl1-mesa-dev
       - libpulse-dev
@@ -26,6 +24,9 @@ parts:
     build: |
       export GOPATH="$HOME/go/"
       mkdir $GOPATH
+      add-apt-repository -y ppa:forkotov02/opt-qt-5.10.0-trusty
+      apt-get -qq update
+      apt-get -y -qq install qt510base qt510connectivity qt510declarative qt510doc qt510location qt510multimedia qt510quickcontrols qt510quickcontrols2 qt510script qt510serialport qt510svg qt510tools qt510translations qt510webchannel qt510webengine qt510websockets qt510x11extras qt510xmlpatterns
       go get -u -v github.com/therecipe/qt/cmd/...
       QT_PKG_CONFIG=true $GOPATH/bin/qtsetup
       $GOPATH/bin/qtdeploy build linux
