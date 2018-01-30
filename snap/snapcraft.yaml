@@ -20,15 +20,16 @@ parts:
       - build-essential
       - libgl1-mesa-dev
       - libpulse-dev
-    after: [desktop-qt5]
+      - curl
     build: |
       export GOPATH="$HOME/go/"
       mkdir $GOPATH
-      add-apt-repository -y ppa:forkotov02/opt-qt-5.10.0-trusty
-      apt-get -qq update
-      apt-get -y -qq install qt510base qt510connectivity qt510declarative qt510doc qt510location qt510multimedia qt510quickcontrols qt510quickcontrols2 qt510script qt510serialport qt510svg qt510tools qt510translations qt510webchannel qt510webengine qt510websockets qt510x11extras qt510xmlpatterns
       go get -u -v github.com/therecipe/qt/cmd/...
-      QT_PKG_CONFIG=true $GOPATH/bin/qtsetup
+      curl -sL --retry 10 --retry-delay 10 -o /tmp/$QT https://download.qt.io/official_releases/online_installers/qt-unified-linux-x64-online.run
+      chmod +x /tmp/qt-unified-linux-x64-online.run
+      /tmp/qt-unified-linux-x64-online.run --script $GOPATH/src/github.com/therecipe/qt/internal/ci/iscript.qs LINUX=true
+      rm -f /tmp/qt-unified-linux-x64-online.run
+      $GOPATH/bin/qtsetup
       $GOPATH/bin/qtdeploy build linux
     install: |
       mv .circleci/Morpheus.sh $SNAPCRAFT_PART_INSTALL/usr/bin/Morpheus.sh
