@@ -13,7 +13,7 @@ import (
 	"github.com/Nordgedanken/Morpheus/matrix/db"
 	"github.com/Nordgedanken/Morpheus/ui"
 	"github.com/dgraph-io/badger"
-	"github.com/matrix-org/dugong"
+	"github.com/Nordgedanken/dugong"
 	"github.com/matrix-org/gomatrix"
 	"github.com/shibukawa/configdir"
 	log "github.com/sirupsen/logrus"
