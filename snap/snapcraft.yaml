@@ -11,22 +11,28 @@ apps:
   morpheus:
     command: morpheus
 
-
 parts:
-  qmake_morpheus:
+  morpheus:
     source: https://github.com/Nordgedanken/Morpheus.git
     plugin: nil
     build-packages:
-      - golang-go
-      - qt5-qmake
-      - qtbase5-dev
       - build-essential
       - libgl1-mesa-dev
       - libpulse-dev
-    after: [desktop-qt5]
+      - curl
     build: |
+      add-apt-repository -y ppa:gophers/archive
+      apt-get -qq update
+      apt-get -y -qq install golang-1.9-go
+      export PATH=$PATH:/usr/lib/go-1.9/bin/
+      export GOPATH="$HOME/go/"
+      mkdir $GOPATH
       go get -u -v github.com/therecipe/qt/cmd/...
-      QT_PKG_CONFIG=true $GOPATH/bin/qtsetup
+      curl -sL --retry 10 --retry-delay 10 -o /tmp/$QT https://download.qt.io/official_releases/online_installers/qt-unified-linux-x64-online.run
+      chmod +x /tmp/qt-unified-linux-x64-online.run
+      /tmp/qt-unified-linux-x64-online.run --script $GOPATH/src/github.com/therecipe/qt/internal/ci/iscript.qs LINUX=true
+      rm -f /tmp/qt-unified-linux-x64-online.run
+      $GOPATH/bin/qtsetup
       $GOPATH/bin/qtdeploy build linux
     install: |
       mv .circleci/Morpheus.sh $SNAPCRAFT_PART_INSTALL/usr/bin/Morpheus.sh
