@@ -15,8 +15,8 @@ parts:
   morpheus:
     source: https://github.com/Nordgedanken/Morpheus.git
     plugin: nil
+    after: [go]
     build-packages:
-      - golang-go
       - build-essential
       - libgl1-mesa-dev
       - libpulse-dev
