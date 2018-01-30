@@ -15,13 +15,15 @@ parts:
   morpheus:
     source: https://github.com/Nordgedanken/Morpheus.git
     plugin: nil
-    after: [go]
     build-packages:
       - build-essential
       - libgl1-mesa-dev
       - libpulse-dev
       - curl
     build: |
+      add-apt-repository -y ppa:gophers/archive
+      apt-get -qq update
+      apt-get -y -qq install golang-1.9-go
       export GOPATH="$HOME/go/"
       mkdir $GOPATH
       go get -u -v github.com/therecipe/qt/cmd/...
