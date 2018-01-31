@@ -23,6 +23,8 @@ parts:
       - libfontconfig
       - xvfb
     build: |
+      apt-get -qq update
+      apt-get install -y -qq software-properties-common
       add-apt-repository -y ppa:gophers/archive
       apt-get -qq update
       apt-get -y -qq install golang-1.9-go
@@ -44,6 +46,7 @@ parts:
       mkdir -p $GOPATH/src/github.com/Nordgedanken/Morpheus/
       mv ./* $GOPATH/src/github.com/Nordgedanken/Morpheus/
       cd $GOPATH/src/github.com/Nordgedanken/Morpheus/
+      go get ./...
       $GOPATH/bin/qtdeploy build linux
     install: |
       mv .circleci/Morpheus.sh $SNAPCRAFT_PART_INSTALL/usr/bin/Morpheus.sh
