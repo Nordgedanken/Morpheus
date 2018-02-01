@@ -202,7 +202,8 @@ func (l *LoginUI) login() (err error) {
 		}()
 
 		//Show MainUI
-		for result := range results {
+		select {
+		case result := <-results:
 			l.Cli = result
 			MainUIStruct := NewMainUIStructWithExistingConfig(l.Config, l.window)
 			mainUIErr := MainUIStruct.NewUI()

@@ -127,7 +127,8 @@ func main() {
 		}()
 
 		//Show MainUI
-		for result := range results {
+		select {
+		case result := <-results:
 			log.Println("Results: ", results)
 			log.Println("ResultsLen: ", len(results))
 			mainUIStruct = ui.NewMainUIStruct(windowWidth, windowHeight, window)
