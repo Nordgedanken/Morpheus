@@ -174,11 +174,13 @@ func (m *MainUI) NewUI() (err error) {
 }
 
 func (m *MainUI) initScrolls() {
-	// Init Message View
-	m.MessageList.InitMessageListLayout(m.messageScrollArea)
-
 	// Init Room View
+	log.Println("Before Room Init")
 	m.RoomList.InitRoomListLayout(m.roomScrollArea)
+
+	// Init Message View
+	log.Println("Before Message Init")
+	m.MessageList.InitMessageListLayout(m.messageScrollArea)
 
 	m.roomScrollArea.SetWidgetResizable(true)
 	m.roomScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
