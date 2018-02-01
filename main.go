@@ -19,6 +19,7 @@ import (
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
+	"github.com/davecheney/profile"
 )
 
 var window *widgets.QMainWindow
