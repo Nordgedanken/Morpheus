@@ -38,7 +38,7 @@ func (r *RoomList) ConnectTriggerRoom(f func(roomID string)) {
 func (r *RoomList) TriggerRoom(roomID string) {
 	log.Println("Trigger Room")
 	for _, f := range r.triggerRoomFuncs {
-		f(roomID)
+		go f(roomID)
 	}
 	return
 }
@@ -50,14 +50,14 @@ func (r *RoomList) ConnectChangeRoom(f func(roomID string)) {
 
 func (r *RoomList) ChangeRoom(roomID string) {
 	for _, f := range r.changeRoomFuncs {
-		f(roomID)
+		go f(roomID)
 	}
 	return
 }
 
 // InitRoomListLayout generates a new QRoomVBoxLayoutWithTriggerSlot and adds it to the room scrollArea
 func (r *RoomList) InitRoomListLayout(scrollArea *widgets.QScrollArea) {
-	roomViewLayout := widgets.NewQVBoxLayout2(nil)
+	roomViewLayout := widgets.NewQVBoxLayout()
 
 	roomViewLayout.SetSpacing(0)
 	roomViewLayout.SetContentsMargins(0, 0, 0, 0)

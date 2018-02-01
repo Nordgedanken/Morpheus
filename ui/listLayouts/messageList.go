@@ -40,7 +40,7 @@ func (m *MessageList) ConnectTriggerMessage(f func(message *messages.Message)) {
 
 func (m *MessageList) TriggerMessage(message *messages.Message) {
 	for _, f := range m.triggerMessageFuncs {
-		f(message)
+		go f(message)
 	}
 	return
 }
