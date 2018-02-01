@@ -389,6 +389,7 @@ func (m *MainUI) startSync() (err error) {
 }
 
 func (m *MainUI) initRoomList() (err error) {
+	log.Println("Init Room List")
 	roomsStruct, roomsErr := rooms.GetRooms(m.Cli)
 	if roomsErr != nil {
 		err = roomsErr
