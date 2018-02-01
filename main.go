@@ -27,6 +27,8 @@ var loginUIStruct *ui.LoginUI
 
 func main() {
 	runtime.GOMAXPROCS(128)
+	
+	defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
 
 	go func() {
 		log.Println(http.ListenAndServe("localhost:6060", nil))
