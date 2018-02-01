@@ -401,8 +401,10 @@ func (m *MainUI) initRoomList() (err error) {
 		m.Rooms[roomID] = rooms.NewRoom()
 		m.Rooms[roomID].Cli = m.Cli
 		m.Rooms[roomID].RoomID = roomID
+		log.Println("Before Trigger Room")
 		m.RoomList.TriggerRoom(roomID)
 		if first {
+			log.Println("First Change Room")
 			m.RoomList.ChangeRoom(roomID)
 		}
 		first = false
