@@ -68,13 +68,13 @@ func (m *MainUI) NewUI() (err error) {
 	m.loadChatUIDefaults()
 
 	//Set Avatar
-	avatarLogo := widgets.NewQLabelFromPointer(m.widget.FindChild("UserAvatar", core.Qt__FindChildrenRecursively).Pointer())
-	avatar, AvatarErr := matrix.GetOwnUserAvatar(m.Cli)
+	//avatarLogo := widgets.NewQLabelFromPointer(m.widget.FindChild("UserAvatar", core.Qt__FindChildrenRecursively).Pointer())
+	/*avatar, AvatarErr := matrix.GetOwnUserAvatar(m.Cli)
 	if AvatarErr != nil {
 		err = AvatarErr
 		return
 	}
-	avatarLogo.SetPixmap(avatar)
+	avatarLogo.SetPixmap(avatar)*/
 
 	//Handle LogoutButton
 	logoutButton := widgets.NewQPushButtonFromPointer(m.widget.FindChild("LogoutButton", core.Qt__FindChildrenRecursively).Pointer())
@@ -105,6 +105,7 @@ func (m *MainUI) NewUI() (err error) {
 	m.MainWidget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 
 	m.RoomList.ConnectTriggerRoom(func(roomID string) {
+		log.Println("Actual Trigger Room")
 		room := m.Rooms[roomID]
 
 		NewRoomErr := m.RoomList.NewRoom(room, m.roomScrollArea)
@@ -177,10 +178,12 @@ func (m *MainUI) initScrolls() {
 	// Init Room View
 	log.Println("Before Room Init")
 	m.RoomList.InitRoomListLayout(m.roomScrollArea)
+	log.Println("After Room Init")
 
 	// Init Message View
 	log.Println("Before Message Init")
 	m.MessageList.InitMessageListLayout(m.messageScrollArea)
+	log.Println("After Message Init")
 
 	m.roomScrollArea.SetWidgetResizable(true)
 	m.roomScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
@@ -403,6 +406,7 @@ func (m *MainUI) initRoomList() (err error) {
 		m.Rooms[roomID].RoomID = roomID
 		log.Println("Before Trigger Room")
 		m.RoomList.TriggerRoom(roomID)
+		log.Println("After Trigger Room")
 		if first {
 			log.Println("First Change Room")
 			m.RoomList.ChangeRoom(roomID)

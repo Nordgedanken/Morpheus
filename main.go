@@ -127,6 +127,8 @@ func main() {
 		}()
 
 		//Show MainUI
+		log.Println("Results: ", results)
+		log.Println("ResultsLen: ", len(results))
 		for result := range results {
 			mainUIStruct = ui.NewMainUIStruct(windowWidth, windowHeight, window)
 			mainUIStruct.SetCli(result)
