@@ -158,11 +158,11 @@ func (m *MainUI) NewUI() (err error) {
 			m.RoomTitle.SetText(room.GetRoomName())
 
 			m.RoomTopic.SetText(room.GetRoomTopic())
-			/*count := m.MessageList.MessageViewLayout.Count()
+			count := m.MessageList.MessageViewLayout.Count()
 			for i := 0; i < count; i++ {
 				widgetScroll := m.MessageList.MessageViewLayout.ItemAt(i).Widget()
 				widgetScroll.DeleteLater()
-			}*/
+			}
 
 			log.Println("next loadCache")
 
@@ -175,7 +175,7 @@ func (m *MainUI) NewUI() (err error) {
 
 func (m *MainUI) initScrolls() {
 	// Init Message View
-	//m.MessageList.InitMessageListLayout(m.messageScrollArea)
+	m.MessageList.InitMessageListLayout(m.messageScrollArea)
 
 	// Init Room View
 	m.RoomList.InitRoomListLayout(m.roomScrollArea)
@@ -348,7 +348,7 @@ func (m *MainUI) startSync() (err error) {
 			message.Cli = m.Cli
 			m.Rooms[room].AddMessage(message)
 
-			//go m.MessageList.TriggerMessage(message)
+			go m.MessageList.TriggerMessage(message)
 		}
 	})
 
@@ -493,7 +493,7 @@ func (m *MainUI) loadCache() (err error) {
 				message.Cli = m.Cli
 				currentRoomMem.AddMessage(message)
 
-				//go m.MessageList.TriggerMessage(message)
+				go m.MessageList.TriggerMessage(message)
 			}
 		}
 

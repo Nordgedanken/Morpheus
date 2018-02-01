@@ -49,12 +49,12 @@ func (m *MessageList) TriggerMessage(message *messages.Message) {
 func (m *MessageList) InitMessageListLayout(scrollArea *widgets.QScrollArea) {
 	messageViewLayout := widgets.NewQVBoxLayout()
 
-	messageViewLayout.AddStretch(1)
+	/*messageViewLayout.AddStretch(1)
 	messageViewLayout.SetSpacing(0)
 	messageViewLayout.SetContentsMargins(15, 0, 15, 15)
 	scrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
 	scrollArea.SetAlignment(core.Qt__AlignLeading | core.Qt__AlignLeft | core.Qt__AlignVCenter)
-	scrollArea.Widget().SetLayout(messageViewLayout)
+	scrollArea.Widget().SetLayout(messageViewLayout)*/
 
 	m.MessageViewLayout = messageViewLayout
 

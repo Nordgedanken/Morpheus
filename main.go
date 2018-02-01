@@ -14,12 +14,12 @@ import (
 	"github.com/Nordgedanken/Morpheus/ui"
 	"github.com/Nordgedanken/dugong"
 	"github.com/matrix-org/gomatrix"
+	"github.com/pkg/profile"
 	"github.com/shibukawa/configdir"
 	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/widgets"
-	"github.com/davecheney/profile"
 )
 
 var window *widgets.QMainWindow
@@ -28,7 +28,7 @@ var loginUIStruct *ui.LoginUI
 
 func main() {
 	runtime.GOMAXPROCS(128)
-	
+
 	defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
 
 	go func() {

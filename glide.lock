@@ -1,5 +1,5 @@
-hash: 9a9f95818edd522f9616c4d48a729f2a24fcd70d0b8d5fdc469f01eb03e1bbfe
-updated: 2017-12-20T22:49:54.6045594+01:00
+hash: d5613074a4bf341910bc1084cd35c91802ea9208475eac20da9c77bb9442e73a
+updated: 2018-02-01T20:39:05.4200208+01:00
 imports:
 - name: github.com/AndreasBriese/bbloom
   version: 28f7e881ca57bc00e028f9ede9f0d9104cfeef5e
@@ -12,7 +12,7 @@ imports:
   - table
   - "y"
 - name: github.com/dgryski/go-farm
-  version: ac7624ea8da311f2fbbd94401d8c1cf66089f9fb
+  version: 2de33835d10275975374b37b2dcfd22c9020a1f5
 - name: github.com/disintegration/letteravatar
   version: 1a457b860450eb157f092fdc511993cfa621cc37
 - name: github.com/golang/freetype
@@ -21,7 +21,7 @@ imports:
   - raster
   - truetype
 - name: github.com/golang/protobuf
-  version: 1e59b77b52bf8e4b449a57e6f79f21226d571845
+  version: 925541529c1fa6821df4e44ce2723319eb2be768
   subpackages:
   - proto
 - name: github.com/matrix-org/gomatrix
@@ -34,6 +34,8 @@ imports:
   version: b26789c088ce775219101836d8473583e2325536
 - name: github.com/pkg/errors
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
+- name: github.com/pkg/profile
+  version: 5b67d428864e92711fcbd2f8629456121a56d91f
 - name: github.com/rhinoman/go-commonmark
   version: baf45d40250496d71f6431a5361c52b6d1f63c5c
 - name: github.com/shibukawa/configdir
@@ -41,7 +43,7 @@ imports:
 - name: github.com/sirupsen/logrus
   version: d682213848ed68c0a260ca37d6dd5ace8423f5ba
 - name: golang.org/x/crypto
-  version: d585fd2cc9195196078f516b69daff6744ef5e84
+  version: 1875d0a70c90e57f11972aefd42276df65e895b9
   subpackages:
   - ssh/terminal
 - name: golang.org/x/image
@@ -52,12 +54,9 @@ imports:
   - math/fixed
   - riff
   - tiff
-  - tiff/lzw
-  - vp8
-  - vp8l
   - webp
 - name: golang.org/x/net
-  version: d866cfc389cec985d6fda2859936a575a55a3ab6
+  version: 309822c5b9b9f80db67f016069a12628d94fad34
   subpackages:
   - context
   - html
@@ -66,7 +65,7 @@ imports:
   - internal/timeseries
   - trace
 - name: golang.org/x/sys
-  version: d818ba11af4465e00c1998bd3f8a55603b422290
+  version: 8f27ce8a604014414f8dfffc25cbcde83a3f2216
   subpackages:
   - unix
   - windows
@@ -92,7 +91,7 @@ testImports:
   - reporters/stenographer/support/go-isatty
   - types
 - name: github.com/onsi/gomega
-  version: c893efa28eb45626cdaa76c9f653b62488858837
+  version: 003f63b7f4cff3fc95357005358af2de0f5fe152
   subpackages:
   - format
   - internal/assertion
@@ -106,7 +105,7 @@ testImports:
   - matchers/support/goraph/util
   - types
 - name: golang.org/x/text
-  version: eb22672bea55af56d225d4e35405f4d2e9f062a0
+  version: e19ae1496984b1c655b8044a65c0300a3c878dd3
   subpackages:
   - encoding
   - encoding/charmap
@@ -124,4 +123,4 @@ testImports:
   - runes
   - transform
 - name: gopkg.in/yaml.v2
-  version: 287cf08546ab5e7e37d55a84f7ed3fd1db036de5
+  version: d670f9405373e636a5a2765eea47fac0c9bc91a4
