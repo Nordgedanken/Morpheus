@@ -111,11 +111,6 @@ func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (e
 
 	wrapperWidget.InstallEventFilter(filterObject)
 
-	r.RoomViewLayout.InsertWidget(r.RoomViewLayout.Count()+1, wrapperWidget, 0, 0)
-	scrollArea.SetWidgetResizable(true)
-	scrollArea.Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
-	scrollArea.Widget().Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
-
 	roomAvatarQLabel.ConnectSetPixmap(func(vqp *gui.QPixmap) {
 		log.Println("SetPixmapEventRoomAvatar")
 
@@ -147,6 +142,11 @@ func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (e
 	})
 
 	go room.GetRoomAvatar()
+
+	r.RoomViewLayout.InsertWidget(r.RoomViewLayout.Count()+1, wrapperWidget, 0, 0)
+	scrollArea.SetWidgetResizable(true)
+	scrollArea.Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
+	scrollArea.Widget().Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
 
 	return
 }

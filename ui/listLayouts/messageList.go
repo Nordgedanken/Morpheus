@@ -151,15 +151,13 @@ func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.
 	m.MessageViewLayout.SetSpacing(1)
 	m.MessageViewLayout.SetContentsMargins(0, 0, 0, 0)
 
-	m.MessageViewLayout.InsertWidget(m.MessageViewLayout.Count()+1, messageWidget, 0, core.Qt__AlignBottom)
-
 	if barAtBottom {
 		bar.SetValue(bar.Maximum())
 	}
 
-	log.Println(m.MessageViewLayout.Count())
-
 	go message.GetUserAvatar()
+
+	m.MessageViewLayout.InsertWidget(m.MessageViewLayout.Count()+1, messageWidget, 0, core.Qt__AlignBottom)
 
 	return
 }
