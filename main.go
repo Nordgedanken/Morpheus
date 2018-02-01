@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"net/http"
 	_ "net/http/pprof"
 	"os"
 	"path/filepath"
@@ -30,10 +29,6 @@ func main() {
 	runtime.GOMAXPROCS(128)
 
 	defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
-
-	go func() {
-		log.Println(http.ListenAndServe("localhost:6060", nil))
-	}()
 
 	// Init Logs and folders
 	configDirs := configdir.New("Nordgedanken", "Morpheus")
