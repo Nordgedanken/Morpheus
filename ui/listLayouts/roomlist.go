@@ -50,7 +50,6 @@ func (r *RoomList) ConnectChangeRoom(f func(roomID string)) {
 
 func (r *RoomList) ChangeRoom(roomID string) {
 	for _, f := range r.changeRoomFuncs {
-		log.Println("Change Room")
 		f(roomID)
 	}
 	return
@@ -72,6 +71,7 @@ func (r *RoomList) InitRoomListLayout(scrollArea *widgets.QScrollArea) {
 
 // NewRoom adds a new room object to the view
 func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (err error) {
+	log.Println("New Room called")
 	var widget = widgets.NewQWidget(nil, 0)
 
 	var loader = uitools.NewQUiLoader(nil)
