@@ -354,7 +354,13 @@ func (m *MainUI) startSync() (err error) {
 			m.Rooms[room].AddMessage(message)
 
 			go m.MessageList.TriggerMessage(message)
+			m.MessageList.MessageCount++
+
+			if (m.MessageList.MessageCount % 10) == 0 {
+				m.App.ProcessEvents(0)
+			}
 		}
+		m.App.ProcessEvents(0)
 	})
 
 	Syncer.OnEventType("m.room.name", func(ev *gomatrix.Event) {
@@ -503,9 +509,14 @@ func (m *MainUI) loadCache() (err error) {
 				currentRoomMem.AddMessage(message)
 
 				go m.MessageList.TriggerMessage(message)
+				m.MessageList.MessageCount++
+
+				if (m.MessageList.MessageCount % 10) == 0 {
+					m.App.ProcessEvents(0)
+				}
 			}
 		}
-
+		m.App.ProcessEvents(0)
 		return nil
 	})
 	if DBerr != nil {

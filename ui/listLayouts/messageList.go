@@ -27,6 +27,7 @@ import (
 type MessageList struct {
 	MessageViewLayout   *widgets.QVBoxLayout
 	triggerMessageFuncs []func(message *messages.Message)
+	MessageCount        int64
 }
 
 func NewMessageList() *MessageList {
@@ -47,14 +48,16 @@ func (m *MessageList) TriggerMessage(message *messages.Message) {
 
 // InitMessageListLayout generates a new widgets.QVBoxLayout and adds it to the message scrollArea
 func (m *MessageList) InitMessageListLayout(scrollArea *widgets.QScrollArea) {
-	messageViewLayout := widgets.NewQVBoxLayout()
+	scrollWidget := widgets.NewQWidget(nil, 0)
+
+	messageViewLayout := widgets.NewQVBoxLayout2(scrollWidget)
 
 	messageViewLayout.AddStretch(1)
 	messageViewLayout.SetSpacing(0)
 	messageViewLayout.SetContentsMargins(15, 0, 15, 15)
 	scrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
 	scrollArea.SetAlignment(core.Qt__AlignLeading | core.Qt__AlignLeft | core.Qt__AlignVCenter)
-	scrollArea.Widget().SetLayout(messageViewLayout)
+	scrollArea.SetWidget(scrollWidget)
 
 	m.MessageViewLayout = messageViewLayout
 

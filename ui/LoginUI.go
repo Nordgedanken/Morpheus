@@ -206,6 +206,7 @@ func (l *LoginUI) login() (err error) {
 		case result := <-results:
 			l.Cli = result
 			MainUIStruct := NewMainUIStructWithExistingConfig(l.Config, l.window)
+			MainUIStruct.App = l.App
 			mainUIErr := MainUIStruct.NewUI()
 			if mainUIErr != nil {
 				err = mainUIErr

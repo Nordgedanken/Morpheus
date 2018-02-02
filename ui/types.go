@@ -11,6 +11,7 @@ type MainUI struct {
 	globalTypes.Config
 
 	widget            *widgets.QWidget
+	App               *widgets.QApplication
 	RoomAvatar        *widgets.QLabel
 	RoomTitle         *widgets.QLabel
 	RoomTopic         *widgets.QLabel
@@ -33,6 +34,7 @@ type LoginUI struct {
 
 	LoginWidget     *widgets.QWidget
 	widget          *widgets.QWidget
+	App             *widgets.QApplication
 	window          *widgets.QMainWindow
 	helloMatrixResp helloMatrixResp
 }

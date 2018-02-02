@@ -127,6 +127,7 @@ func main() {
 			log.Println("ResultsLen: ", len(results))
 			mainUIStruct = ui.NewMainUIStruct(windowWidth, windowHeight, window)
 			mainUIStruct.SetCli(result)
+			mainUIStruct.App = app
 			mainUIErr := mainUIStruct.NewUI()
 			if mainUIErr != nil {
 				log.Errorln("mainUI: ", mainUIErr)
@@ -139,6 +140,7 @@ func main() {
 	} else {
 		//Show loginUI
 		loginUIStruct = ui.NewLoginUIStruct(windowWidth, windowHeight, window)
+		loginUIStruct.App = app
 		loginUIErr := loginUIStruct.NewUI()
 		if loginUIErr != nil {
 			log.Errorln("Login Err: ", loginUIErr)
