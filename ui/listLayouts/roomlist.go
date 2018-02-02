@@ -63,6 +63,7 @@ func (r *RoomList) InitRoomListLayout(scrollArea *widgets.QScrollArea) {
 	roomViewLayout.SetContentsMargins(0, 0, 0, 0)
 	scrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
 	scrollArea.Widget().SetLayout(roomViewLayout)
+	log.Println(r.RoomViewLayout.Count())
 
 	r.RoomViewLayout = roomViewLayout
 
@@ -81,7 +82,7 @@ func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (e
 	var wrapperWidget = loader.Load(file, widget)
 	file.Close()
 
-	//roomAvatarQLabel := widgets.NewQLabelFromPointer(widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
+	roomAvatarQLabel := widgets.NewQLabelFromPointer(widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
 	roomName := widgets.NewQLabelFromPointer(widget.FindChild("roomName", core.Qt__FindChildrenRecursively).Pointer())
 	/*lastMessageContent := widgets.NewQLabelFromPointer(widget.FindChild("lastMessage", core.Qt__FindChildrenRecursively).Pointer())*/
 
@@ -111,7 +112,7 @@ func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (e
 
 	wrapperWidget.InstallEventFilter(filterObject)
 
-	/*roomAvatarQLabel.ConnectSetPixmap(func(vqp *gui.QPixmap) {
+	roomAvatarQLabel.ConnectSetPixmap(func(vqp *gui.QPixmap) {
 		log.Println("SetPixmapEventRoomAvatar")
 
 		vqp.Scaled2(roomAvatarQLabel.Width(), roomAvatarQLabel.Height(), 0, 0)
@@ -128,9 +129,9 @@ func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (e
 		painter.DrawPixmap10(roomAvatarQLabel.Rect(), vqp)
 		newImage := newPixmap.ToImage()
 		vqp.FromImage(newImage, 0)
-	})*/
+	})
 
-	/*room.ConnectSetAvatar(func(IMGdata []byte) {
+	room.ConnectSetAvatar(func(IMGdata []byte) {
 		avatar := gui.NewQPixmap()
 
 		str := string(IMGdata[:])
@@ -141,9 +142,15 @@ func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (e
 		return
 	})
 
-	go room.GetRoomAvatar()*/
+	go room.GetRoomAvatar()
 
+	log.Println(r.RoomViewLayout)
+	log.Println(r.RoomViewLayout.Count())
+	log.Println(scrollArea.Widget().Layout().Count())
 	r.RoomViewLayout.InsertWidget(-1, wrapperWidget, 0, core.Qt__AlignBottom)
+	log.Println(r.RoomViewLayout)
+	log.Println(r.RoomViewLayout.Count())
+	log.Println(scrollArea.Widget().Layout().Count())
 	scrollArea.SetWidgetResizable(true)
 	scrollArea.Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
 	scrollArea.Widget().Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
