@@ -412,14 +412,20 @@ func (m *MainUI) initRoomList() (err error) {
 		m.Rooms[roomID].RoomID = roomID
 		log.Println("Before Trigger Room")
 		m.RoomList.TriggerRoom(roomID)
+		m.RoomList.RoomCount++
+		if (m.RoomList.RoomCount % 10) == 0 {
+			m.App.ProcessEvents(0)
+		}
 		log.Println("After Trigger Room")
 		if first {
 			log.Println("First Change Room")
 			m.RoomList.ChangeRoom(roomID)
+			m.App.ProcessEvents(0)
 		}
 		first = false
 	}
 
+	m.App.ProcessEvents(0)
 	return
 }
 

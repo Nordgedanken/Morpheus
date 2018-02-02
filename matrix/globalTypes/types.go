@@ -5,6 +5,7 @@ import (
 	"github.com/Nordgedanken/Morpheus/matrix/rooms"
 	"github.com/Nordgedanken/Morpheus/ui/listLayouts"
 	"github.com/matrix-org/gomatrix"
+	"github.com/therecipe/qt/widgets"
 )
 
 // Config holds important reused information in the UI
@@ -21,6 +22,8 @@ type Config struct {
 
 	MessageList *listLayouts.MessageList
 	RoomList    *listLayouts.RoomList
+
+	App *widgets.QApplication
 
 	matrixClient
 }

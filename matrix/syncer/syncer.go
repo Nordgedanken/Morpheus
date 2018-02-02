@@ -132,6 +132,10 @@ func (s *MorpheusSyncer) getOrCreateRoom(roomID, state string) *gomatrix.Room {
 		s.config.Rooms[roomID] = rooms.NewRoom()
 		s.config.Rooms[roomID].RoomID = roomID
 		s.config.Rooms[roomID].Cli = s.config.GetCli()
+		s.config.RoomList.RoomCount++
+		if (s.config.RoomList.RoomCount % 10) == 0 {
+			s.config.App.ProcessEvents(0)
+		}
 		s.config.RoomList.TriggerRoom(roomID)
 	}
 

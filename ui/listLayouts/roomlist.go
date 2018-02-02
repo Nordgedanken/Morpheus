@@ -24,6 +24,7 @@ type RoomList struct {
 	RoomViewLayout   *widgets.QVBoxLayout
 	triggerRoomFuncs []func(roomID string)
 	changeRoomFuncs  []func(roomID string)
+	RoomCount        int64
 }
 
 func NewRoomList() *RoomList {
@@ -36,7 +37,7 @@ func (r *RoomList) ConnectTriggerRoom(f func(roomID string)) {
 }
 
 func (r *RoomList) TriggerRoom(roomID string) {
-	log.Println("Trigger Room")
+	log.Println(len(r.triggerRoomFuncs))
 	for _, f := range r.triggerRoomFuncs {
 		go f(roomID)
 	}
@@ -65,8 +66,6 @@ func (r *RoomList) InitRoomListLayout(scrollArea *widgets.QScrollArea) {
 	roomViewLayout.SetContentsMargins(0, 0, 0, 0)
 	scrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
 	scrollArea.SetWidget(scrollWidget)
-	log.Println(roomViewLayout.Count())
-	log.Println(scrollArea.Widget().Layout().Count())
 
 	r.RoomViewLayout = roomViewLayout
 
@@ -147,14 +146,7 @@ func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (e
 
 	go room.GetRoomAvatar()
 
-	log.Println("Before")
-	log.Println(r.RoomViewLayout.Count())
-	log.Println(scrollArea.Widget().Layout().Count())
-
 	r.RoomViewLayout.InsertWidget(-1, wrapperWidget, 0, core.Qt__AlignBottom)
-	log.Println("After")
-	log.Println(r.RoomViewLayout.Count())
-	log.Println(scrollArea.Widget().Layout().Count())
 	scrollArea.SetWidgetResizable(true)
 	scrollArea.Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
 	scrollArea.Widget().Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
