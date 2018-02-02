@@ -154,7 +154,7 @@ func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.
 
 	go message.GetUserAvatar()
 
-	m.MessageViewLayout.InsertWidget(-1, widget, 0, core.Qt__AlignBottom)
+	m.MessageViewLayout.InsertWidget(-1, wrapperWidget, 0, core.Qt__AlignBottom)
 
 	if barAtBottom {
 		bar.SetValue(bar.Maximum())
