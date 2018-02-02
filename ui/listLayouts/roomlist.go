@@ -59,15 +59,14 @@ func (r *RoomList) ChangeRoom(roomID string) {
 }
 
 // InitRoomListLayout generates a new QRoomVBoxLayoutWithTriggerSlot and adds it to the room scrollArea
-func (r *RoomList) InitRoomListLayout(scrollArea *widgets.QScrollArea) {
-	scrollWidget := widgets.NewQWidget(nil, 0)
-
-	roomViewLayout := widgets.NewQVBoxLayout2(scrollWidget)
+func (r *RoomList) InitRoomListLayout(scrollArea *widgets.QScrollArea, roomView *widgets.QWidget) {
+	roomViewLayout := widgets.NewQVBoxLayout2(roomView)
 
 	roomViewLayout.SetSpacing(0)
 	roomViewLayout.SetContentsMargins(0, 0, 0, 0)
-	scrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
-	scrollArea.SetWidget(scrollWidget)
+	roomView.SetContentsMargins(0, 0, 0, 0)
+	scrollArea.SetWidget(roomView)
+	scrollArea.Widget().SetLayout(roomViewLayout)
 
 	r.RoomViewLayout = roomViewLayout
 

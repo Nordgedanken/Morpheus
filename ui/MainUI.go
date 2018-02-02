@@ -170,11 +170,14 @@ func (m *MainUI) NewUI() (err error) {
 }
 
 func (m *MainUI) initScrolls() {
+	messagesScrollAreaContent := widgets.NewQWidgetFromPointer(m.widget.FindChild("messagesScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
+	roomScrollAreaContent := widgets.NewQWidgetFromPointer(m.widget.FindChild("roomScrollAreaContent", core.Qt__FindChildrenRecursively).Pointer())
+
 	// Init Room View
-	m.RoomList.InitRoomListLayout(m.roomScrollArea)
+	m.RoomList.InitRoomListLayout(m.roomScrollArea, roomScrollAreaContent)
 
 	// Init Message View
-	m.MessageList.InitMessageListLayout(m.messageScrollArea)
+	m.MessageList.InitMessageListLayout(m.messageScrollArea, messagesScrollAreaContent)
 
 	m.roomScrollArea.SetWidgetResizable(true)
 	m.roomScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
