@@ -146,9 +146,6 @@ func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (e
 	go room.GetRoomAvatar()
 
 	r.RoomViewLayout.InsertWidget(-1, wrapperWidget, 0, core.Qt__AlignBottom)
-	scrollArea.SetWidgetResizable(true)
-	scrollArea.Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
-	scrollArea.Widget().Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
 
 	return
 }
