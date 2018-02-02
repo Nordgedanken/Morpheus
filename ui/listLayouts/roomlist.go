@@ -19,11 +19,14 @@ import (
 //                                                //
 //                                                //
 ////////////////////////////////////////////////////
+
+type RoomFunc func(roomID string)
+
 // RoomList defines the TriggerRoom and ChangeRoom method to add messages to the View
 type RoomList struct {
 	RoomViewLayout   *widgets.QVBoxLayout
-	triggerRoomFuncs []func(roomID string)
-	changeRoomFuncs  []func(roomID string)
+	triggerRoomFuncs []RoomFunc
+	changeRoomFuncs  []RoomFunc
 	RoomCount        int64
 }
 
@@ -31,20 +34,20 @@ func NewRoomList() *RoomList {
 	return &RoomList{}
 }
 
-func (r *RoomList) ConnectTriggerRoom(f func(roomID string)) {
+func (r *RoomList) ConnectTriggerRoom(f RoomFunc) {
 	r.triggerRoomFuncs = append(r.triggerRoomFuncs, f)
 	return
 }
 
 func (r *RoomList) TriggerRoom(roomID string) {
-	log.Println(len(r.triggerRoomFuncs))
+	log.Println(r.triggerRoomFuncs)
 	for _, f := range r.triggerRoomFuncs {
 		go f(roomID)
 	}
 	return
 }
 
-func (r *RoomList) ConnectChangeRoom(f func(roomID string)) {
+func (r *RoomList) ConnectChangeRoom(f RoomFunc) {
 	r.changeRoomFuncs = append(r.changeRoomFuncs, f)
 	return
 }
