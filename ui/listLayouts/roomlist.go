@@ -63,7 +63,8 @@ func (r *RoomList) InitRoomListLayout(scrollArea *widgets.QScrollArea) {
 	roomViewLayout.SetContentsMargins(0, 0, 0, 0)
 	scrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
 	scrollArea.Widget().SetLayout(roomViewLayout)
-	log.Println(r.RoomViewLayout.Count())
+	log.Println(roomViewLayout.Count())
+	log.Println(scrollArea.Widget().Layout().Count())
 
 	r.RoomViewLayout = roomViewLayout
 
