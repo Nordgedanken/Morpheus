@@ -344,7 +344,7 @@ func (m *MainUI) startSync() (err error) {
 			message.Cli = m.Cli
 			m.Rooms[room].AddMessage(message)
 
-			go m.MessageList.TriggerMessage(message)
+			m.MessageList.TriggerMessage(message)
 			m.MessageList.MessageCount++
 
 			if (m.MessageList.MessageCount % 10) == 0 {
@@ -501,7 +501,7 @@ func (m *MainUI) loadCache() (err error) {
 				message.Cli = m.Cli
 				currentRoomMem.AddMessage(message)
 
-				go m.MessageList.TriggerMessage(message)
+				m.MessageList.TriggerMessage(message)
 				m.MessageList.MessageCount++
 
 				if (m.MessageList.MessageCount % 10) == 0 {
