@@ -123,7 +123,6 @@ func (l *LoginUI) NewUI() (err error) {
 	})
 
 	registerButton.ConnectClicked(func(_ bool) {
-		log.Println("register Clicked")
 		registerUIStruct := NewRegUIStructWithExistingConfig(l.Config, l.window)
 		regUIErr := registerUIStruct.NewUI()
 		if regUIErr != nil {
@@ -185,7 +184,6 @@ func (l *LoginUI) NewUI() (err error) {
 
 func (l *LoginUI) login() (err error) {
 	//TODO register enter and show loader or so
-	log.Println(l.Server)
 
 	var wg sync.WaitGroup
 

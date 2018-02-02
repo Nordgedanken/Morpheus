@@ -123,8 +123,6 @@ func main() {
 		//Show MainUI
 		select {
 		case result := <-results:
-			log.Println("Results: ", results)
-			log.Println("ResultsLen: ", len(results))
 			mainUIStruct = ui.NewMainUIStruct(windowWidth, windowHeight, window)
 			mainUIStruct.SetCli(result)
 			mainUIStruct.App = app

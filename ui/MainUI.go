@@ -89,7 +89,6 @@ func (m *MainUI) NewUI() (err error) {
 	m.initScrolls()
 
 	m.MessageList.ConnectTriggerMessage(func(message *messages.Message) {
-		log.Println("triggered Message")
 		var own bool
 		if message.Author == m.Cli.UserID {
 			own = true
@@ -105,7 +104,6 @@ func (m *MainUI) NewUI() (err error) {
 	m.MainWidget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 
 	m.RoomList.ConnectTriggerRoom(func(roomID string) {
-		log.Println("Actual Trigger Room")
 		room := m.Rooms[roomID]
 
 		NewRoomErr := m.RoomList.NewRoom(room, m.roomScrollArea)
@@ -137,7 +135,6 @@ func (m *MainUI) NewUI() (err error) {
 	})
 
 	m.RoomList.ConnectChangeRoom(func(roomID string) {
-		log.Println("Change Room")
 		room := m.Rooms[roomID]
 
 		if m.CurrentRoom != room.RoomID {
@@ -165,8 +162,6 @@ func (m *MainUI) NewUI() (err error) {
 				widgetScroll.DeleteLater()
 			}
 
-			log.Println("next loadCache")
-
 			go m.loadCache()
 		}
 	})
@@ -176,14 +171,10 @@ func (m *MainUI) NewUI() (err error) {
 
 func (m *MainUI) initScrolls() {
 	// Init Room View
-	log.Println("Before Room Init")
 	m.RoomList.InitRoomListLayout(m.roomScrollArea)
-	log.Println("After Room Init")
 
 	// Init Message View
-	log.Println("Before Message Init")
 	m.MessageList.InitMessageListLayout(m.messageScrollArea)
-	log.Println("After Message Init")
 
 	m.roomScrollArea.SetWidgetResizable(true)
 	m.roomScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
@@ -398,7 +389,6 @@ func (m *MainUI) startSync() (err error) {
 }
 
 func (m *MainUI) initRoomList() (err error) {
-	log.Println("Init Room List")
 	roomsStruct, roomsErr := rooms.GetRooms(m.Cli)
 	if roomsErr != nil {
 		err = roomsErr
@@ -410,15 +400,12 @@ func (m *MainUI) initRoomList() (err error) {
 		m.Rooms[roomID] = rooms.NewRoom()
 		m.Rooms[roomID].Cli = m.Cli
 		m.Rooms[roomID].RoomID = roomID
-		log.Println("Before Trigger Room")
 		m.RoomList.TriggerRoom(roomID)
 		m.RoomList.RoomCount++
 		if (m.RoomList.RoomCount % 10) == 0 {
 			m.App.ProcessEvents(0)
 		}
-		log.Println("After Trigger Room")
 		if first {
-			log.Println("First Change Room")
 			m.RoomList.ChangeRoom(roomID)
 			m.App.ProcessEvents(0)
 		}

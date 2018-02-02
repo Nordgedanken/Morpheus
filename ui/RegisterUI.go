@@ -44,7 +44,6 @@ func (r *RegUI) GetWidget() (widget *widgets.QWidget) {
 
 // NewUI initializes a new login Screen
 func (r *RegUI) NewUI() (err error) {
-	log.Println("register UI started")
 	r.widget = widgets.NewQWidget(nil, 0)
 
 	var loader = uitools.NewQUiLoader(nil)
@@ -83,8 +82,6 @@ func (r *RegUI) NewUI() (err error) {
 		r.window.Resize(r.widget.Size())
 	})
 
-	log.Println("register UI Items loaded")
-
 	var helloMatrixRespErr error
 	r.helloMatrixResp, helloMatrixRespErr = getHelloMatrixList()
 	if helloMatrixRespErr != nil {
@@ -93,12 +90,8 @@ func (r *RegUI) NewUI() (err error) {
 		return
 	}
 
-	log.Println("helloMatrix got called")
-
 	hostnames := convertHelloMatrixRespToNameSlice(r.helloMatrixResp)
 	serverDropdown.AddItems(hostnames)
-
-	log.Println("serverDropdown initialized")
 
 	var layout = widgets.NewQHBoxLayout()
 	r.window.SetLayout(layout)
@@ -107,8 +100,6 @@ func (r *RegUI) NewUI() (err error) {
 	layout.SetContentsMargins(0, 0, 0, 0)
 	r.widget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 	r.RegWidget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
-
-	log.Println("widgets Got set")
 
 	r.widget.ConnectResizeEvent(func(event *gui.QResizeEvent) {
 		r.RegWidget.Resize(event.Size())
@@ -188,8 +179,6 @@ func (r *RegUI) NewUI() (err error) {
 
 	r.RegWidget.SetWindowTitle("Morpheus - Register")
 
-	log.Println("rests initialized")
-
 	return
 }
 
@@ -198,12 +187,10 @@ func (r *RegUI) register() error {
 }
 
 func getHelloMatrixList() (resp helloMatrixResp, err error) {
-	log.Println("Get HelloMatrix List")
 	var httpClient = &http.Client{Timeout: 10 * time.Second}
 
 	url := "https://www.hello-matrix.net/public_servers.php?format=json&only_public=true"
 
-	log.Println("Before HTTPGet HelloMatrix List")
 	r, RespErr := httpClient.Get(url)
 	if RespErr != nil {
 		err = RespErr
@@ -211,7 +198,6 @@ func getHelloMatrixList() (resp helloMatrixResp, err error) {
 	}
 	defer r.Body.Close()
 
-	log.Println("Before HelloMatrix List decode")
 	decodeErr := json.NewDecoder(r.Body).Decode(&resp)
 	if decodeErr != nil {
 		err = decodeErr
