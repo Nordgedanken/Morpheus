@@ -154,10 +154,6 @@ func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.
 	m.MessageViewLayout.SetSpacing(1)
 	m.MessageViewLayout.SetContentsMargins(0, 0, 0, 0)
 
-	if barAtBottom {
-		bar.SetValue(bar.Maximum())
-	}
-
 	go message.GetUserAvatar()
 
 	log.Println(wrapperWidget.IsVisible())
@@ -167,6 +163,10 @@ func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.
 	widget.SetVisible(true)
 	messageWidget.SetVisible(true)
 	m.MessageViewLayout.InsertWidget(-1, wrapperWidget, 0, core.Qt__AlignBottom)
+
+	if barAtBottom {
+		bar.SetValue(bar.Maximum())
+	}
 
 	return
 }

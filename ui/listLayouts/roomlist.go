@@ -40,7 +40,6 @@ func (r *RoomList) ConnectTriggerRoom(f RoomFunc) {
 }
 
 func (r *RoomList) TriggerRoom(roomID string) {
-	log.Println(r.triggerRoomFuncs)
 	for _, f := range r.triggerRoomFuncs {
 		go f(roomID)
 	}
