@@ -160,7 +160,13 @@ func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.
 
 	go message.GetUserAvatar()
 
-	m.MessageViewLayout.InsertWidget(-1, messageWidget, 0, core.Qt__AlignBottom)
+	log.Println(wrapperWidget.IsVisible())
+	log.Println(widget.IsVisible())
+	log.Println(messageWidget.IsVisible())
+	wrapperWidget.SetVisible(true)
+	widget.SetVisible(true)
+	messageWidget.SetVisible(true)
+	m.MessageViewLayout.InsertWidget(-1, wrapperWidget, 0, core.Qt__AlignBottom)
 
 	return
 }
