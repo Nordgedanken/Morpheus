@@ -35,12 +35,12 @@ func NewRoomList() *RoomList {
 }
 
 func (r *RoomList) ConnectTriggerRoom(f RoomFunc) {
+	log.Println(r.triggerRoomFuncs)
 	r.triggerRoomFuncs = append(r.triggerRoomFuncs, f)
 	return
 }
 
 func (r *RoomList) TriggerRoom(roomID string) {
-	log.Println(r.triggerRoomFuncs)
 	for _, f := range r.triggerRoomFuncs {
 		go f(roomID)
 	}
