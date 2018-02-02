@@ -159,5 +159,7 @@ func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.
 
 	m.MessageViewLayout.InsertWidget(-1, messageWidget, 0, core.Qt__AlignBottom)
 
+	scrollArea.Widget().SetLayout(m.MessageViewLayout)
+
 	return
 }

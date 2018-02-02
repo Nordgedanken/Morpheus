@@ -148,5 +148,7 @@ func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (e
 	scrollArea.Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
 	scrollArea.Widget().Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
 
+	scrollArea.Widget().SetLayout(r.RoomViewLayout)
+
 	return
 }
