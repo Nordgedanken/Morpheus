@@ -64,6 +64,7 @@ func (m *MessageList) InitMessageListLayout(scrollArea *widgets.QScrollArea) {
 
 // NewMessage adds a new message object to the view
 func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.QScrollArea, own bool) (err error) {
+	log.Println(message)
 	barAtBottom := false
 	bar := scrollArea.VerticalScrollBar()
 	if bar.Value() == bar.Maximum() {
