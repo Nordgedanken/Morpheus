@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	_ "net/http/pprof"
 	"os"
 	"path/filepath"
@@ -35,7 +34,7 @@ func main() {
 	if _, StatErr := os.Stat(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/log/"); os.IsNotExist(StatErr) {
 		MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/log/", 0700)
 		if MkdirErr != nil {
-			fmt.Errorf("%s", MkdirErr)
+			log.Println(MkdirErr)
 			return
 		}
 	}
