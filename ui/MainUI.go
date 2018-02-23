@@ -68,13 +68,13 @@ func (m *MainUI) NewUI() (err error) {
 	m.loadChatUIDefaults()
 
 	//Set Avatar
-	avatarLogo := widgets.NewQLabelFromPointer(m.widget.FindChild("UserAvatar", core.Qt__FindChildrenRecursively).Pointer())
+	/*avatarLogo := widgets.NewQLabelFromPointer(m.widget.FindChild("UserAvatar", core.Qt__FindChildrenRecursively).Pointer())
 	avatar, AvatarErr := matrix.GetOwnUserAvatar(m.Cli)
 	if AvatarErr != nil {
 		err = AvatarErr
 		return
 	}
-	avatarLogo.SetPixmap(avatar)
+	avatarLogo.SetPixmap(avatar)*/
 
 	//Handle LogoutButton
 	logoutButton := widgets.NewQPushButtonFromPointer(m.widget.FindChild("LogoutButton", core.Qt__FindChildrenRecursively).Pointer())
