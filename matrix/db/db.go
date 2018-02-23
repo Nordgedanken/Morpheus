@@ -15,6 +15,7 @@ var cacheDB *badger.DB
 var onceCache Once
 var onceUser Once
 
+// ResetOnceUser is used to reset the DB after a logout
 func ResetOnceUser() {
 	onceUser.Reset()
 }

@@ -29,7 +29,7 @@ func NewRegUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow) 
 	return
 }
 
-// NewLoginUIStructWithExistingConfig gives you a LoginUI struct with prefilled data and data from a previous Config
+// NewRegUIStructWithExistingConfig gives you a LoginUI struct with prefilled data and data from a previous Config
 func NewRegUIStructWithExistingConfig(configStruct globalTypes.Config, window *widgets.QMainWindow) (regUIStruct *RegUI) {
 	regUIStruct = &RegUI{
 		Config: configStruct,
