@@ -129,10 +129,7 @@ func (m *MainUI) NewUI() (err error) {
 		room := m.Rooms[roomID]
 
 		if m.CurrentRoom != room.RoomID {
-			log.Println("New: ", room.RoomID)
-			log.Println("Old: ", m.CurrentRoom)
 			m.SetCurrentRoom(room.RoomID)
-			log.Println("NewRes: ", m.CurrentRoom)
 			m.MainWidget.SetWindowTitle("Morpheus - " + room.GetRoomTopic())
 
 			room.ConnectSetAvatar(func(IMGdata []byte) {
@@ -399,7 +396,6 @@ func (m *MainUI) initRoomList() (err error) {
 		m.Rooms[roomID].RoomID = roomID
 		go m.RoomList.TriggerRoom(roomID)
 		m.RoomList.RoomCount++
-		log.Println(m.RoomList.RoomCount)
 		if (m.RoomList.RoomCount % 10) == 0 {
 			m.App.ProcessEvents(core.QEventLoop__AllEvents)
 		}
@@ -501,6 +497,8 @@ func (m *MainUI) loadCache() (err error) {
 
 				go m.MessageList.TriggerMessage(message)
 				m.MessageList.MessageCount++
+
+				log.Println(m.MessageList.MessageCount)
 
 				if (m.MessageList.MessageCount % 10) == 0 {
 					m.App.ProcessEvents(core.QEventLoop__AllEvents)
