@@ -87,7 +87,7 @@ func (m *MainUI) NewUI() (err error) {
 			own = false
 		}
 
-		m.MessageList.NewMessage(message, m.messageScrollArea, own)
+		go m.MessageList.NewMessage(message, m.messageScrollArea, own)
 	})
 
 	go m.startSync()
