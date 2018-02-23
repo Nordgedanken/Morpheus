@@ -440,10 +440,9 @@ func (m *MainUI) loadCache() (err error) {
 	DBerr := cacheDB.View(func(txn *badger.Txn) error {
 		log.Println("CacheDB")
 		MsgOpts := badger.DefaultIteratorOptions
-		MsgOpts.PrefetchSize = 10
 		MsgIt := txn.NewIterator(MsgOpts)
+		log.Println("MsgPrefix: ", "room|"+m.CurrentRoom+"|messages")
 		MsgPrefix := []byte("room|" + m.CurrentRoom + "|messages")
-		log.Println("MsgPrefix: ", MsgPrefix)
 
 		var doneMsg []string
 
