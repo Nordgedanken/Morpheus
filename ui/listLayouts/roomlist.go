@@ -20,8 +20,6 @@ import (
 //                                                //
 ////////////////////////////////////////////////////
 
-type RoomFunc func(roomID string)
-
 // RoomList defines the TriggerRoom and ChangeRoom method to add messages to the View
 type RoomList struct {
 	widgets.QVBoxLayout

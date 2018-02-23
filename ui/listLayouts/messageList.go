@@ -87,6 +87,11 @@ func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.
 	senderContent.SetText(senderDisplayName)
 	timestampContent.SetText(timestampString)
 
+	m.InsertWidget(m.Count()+1, wrapperWidget, 0, 0)
+	scrollArea.SetWidgetResizable(true)
+	scrollArea.Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
+	scrollArea.Widget().Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
+
 	avatarLogo.ConnectSetPixmap(func(vqp *gui.QPixmap) {
 		log.Println("SetPixmapEventRoomAvatar")
 
@@ -110,10 +115,11 @@ func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.
 		avatar := gui.NewQPixmap()
 
 		str := string(IMGdata[:])
-
 		avatar.LoadFromData(string(str[:]), uint(len(str)), "", 0)
 
 		avatarLogo.SetPixmap(avatar)
+
+		return
 	})
 
 	var lineLength int
@@ -127,12 +133,7 @@ func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.
 	messageWidget.SetMinimumWidth(lineLength)
 	messageWidget.Resize2(lineLength, wrapperWidget.Size().Height())
 
-	m.SetSpacing(1)
-	m.SetContentsMargins(0, 0, 0, 0)
-
 	go message.GetUserAvatar()
-
-	m.InsertWidget(m.Count()+1, wrapperWidget, 0, core.Qt__AlignBottom)
 
 	if barAtBottom {
 		bar.SetValue(bar.Maximum())
