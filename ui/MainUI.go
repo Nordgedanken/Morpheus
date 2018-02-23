@@ -87,7 +87,7 @@ func (m *MainUI) NewUI() (err error) {
 			own = false
 		}
 
-		go m.MessageList.NewMessage(message, m.messageScrollArea, own)
+		m.MessageList.NewMessage(message, m.messageScrollArea, own)
 	})
 
 	go m.startSync()
@@ -97,13 +97,11 @@ func (m *MainUI) NewUI() (err error) {
 	m.RoomList.ConnectTriggerRoom(func(roomID string) {
 		room := m.Rooms[roomID]
 
-		go func() {
-			NewRoomErr := m.RoomList.NewRoom(room, m.roomScrollArea)
-			if NewRoomErr != nil {
-				err = NewRoomErr
-				return
-			}
-		}()
+		NewRoomErr := m.RoomList.NewRoom(room, m.roomScrollArea)
+		if NewRoomErr != nil {
+			err = NewRoomErr
+			return
+		}
 	})
 
 	go m.initRoomList()
