@@ -80,6 +80,7 @@ func (m *MainUI) NewUI() (err error) {
 	m.initScrolls()
 
 	m.MessageList.ConnectTriggerMessage(func(message *messages.Message) {
+		log.Infoln("Trigger Message")
 		var own bool
 		if message.Author == m.Cli.UserID {
 			own = true
@@ -335,6 +336,7 @@ func (m *MainUI) startSync() (err error) {
 		id := ev.ID
 		timestamp := ev.Timestamp
 		go db.CacheMessageEvents(id, sender, room, msg, timestamp)
+		log.Infoln("NewEVENT")
 		if room == m.CurrentRoom {
 			message := messages.NewMessage(nil)
 			message.EventID = id
