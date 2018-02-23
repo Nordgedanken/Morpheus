@@ -338,14 +338,14 @@ func (m *MainUI) startSync() (err error) {
 			message.Cli = m.Cli
 			m.Rooms[room].AddMessage(message)
 
-			m.MessageList.TriggerMessage(message)
+			go m.MessageList.TriggerMessage(message)
 			m.MessageList.MessageCount++
 
 			if (m.MessageList.MessageCount % 10) == 0 {
-				m.App.ProcessEvents(0)
+				m.App.ProcessEvents(core.QEventLoop__AllEvents)
 			}
 		}
-		m.App.ProcessEvents(0)
+		m.App.ProcessEvents(core.QEventLoop__AllEvents)
 	})
 
 	Syncer.OnEventType("m.room.name", func(ev *gomatrix.Event) {
@@ -394,19 +394,19 @@ func (m *MainUI) initRoomList() (err error) {
 		m.Rooms[roomID] = rooms.NewRoom()
 		m.Rooms[roomID].Cli = m.Cli
 		m.Rooms[roomID].RoomID = roomID
-		m.RoomList.TriggerRoom(roomID)
+		go m.RoomList.TriggerRoom(roomID)
 		m.RoomList.RoomCount++
 		if (m.RoomList.RoomCount % 10) == 0 {
-			m.App.ProcessEvents(0)
+			m.App.ProcessEvents(core.QEventLoop__AllEvents)
 		}
 		if first {
 			m.RoomList.ChangeRoom(roomID)
-			m.App.ProcessEvents(0)
+			m.App.ProcessEvents(core.QEventLoop__AllEvents)
 		}
 		first = false
 	}
 
-	m.App.ProcessEvents(0)
+	m.App.ProcessEvents(core.QEventLoop__AllEvents)
 	return
 }
 
@@ -495,15 +495,15 @@ func (m *MainUI) loadCache() (err error) {
 				message.Cli = m.Cli
 				currentRoomMem.AddMessage(message)
 
-				m.MessageList.TriggerMessage(message)
+				go m.MessageList.TriggerMessage(message)
 				m.MessageList.MessageCount++
 
 				if (m.MessageList.MessageCount % 10) == 0 {
-					m.App.ProcessEvents(0)
+					m.App.ProcessEvents(core.QEventLoop__AllEvents)
 				}
 			}
 		}
-		m.App.ProcessEvents(0)
+		m.App.ProcessEvents(core.QEventLoop__AllEvents)
 		return nil
 	})
 	if DBerr != nil {
