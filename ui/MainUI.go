@@ -414,16 +414,6 @@ func (m *MainUI) initRoomList() (err error) {
 	return
 }
 
-func contains(slice []string, item string) bool {
-	set := make(map[string]struct{}, len(slice))
-	for _, s := range slice {
-		set[s] = struct{}{}
-	}
-
-	_, ok := set[item]
-	return ok
-}
-
 func (m *MainUI) loadCache() (err error) {
 	log.Println("Loading cache!")
 	barAtBottom := false
@@ -444,7 +434,7 @@ func (m *MainUI) loadCache() (err error) {
 		log.Println("MsgPrefix: ", "room|"+m.CurrentRoom+"|messages")
 		MsgPrefix := []byte("room|" + m.CurrentRoom + "|messages")
 
-		var doneMsg []string
+		doneMsg := make(map[string]bool)
 
 		for MsgIt.Seek(MsgPrefix); MsgIt.ValidForPrefix(MsgPrefix); MsgIt.Next() {
 			log.Println("MSG LOOP")
@@ -463,9 +453,9 @@ func (m *MainUI) loadCache() (err error) {
 			}
 			idValue := fmt.Sprintf("%s", value)
 
-			if !contains(doneMsg, idValue) {
+			if !doneMsg[idValue] {
 				// Remember we already added this message to the view
-				doneMsg = append(doneMsg, idValue)
+				doneMsg[idValue] = true
 
 				// Get all Data
 				senderResult, QueryErr := db.Get(txn, []byte(strings.Replace(stringKey, "|id", "|sender", -1)))
