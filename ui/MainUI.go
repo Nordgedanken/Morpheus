@@ -427,8 +427,8 @@ func (m *MainUI) loadCache() (err error) {
 	if DBOpenErr != nil {
 		err = DBOpenErr
 	}
-	log.Infoln("room|" + m.CurrentRoom + "|messages")
-	MsgPrefix := []byte("room|" + m.CurrentRoom + "|messages")
+	log.Infoln("room|" + m.CurrentRoom + "|messages|")
+	MsgPrefix := []byte("room|" + m.CurrentRoom + "|messages|")
 	DBerr := cacheDB.View(func(txn *badger.Txn) error {
 		log.Println("CacheDB")
 		opts := badger.DefaultIteratorOptions
@@ -443,7 +443,7 @@ func (m *MainUI) loadCache() (err error) {
 			return valid
 		}()
 
-		for MsgIt.Rewind(); valid; MsgIt.Next() {
+		for MsgIt.Seek(MsgPrefix); valid; MsgIt.Next() {
 			log.Println("MSG LOOP")
 			item := MsgIt.Item()
 			key := item.Key()
