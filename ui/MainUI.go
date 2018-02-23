@@ -188,6 +188,7 @@ func (m *MainUI) loadChatUIDefaults() {
 
 	m.MessageList = listLayouts.NewMessageList()
 	m.RoomList = listLayouts.NewRoomList2(m.roomScrollArea)
+	m.RoomList.Init(m.roomScrollArea)
 
 	m.RoomAvatar = widgets.NewQLabelFromPointer(m.widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
 	m.RoomTitle = widgets.NewQLabelFromPointer(m.widget.FindChild("RoomTitle", core.Qt__FindChildrenRecursively).Pointer())

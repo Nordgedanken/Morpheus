@@ -29,7 +29,6 @@ type RoomList struct {
 	_               func(roomID string) `slot:"triggerRoom"`
 	changeRoomFuncs []RoomFunc
 	RoomCount       int64
-	scrollArea      *widgets.QScrollArea
 }
 
 /*func (r *RoomList) ConnectTriggerRoom(f RoomFunc) {
@@ -56,12 +55,12 @@ func (r *RoomList) ChangeRoom(roomID string) {
 	return
 }
 
-// init generates a new RoomList and adds it to the room scrollArea
-func (r *RoomList) init() {
+// Init generates a new RoomList and adds it to the room scrollArea
+func (r *RoomList) Init(scrollArea *widgets.QScrollArea) {
 	r.SetSpacing(0)
 	r.SetContentsMargins(0, 0, 0, 0)
-	r.scrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
-	r.scrollArea.Widget().SetLayout(r)
+	scrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
+	scrollArea.Widget().SetLayout(r)
 
 	return
 }
