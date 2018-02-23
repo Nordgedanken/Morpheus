@@ -170,6 +170,7 @@ func (m *MainUI) initScrolls() {
 	m.roomScrollArea.SetWidgetResizable(true)
 	m.roomScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
 	m.roomScrollArea.SetContentsMargins(0, 0, 0, 0)
+	m.roomScrollArea.SetSizeAdjustPolicy(widgets.QAbstractScrollArea__AdjustToContents)
 
 	m.messageScrollArea.SetWidgetResizable(true)
 	m.messageScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
@@ -433,7 +434,7 @@ func (m *MainUI) loadCache() (err error) {
 		log.Println("CacheDB")
 		MsgOpts := badger.DefaultIteratorOptions
 		MsgIt := txn.NewIterator(MsgOpts)
-		MsgPrefix := []byte("room|" + m.CurrentRoom + "|messages")
+		MsgPrefix := []byte("room|" + m.CurrentRoom + "|messages|")
 
 		doneMsg := make(map[string]bool)
 
