@@ -149,10 +149,14 @@ func (m *MainUI) NewUI() (err error) {
 			m.RoomTopic.SetText(room.GetRoomTopic())
 			count := m.MessageList.Count()
 			for i := 0; i < count; i++ {
+				if (i % 10) == 0 {
+					m.App.ProcessEvents(core.QEventLoop__AllEvents)
+				}
 				widgetScroll := m.MessageList.ItemAt(i).Widget()
 				widgetScroll.DeleteLater()
 			}
 
+			log.Println("Before loadCache")
 			go m.loadCache()
 		}
 	})
@@ -421,6 +425,7 @@ func contains(slice []string, item string) bool {
 }
 
 func (m *MainUI) loadCache() (err error) {
+	log.Println("Loading cache!")
 	barAtBottom := false
 	bar := m.messageScrollArea.VerticalScrollBar()
 	if bar.Value() == bar.Maximum() {
