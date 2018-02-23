@@ -79,6 +79,7 @@ func (r *Room) AddMessage(message *messages.Message) {
 	if r.Messages == nil {
 		r.Messages = make(map[string]*messages.Message)
 	}
+	log.Println(message.EventID)
 	r.Messages[message.EventID] = message
 }
 
