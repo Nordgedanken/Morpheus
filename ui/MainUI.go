@@ -104,6 +104,7 @@ func (m *MainUI) NewUI() (err error) {
 	m.MainWidget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
 
 	m.RoomList.ConnectTriggerRoom(func(roomID string) {
+		log.Println(m.Rooms)
 		room := m.Rooms[roomID]
 
 		NewRoomErr := m.RoomList.NewRoom(room, m.roomScrollArea)
