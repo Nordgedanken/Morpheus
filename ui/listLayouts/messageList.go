@@ -25,40 +25,17 @@ import (
 
 // messageList defines the TriggerMessage method to add messages to the View
 type MessageList struct {
-	MessageViewLayout   *widgets.QVBoxLayout
-	triggerMessageFuncs []func(message *messages.Message)
-	MessageCount        int64
+	widgets.QVBoxLayout
+	_            func(message *messages.Message) `slot:"triggerMessage"`
+	MessageCount int64
 }
 
-func NewMessageList() *MessageList {
-	return &MessageList{}
-}
-
-func (m *MessageList) ConnectTriggerMessage(f func(message *messages.Message)) {
-	m.triggerMessageFuncs = append(m.triggerMessageFuncs, f)
-	return
-}
-
-func (m *MessageList) TriggerMessage(message *messages.Message) {
-	for _, f := range m.triggerMessageFuncs {
-		go f(message)
-	}
-	return
-}
-
-// InitMessageListLayout generates a new widgets.QVBoxLayout and adds it to the message scrollArea
-func (m *MessageList) InitMessageListLayout(scrollArea *widgets.QScrollArea) {
-	messageViewLayout := widgets.NewQVBoxLayout2(scrollArea.Widget())
-
-	messageViewLayout.SetSpacing(0)
-	messageViewLayout.AddStretch(1)
-	messageViewLayout.SetContentsMargins(15, 0, 15, 15)
+// Init generates a new widgets.QVBoxLayout and adds it to the message scrollArea
+func (m *MessageList) Init(scrollArea *widgets.QScrollArea) {
+	m.SetSpacing(0)
+	m.SetContentsMargins(0, 0, 0, 0)
 	scrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
-	scrollArea.SetAlignment(core.Qt__AlignLeading | core.Qt__AlignLeft | core.Qt__AlignVCenter)
-	scrollArea.Widget().SetLayout(messageViewLayout)
-
-	m.MessageViewLayout = messageViewLayout
-
+	scrollArea.Widget().SetLayout(m)
 	return
 }
 
@@ -150,12 +127,12 @@ func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.
 	messageWidget.SetMinimumWidth(lineLength)
 	messageWidget.Resize2(lineLength, wrapperWidget.Size().Height())
 
-	m.MessageViewLayout.SetSpacing(1)
-	m.MessageViewLayout.SetContentsMargins(0, 0, 0, 0)
+	m.SetSpacing(1)
+	m.SetContentsMargins(0, 0, 0, 0)
 
 	go message.GetUserAvatar()
 
-	m.MessageViewLayout.InsertWidget(m.MessageViewLayout.Count()+1, wrapperWidget, 0, core.Qt__AlignBottom)
+	m.InsertWidget(m.Count()+1, wrapperWidget, 0, core.Qt__AlignBottom)
 
 	if barAtBottom {
 		bar.SetValue(bar.Maximum())

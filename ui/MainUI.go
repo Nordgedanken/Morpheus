@@ -147,9 +147,9 @@ func (m *MainUI) NewUI() (err error) {
 			m.RoomTitle.SetText(room.GetRoomName())
 
 			m.RoomTopic.SetText(room.GetRoomTopic())
-			count := m.MessageList.MessageViewLayout.Count()
+			count := m.MessageList.Count()
 			for i := 0; i < count; i++ {
-				widgetScroll := m.MessageList.MessageViewLayout.ItemAt(i).Widget()
+				widgetScroll := m.MessageList.ItemAt(i).Widget()
 				widgetScroll.DeleteLater()
 			}
 
@@ -161,9 +161,6 @@ func (m *MainUI) NewUI() (err error) {
 }
 
 func (m *MainUI) initScrolls() {
-	// Init Message View
-	m.MessageList.InitMessageListLayout(m.messageScrollArea)
-
 	m.roomScrollArea.SetWidgetResizable(true)
 	m.roomScrollArea.SetHorizontalScrollBarPolicy(core.Qt__ScrollBarAlwaysOff)
 	m.roomScrollArea.SetContentsMargins(0, 0, 0, 0)
@@ -186,7 +183,8 @@ func (m *MainUI) loadChatUIDefaults() {
 	m.messageScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
 	m.roomScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("roomScroll", core.Qt__FindChildrenRecursively).Pointer())
 
-	m.MessageList = listLayouts.NewMessageList()
+	m.MessageList = listLayouts.NewMessageList2(m.roomScrollArea)
+	m.MessageList.Init(m.roomScrollArea)
 	m.RoomList = listLayouts.NewRoomList2(m.roomScrollArea)
 	m.RoomList.Init(m.roomScrollArea)
 
@@ -332,7 +330,7 @@ func (m *MainUI) startSync() (err error) {
 		timestamp := ev.Timestamp
 		go db.CacheMessageEvents(id, sender, room, msg, timestamp)
 		if room == m.CurrentRoom {
-			message := messages.NewMessage()
+			message := messages.NewMessage(nil)
 			message.EventID = id
 			message.Author = sender
 			message.Message = msg
@@ -489,7 +487,7 @@ func (m *MainUI) loadCache() (err error) {
 				//TODO Use for better/faster cache loading
 				currentRoomMem := m.Rooms[m.CurrentRoom]
 
-				message := messages.NewMessage()
+				message := messages.NewMessage(nil)
 				message.EventID = idValue
 				message.Author = sender
 				message.Message = msg

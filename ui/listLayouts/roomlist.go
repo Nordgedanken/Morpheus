@@ -25,34 +25,9 @@ type RoomFunc func(roomID string)
 // RoomList defines the TriggerRoom and ChangeRoom method to add messages to the View
 type RoomList struct {
 	widgets.QVBoxLayout
-	//triggerRoomFuncs []RoomFunc
-	_               func(roomID string) `slot:"triggerRoom"`
-	changeRoomFuncs []RoomFunc
-	RoomCount       int64
-}
-
-/*func (r *RoomList) ConnectTriggerRoom(f RoomFunc) {
-	r.triggerRoomFuncs = append(r.triggerRoomFuncs, f)
-	return
-}
-
-func (r *RoomList) TriggerRoom(roomID string) {
-	for _, f := range r.triggerRoomFuncs {
-		go f(roomID)
-	}
-	return
-}*/
-
-func (r *RoomList) ConnectChangeRoom(f RoomFunc) {
-	r.changeRoomFuncs = append(r.changeRoomFuncs, f)
-	return
-}
-
-func (r *RoomList) ChangeRoom(roomID string) {
-	for _, f := range r.changeRoomFuncs {
-		go f(roomID)
-	}
-	return
+	_         func(roomID string) `slot:"triggerRoom"`
+	_         func(roomID string) `slot:"changeRoom"`
+	RoomCount int64
 }
 
 // Init generates a new RoomList and adds it to the room scrollArea
