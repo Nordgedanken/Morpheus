@@ -2,9 +2,9 @@ package listLayouts
 
 import (
 	"github.com/Nordgedanken/Morpheus/matrix/rooms"
-	log "github.com/sirupsen/logrus"
+	//log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
-	"github.com/therecipe/qt/gui"
+	//"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
 )
@@ -83,7 +83,7 @@ func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (e
 	var wrapperWidget = loader.Load(file, widget)
 	file.Close()
 
-	roomAvatarQLabel := widgets.NewQLabelFromPointer(widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
+	//roomAvatarQLabel := widgets.NewQLabelFromPointer(widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
 	roomName := widgets.NewQLabelFromPointer(widget.FindChild("roomName", core.Qt__FindChildrenRecursively).Pointer())
 	/*lastMessageContent := widgets.NewQLabelFromPointer(widget.FindChild("lastMessage", core.Qt__FindChildrenRecursively).Pointer())*/
 
@@ -92,7 +92,7 @@ func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (e
 	wrapperWidget.Resize2(scrollArea.Widget().Size().Width(), wrapperWidget.Size().Height())
 	widget.Resize2(scrollArea.Widget().Size().Width(), wrapperWidget.Size().Height())
 
-	var filterObject = core.NewQObject(nil)
+	/*var filterObject = core.NewQObject(nil)
 	filterObject.ConnectEventFilter(func(watched *core.QObject, event *core.QEvent) bool {
 		if event.Type() == core.QEvent__MouseButtonPress {
 			var mouseEvent = gui.NewQMouseEventFromPointer(event.Pointer())
@@ -106,20 +106,19 @@ func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (e
 		}
 
 		return false
-	})
+	})*/
 
 	r.RoomViewLayout.SetSpacing(0)
 	r.RoomViewLayout.SetContentsMargins(0, 0, 0, 0)
 
-	wrapperWidget.InstallEventFilter(filterObject)
+	//wrapperWidget.InstallEventFilter(filterObject)
 
-	log.Println(r.RoomViewLayout.Pointer())
 	r.RoomViewLayout.InsertWidget(r.RoomViewLayout.Count()+1, wrapperWidget, 0, 0)
 	scrollArea.SetWidgetResizable(true)
 	scrollArea.Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
 	scrollArea.Widget().Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
 
-	roomAvatarQLabel.ConnectSetPixmap(func(vqp *gui.QPixmap) {
+	/*roomAvatarQLabel.ConnectSetPixmap(func(vqp *gui.QPixmap) {
 		log.Println("SetPixmapEventRoomAvatar")
 
 		vqp.Scaled2(roomAvatarQLabel.Width(), roomAvatarQLabel.Height(), 0, 0)
@@ -136,9 +135,9 @@ func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (e
 		painter.DrawPixmap10(roomAvatarQLabel.Rect(), vqp)
 		newImage := newPixmap.ToImage()
 		vqp.FromImage(newImage, 0)
-	})
+	})*/
 
-	room.ConnectSetAvatar(func(IMGdata []byte) {
+	/*room.ConnectSetAvatar(func(IMGdata []byte) {
 		avatar := gui.NewQPixmap()
 
 		str := string(IMGdata[:])
@@ -147,9 +146,9 @@ func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (e
 		roomAvatarQLabel.SetPixmap(avatar)
 
 		return
-	})
+	})*/
 
-	go room.GetRoomAvatar()
+	//go room.GetRoomAvatar()
 
 	return
 }
