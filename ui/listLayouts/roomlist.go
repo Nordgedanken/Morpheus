@@ -30,8 +30,10 @@ type RoomList struct {
 	RoomCount        int64
 }
 
-func NewRoomList() *RoomList {
-	return &RoomList{}
+func NewRoomList(scrollArea *widgets.QScrollArea) *RoomList {
+	list := &RoomList{}
+	list.InitRoomListLayout(scrollArea)
+	return list
 }
 
 func (r *RoomList) ConnectTriggerRoom(f RoomFunc) {
@@ -72,8 +74,7 @@ func (r *RoomList) InitRoomListLayout(scrollArea *widgets.QScrollArea) {
 
 // NewRoom adds a new room object to the view
 func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (err error) {
-	layoutItem := widgets.NewQLayoutItem(0)
-	var widget = layoutItem.Widget()
+	var widget = widgets.NewQWidget(nil, 0)
 
 	var loader = uitools.NewQUiLoader(nil)
 	var file = core.NewQFile2(":/qml/ui/room.ui")
@@ -112,8 +113,8 @@ func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (e
 
 	wrapperWidget.InstallEventFilter(filterObject)
 
-	//r.RoomViewLayout.InsertWidget(r.RoomViewLayout.Count()+1, wrapperWidget, 0, 0)
-	r.RoomViewLayout.AddItem(layoutItem)
+	log.Println(r.RoomViewLayout.Pointer())
+	r.RoomViewLayout.InsertWidget(r.RoomViewLayout.Count()+1, wrapperWidget, 0, 0)
 	scrollArea.SetWidgetResizable(true)
 	scrollArea.Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
 	scrollArea.Widget().Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())

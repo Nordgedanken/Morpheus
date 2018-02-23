@@ -67,15 +67,6 @@ func (m *MainUI) GetWidget() (widget *widgets.QWidget) {
 func (m *MainUI) NewUI() (err error) {
 	m.loadChatUIDefaults()
 
-	//Set Avatar
-	/*avatarLogo := widgets.NewQLabelFromPointer(m.widget.FindChild("UserAvatar", core.Qt__FindChildrenRecursively).Pointer())
-	avatar, AvatarErr := matrix.GetOwnUserAvatar(m.Cli)
-	if AvatarErr != nil {
-		err = AvatarErr
-		return
-	}
-	avatarLogo.SetPixmap(avatar)*/
-
 	//Handle LogoutButton
 	logoutButton := widgets.NewQPushButtonFromPointer(m.widget.FindChild("LogoutButton", core.Qt__FindChildrenRecursively).Pointer())
 	logoutButton.ConnectClicked(func(_ bool) {
@@ -170,9 +161,6 @@ func (m *MainUI) NewUI() (err error) {
 }
 
 func (m *MainUI) initScrolls() {
-	// Init Room View
-	m.RoomList.InitRoomListLayout(m.roomScrollArea)
-
 	// Init Message View
 	m.MessageList.InitMessageListLayout(m.messageScrollArea)
 
@@ -195,13 +183,11 @@ func (m *MainUI) loadChatUIDefaults() {
 	m.MainWidget = loader.Load(file, m.widget)
 	file.Close()
 
-	m.MessageList = listLayouts.NewMessageList()
-	m.RoomList = listLayouts.NewRoomList()
-
 	m.messageScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("messageScroll", core.Qt__FindChildrenRecursively).Pointer())
 	m.roomScrollArea = widgets.NewQScrollAreaFromPointer(m.widget.FindChild("roomScroll", core.Qt__FindChildrenRecursively).Pointer())
-	m.messageScrollArea.Show()
-	m.roomScrollArea.Show()
+
+	m.MessageList = listLayouts.NewMessageList()
+	m.RoomList = listLayouts.NewRoomList(m.roomScrollArea)
 
 	m.RoomAvatar = widgets.NewQLabelFromPointer(m.widget.FindChild("roomAvatar", core.Qt__FindChildrenRecursively).Pointer())
 	m.RoomTitle = widgets.NewQLabelFromPointer(m.widget.FindChild("RoomTitle", core.Qt__FindChildrenRecursively).Pointer())
@@ -217,6 +203,15 @@ func (m *MainUI) loadChatUIDefaults() {
 		m.MainWidget.Resize(event.Size())
 		event.Accept()
 	})
+
+	//Set Avatar
+	/*avatarLogo := widgets.NewQLabelFromPointer(m.widget.FindChild("UserAvatar", core.Qt__FindChildrenRecursively).Pointer())
+	avatar, AvatarErr := matrix.GetOwnUserAvatar(m.Cli)
+	if AvatarErr != nil {
+		err = AvatarErr
+		return
+	}
+	avatarLogo.SetPixmap(avatar)*/
 }
 
 func (m *MainUI) sendMessage(message string) (err error) {
