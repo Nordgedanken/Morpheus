@@ -154,7 +154,7 @@ func (m *Message) ConnectSetAvatar(f func(IMGdata []byte)) {
 // SetAvatar triggers all callback functions
 func (m *Message) SetAvatar(IMGdata []byte) {
 	for _, f := range m.setAvatarFuncs {
-		f(IMGdata)
+		go f(IMGdata)
 	}
 	return
 }
