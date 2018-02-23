@@ -1,7 +1,6 @@
 package main
 
 import (
-	_ "net/http/pprof"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -12,7 +11,6 @@ import (
 	"github.com/Nordgedanken/Morpheus/ui"
 	"github.com/Nordgedanken/dugong"
 	"github.com/matrix-org/gomatrix"
-	"github.com/pkg/profile"
 	"github.com/shibukawa/configdir"
 	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
@@ -27,7 +25,7 @@ var loginUIStruct *ui.LoginUI
 func main() {
 	runtime.GOMAXPROCS(128)
 
-	defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
+	//defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
 
 	// Init Logs and folders
 	configDirs := configdir.New("Nordgedanken", "Morpheus")
