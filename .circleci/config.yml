@@ -14,13 +14,13 @@ jobs:
           name: Set PATH to correct value
           command: echo 'export PATH=/usr/local/go/bin:/usr/local/go_workspace/bin:~/.go_workspace/bin:/home/user/work/bin:$GOBIN:$PATH' >> $BASH_ENV
       - run:
-          name: Get Glide
+          name: Get Dep
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-          command: curl https://glide.sh/get | sh
+          command: curl -L -s https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64 -o $GOPATH/bin/dep && chmod +x $GOPATH/bin/dep
       - run:
           name: Get Go Dependencies
           working_directory: /home/user/work/src/github.com/Nordgedanken/Morpheus/
-          command: glide install
+          command: dep ensure
       - run:
           name: Get Ginko CLI
           command: go get -u -v github.com/onsi/ginkgo/ginkgo && go get -u -v github.com/onsi/gomega
