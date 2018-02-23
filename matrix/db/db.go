@@ -60,15 +60,15 @@ func OpenCacheDB() (db *badger.DB, err error) {
 			err = DBErr
 			return
 		}
-		userDB = expDB
+		cacheDB = expDB
 	})
 
-	if userDB == nil {
+	if cacheDB == nil {
 		err = errors.New("missing CacheDB")
 		return
 	}
 
-	db = userDB
+	db = cacheDB
 	return
 }
 
@@ -112,15 +112,15 @@ func OpenUserDB() (db *badger.DB, err error) {
 			return
 		}
 
-		cacheDB = expDB
+		userDB = expDB
 	})
 
-	if cacheDB == nil {
+	if userDB == nil {
 		err = errors.New("missing UserDB")
 		return
 	}
 
-	db = cacheDB
+	db = userDB
 	return
 }
 
