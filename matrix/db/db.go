@@ -8,6 +8,7 @@ import (
 
 	"github.com/dgraph-io/badger"
 	"github.com/shibukawa/configdir"
+	log "github.com/sirupsen/logrus"
 )
 
 var userDB *badger.DB
@@ -133,6 +134,7 @@ func CacheMessageEvents(id, sender, roomID, message string, timestamp int64) (er
 
 	// Update cache
 	DBerr := db.Update(func(txn *badger.Txn) error {
+		log.Infoln("room|" + roomID + "|messages|" + id + "|id")
 		DBSetIDErr := txn.Set([]byte("room|"+roomID+"|messages|"+id+"|id"), []byte(id))
 		if DBSetIDErr != nil {
 			return DBSetIDErr
@@ -161,7 +163,7 @@ func CacheMessageEvents(id, sender, roomID, message string, timestamp int64) (er
 	return
 }
 
-// Get dedpulicates all the Gets inside the Database to not repeat that much code.
+// Get deduplicates all the Gets inside the Database to not repeat that much code.
 func Get(txn *badger.Txn, key []byte) (result []byte, err error) {
 	item, QueryErr := txn.Get(key)
 	if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {

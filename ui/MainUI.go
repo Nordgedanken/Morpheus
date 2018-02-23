@@ -427,6 +427,7 @@ func (m *MainUI) loadCache() (err error) {
 	if DBOpenErr != nil {
 		err = DBOpenErr
 	}
+	log.Infoln("room|" + m.CurrentRoom + "|messages|")
 	MsgPrefix := []byte("room|" + m.CurrentRoom + "|messages|")
 	DBerr := cacheDB.View(func(txn *badger.Txn) error {
 		log.Println("CacheDB")
