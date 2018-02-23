@@ -427,16 +427,19 @@ func (m *MainUI) loadCache() (err error) {
 	if DBOpenErr != nil {
 		err = DBOpenErr
 	}
-
+	MsgPrefix := []byte("room|" + m.CurrentRoom + "|messages|")
 	DBerr := cacheDB.View(func(txn *badger.Txn) error {
 		log.Println("CacheDB")
-		MsgOpts := badger.DefaultIteratorOptions
-		MsgIt := txn.NewIterator(MsgOpts)
-		MsgPrefix := []byte("room|" + m.CurrentRoom + "|messages|")
+		MsgIt := txn.NewIterator(badger.DefaultIteratorOptions)
 
 		doneMsg := make(map[string]bool)
+		valid := func() bool {
+			valid := MsgIt.ValidForPrefix(MsgPrefix)
+			log.Println(valid)
+			return valid
+		}()
 
-		for MsgIt.Seek(MsgPrefix); MsgIt.ValidForPrefix(MsgPrefix); MsgIt.Next() {
+		for MsgIt.Seek(MsgPrefix); valid; MsgIt.Next() {
 			log.Println("MSG LOOP")
 			item := MsgIt.Item()
 			key := item.Key()
