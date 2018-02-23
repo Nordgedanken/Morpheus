@@ -21,8 +21,17 @@
 #  version = "2.4.0"
 
 
+ignored = [
+  "github.com/therecipe/qt*"
+]
+
+[prune]
+  go-tests = true
+  unused-packages = true
+
 [[constraint]]
   name = "github.com/Nordgedanken/dugong"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/dgraph-io/badger"
@@ -30,20 +39,15 @@
 
 [[constraint]]
   name = "github.com/disintegration/letteravatar"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/matrix-org/gomatrix"
-
-[[constraint]]
-  name = "github.com/onsi/ginkgo"
-  version = "1.4.0"
-
-[[constraint]]
-  name = "github.com/onsi/gomega"
-  version = "1.2.0"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/opennota/linkify"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/pkg/errors"
@@ -59,6 +63,7 @@
 
 [[constraint]]
   name = "github.com/shibukawa/configdir"
+  branch = "master"
 
 [[constraint]]
   name = "github.com/sirupsen/logrus"
