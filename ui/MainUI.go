@@ -438,14 +438,17 @@ func (m *MainUI) loadCache() (err error) {
 	}
 
 	DBerr := cacheDB.View(func(txn *badger.Txn) error {
+		log.Println("CacheDB")
 		MsgOpts := badger.DefaultIteratorOptions
 		MsgOpts.PrefetchSize = 10
 		MsgIt := txn.NewIterator(MsgOpts)
 		MsgPrefix := []byte("room|" + m.CurrentRoom + "|messages")
+		log.Println("MsgPrefix: ", MsgPrefix)
 
 		var doneMsg []string
 
 		for MsgIt.Seek(MsgPrefix); MsgIt.ValidForPrefix(MsgPrefix); MsgIt.Next() {
+			log.Println("MSG LOOP")
 			item := MsgIt.Item()
 			key := item.Key()
 			stringKey := fmt.Sprintf("%s", key)
