@@ -14,6 +14,8 @@ import (
 	"github.com/therecipe/qt/widgets"
 )
 
+const redBorder = "border: 1px solid red"
+
 // NewRegUIStruct gives you a RegUI struct with prefilled data
 func NewRegUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow) (regUIStruct *RegUI) {
 	configStruct := globalTypes.Config{
@@ -107,14 +109,14 @@ func (r *RegUI) NewUI() (err error) {
 	})
 
 	usernameInput.ConnectTextChanged(func(value string) {
-		if usernameInput.StyleSheet() == "border: 1px solid red" {
+		if usernameInput.StyleSheet() == redBorder {
 			usernameInput.SetStyleSheet("")
 		}
 		r.Localpart = value
 	})
 
 	passwordInput.ConnectTextChanged(func(value string) {
-		if passwordInput.StyleSheet() == "border: 1px solid red" {
+		if passwordInput.StyleSheet() == redBorder {
 			passwordInput.SetStyleSheet("")
 		}
 		r.Password = value
@@ -129,7 +131,7 @@ func (r *RegUI) NewUI() (err error) {
 				return
 			}
 		} else {
-			passwordInput.SetStyleSheet("border: 1px solid red")
+			passwordInput.SetStyleSheet(redBorder)
 		}
 	})
 
@@ -146,7 +148,7 @@ func (r *RegUI) NewUI() (err error) {
 				usernameInput.Clear()
 				ev.Accept()
 			} else {
-				passwordInput.SetStyleSheet("border: 1px solid red")
+				passwordInput.SetStyleSheet(redBorder)
 				ev.Ignore()
 			}
 		} else {
@@ -168,7 +170,7 @@ func (r *RegUI) NewUI() (err error) {
 				passwordInput.Clear()
 				ev.Accept()
 			} else {
-				usernameInput.SetStyleSheet("border: 1px solid red")
+				usernameInput.SetStyleSheet(redBorder)
 				ev.Ignore()
 			}
 		} else {

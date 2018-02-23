@@ -41,6 +41,7 @@ func (m *Message) crawlAvatarURL() (err error) {
 	return
 }
 
+// Linkify makes urls to html links
 func (m *Message) Linkify() (err error) {
 	lm := linkify.Links(m.Message)
 	for _, l := range lm {
@@ -144,11 +145,13 @@ func (m *Message) GetUserAvatar() {
 	return
 }
 
+// ConnectSetAvatar registers a callback function
 func (m *Message) ConnectSetAvatar(f func(IMGdata []byte)) {
 	m.setAvatarFuncs = append(m.setAvatarFuncs, f)
 	return
 }
 
+// SetAvatar triggers all callback functions
 func (m *Message) SetAvatar(IMGdata []byte) {
 	for _, f := range m.setAvatarFuncs {
 		f(IMGdata)

@@ -71,10 +71,12 @@ func GetRooms(cli *gomatrix.Client) (rooms []string, err error) {
 	return
 }
 
+// NewRoom creates a new Room struct
 func NewRoom() *Room {
 	return &Room{}
 }
 
+// AddMessage adds a message struct to a map to keep them in the memory to later have a faster room switching
 func (r *Room) AddMessage(message *messages.Message) {
 	if r.Messages == nil {
 		r.Messages = make(map[string]*messages.Message)
@@ -199,11 +201,13 @@ func (r *Room) GetRoomAvatar() {
 	return
 }
 
+// ConnectSetAvatar registers a callback function
 func (r *Room) ConnectSetAvatar(f func(IMGdata []byte)) {
 	r.setAvatarFuncs = append(r.setAvatarFuncs, f)
 	return
 }
 
+// SetAvatar triggers all callback functions
 func (r *Room) SetAvatar(IMGdata []byte) {
 	for _, f := range r.setAvatarFuncs {
 		f(IMGdata)

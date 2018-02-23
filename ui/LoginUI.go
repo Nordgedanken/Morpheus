@@ -92,14 +92,14 @@ func (l *LoginUI) NewUI() (err error) {
 	serverDropdown.AddItems(hostnames)
 
 	localpartInput.ConnectTextChanged(func(value string) {
-		if localpartInput.StyleSheet() == "border: 1px solid red" {
+		if localpartInput.StyleSheet() == redBorder {
 			localpartInput.SetStyleSheet("")
 		}
 		l.Localpart = value
 	})
 
 	passwordInput.ConnectTextChanged(func(value string) {
-		if passwordInput.StyleSheet() == "border: 1px solid red" {
+		if passwordInput.StyleSheet() == redBorder {
 			passwordInput.SetStyleSheet("")
 		}
 		l.Password = value
@@ -115,9 +115,9 @@ func (l *LoginUI) NewUI() (err error) {
 			}
 		} else {
 			if l.Localpart == "" {
-				localpartInput.SetStyleSheet("border: 1px solid red")
+				localpartInput.SetStyleSheet(redBorder)
 			} else {
-				passwordInput.SetStyleSheet("border: 1px solid red")
+				passwordInput.SetStyleSheet(redBorder)
 			}
 		}
 	})
@@ -146,7 +146,7 @@ func (l *LoginUI) NewUI() (err error) {
 				localpartInput.Clear()
 				ev.Accept()
 			} else {
-				passwordInput.SetStyleSheet("border: 1px solid red")
+				passwordInput.SetStyleSheet(redBorder)
 				ev.Ignore()
 			}
 		} else {
@@ -168,7 +168,7 @@ func (l *LoginUI) NewUI() (err error) {
 				passwordInput.Clear()
 				ev.Accept()
 			} else {
-				localpartInput.SetStyleSheet("border: 1px solid red")
+				localpartInput.SetStyleSheet(redBorder)
 				ev.Ignore()
 			}
 		} else {
