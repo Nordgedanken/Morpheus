@@ -435,6 +435,7 @@ func (m *MainUI) loadCache() (err error) {
 
 		doneMsg := make(map[string]bool)
 		valid := func() bool {
+			log.Infoln(MsgIt.Item())
 			valid := MsgIt.ValidForPrefix(MsgPrefix)
 			log.Println(valid)
 			return valid
