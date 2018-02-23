@@ -97,11 +97,13 @@ func (m *MainUI) NewUI() (err error) {
 	m.RoomList.ConnectTriggerRoom(func(roomID string) {
 		room := m.Rooms[roomID]
 
-		NewRoomErr := m.RoomList.NewRoom(room, m.roomScrollArea)
-		if NewRoomErr != nil {
-			err = NewRoomErr
-			return
-		}
+		go func() {
+			NewRoomErr := m.RoomList.NewRoom(room, m.roomScrollArea)
+			if NewRoomErr != nil {
+				err = NewRoomErr
+				return
+			}
+		}()
 	})
 
 	go m.initRoomList()
@@ -431,7 +433,6 @@ func (m *MainUI) loadCache() (err error) {
 		log.Println("CacheDB")
 		MsgOpts := badger.DefaultIteratorOptions
 		MsgIt := txn.NewIterator(MsgOpts)
-		log.Println("MsgPrefix: ", "room|"+m.CurrentRoom+"|messages")
 		MsgPrefix := []byte("room|" + m.CurrentRoom + "|messages")
 
 		doneMsg := make(map[string]bool)
