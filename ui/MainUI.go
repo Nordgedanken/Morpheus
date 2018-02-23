@@ -240,6 +240,7 @@ func (m *MainUI) sendMessage(message string) (err error) {
 			return
 		}
 	}
+	log.Infoln("SendErr: ", err)
 	return
 }
 
