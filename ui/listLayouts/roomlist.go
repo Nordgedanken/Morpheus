@@ -60,14 +60,12 @@ func (r *RoomList) ChangeRoom(roomID string) {
 
 // InitRoomListLayout generates a new QRoomVBoxLayoutWithTriggerSlot and adds it to the room scrollArea
 func (r *RoomList) InitRoomListLayout(scrollArea *widgets.QScrollArea) {
-	roomViewLayout := widgets.NewQVBoxLayout2(scrollArea.Widget())
+	r.RoomViewLayout = widgets.NewQVBoxLayout2(scrollArea.Widget())
 
-	roomViewLayout.SetSpacing(0)
-	roomViewLayout.SetContentsMargins(0, 0, 0, 0)
+	r.RoomViewLayout.SetSpacing(0)
+	r.RoomViewLayout.SetContentsMargins(0, 0, 0, 0)
 	scrollArea.Widget().SetContentsMargins(0, 0, 0, 0)
-	scrollArea.Widget().SetLayout(roomViewLayout)
-
-	r.RoomViewLayout = roomViewLayout
+	scrollArea.Widget().SetLayout(r.RoomViewLayout)
 
 	return
 }
@@ -113,6 +111,11 @@ func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (e
 
 	wrapperWidget.InstallEventFilter(filterObject)
 
+	r.RoomViewLayout.InsertWidget(r.RoomViewLayout.Count()+1, wrapperWidget, 0, 0)
+	scrollArea.SetWidgetResizable(true)
+	scrollArea.Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
+	scrollArea.Widget().Resize2(wrapperWidget.Size().Width(), scrollArea.Widget().Size().Height())
+
 	roomAvatarQLabel.ConnectSetPixmap(func(vqp *gui.QPixmap) {
 		log.Println("SetPixmapEventRoomAvatar")
 
@@ -144,8 +147,6 @@ func (r *RoomList) NewRoom(room *rooms.Room, scrollArea *widgets.QScrollArea) (e
 	})
 
 	go room.GetRoomAvatar()
-
-	r.RoomViewLayout.InsertWidget(r.RoomViewLayout.Count()+1, wrapperWidget, 0, core.Qt__AlignBottom)
 
 	return
 }
