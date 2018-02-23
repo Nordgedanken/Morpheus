@@ -172,6 +172,7 @@ func cleanup() bool {
 			log.Infoln("Stop Sync")
 			mainUIStruct.GetCli().StopSync()
 		}
+		mainUIStruct.RoomList.DestroyRoomList()
 	}
 
 	if loginUIStruct != nil {
