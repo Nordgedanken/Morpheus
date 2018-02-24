@@ -9,6 +9,7 @@ import (
 	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
 	"github.com/Nordgedanken/Morpheus/matrix/rooms"
 	"github.com/matrix-org/gomatrix"
+	"github.com/therecipe/qt/core"
 )
 
 //MorpheusSyncer holds the UserID, the used Storer and the listener
@@ -128,13 +129,13 @@ func (s *MorpheusSyncer) shouldProcessResponse(resp *gomatrix.RespSync, since st
 func (s *MorpheusSyncer) getOrCreateRoom(roomID, state string) *gomatrix.Room {
 	// Add new Room to the List if new
 	_, present := s.config.Rooms[roomID]
-	if !present && state == "join" {
+	if present && state == "join" {
 		s.config.Rooms[roomID] = rooms.NewRoom()
 		s.config.Rooms[roomID].RoomID = roomID
 		s.config.Rooms[roomID].Cli = s.config.GetCli()
 		s.config.RoomList.RoomCount++
 		if (s.config.RoomList.RoomCount % 10) == 0 {
-			s.config.App.ProcessEvents(0)
+			s.config.App.ProcessEvents(core.QEventLoop__AllEvents)
 		}
 		s.config.RoomList.TriggerRoom(roomID)
 	}

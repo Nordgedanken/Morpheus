@@ -325,6 +325,7 @@ func (m *MainUI) startSync() (err error) {
 	Syncer.Store = m.storage
 
 	Syncer.OnEventType("m.room.message", func(ev *gomatrix.Event) {
+		log.Infoln("NewEVENT")
 		formattedBody, _ := ev.Content["formatted_body"]
 		var msg string
 		msg, _ = formattedBody.(string)
@@ -336,7 +337,6 @@ func (m *MainUI) startSync() (err error) {
 		id := ev.ID
 		timestamp := ev.Timestamp
 		go db.CacheMessageEvents(id, sender, room, msg, timestamp)
-		log.Infoln("NewEVENT")
 		if room == m.CurrentRoom {
 			message := messages.NewMessage(nil)
 			message.EventID = id
