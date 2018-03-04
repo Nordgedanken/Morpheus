@@ -439,9 +439,16 @@ func (m *MainUI) loadCache() (err error) {
 		opts.PrefetchValues = false
 		MsgIt := txn.NewIterator(opts)
 
+		//DEBUG
+		debugResult, QueryErr := db.Get(txn, []byte("room|"+m.CurrentRoom+"|messages|"))
+		if QueryErr != nil {
+			return errors.WithMessage(QueryErr, "Key: "+"room|"+m.CurrentRoom+"|messages|")
+		}
+		log.Infoln("Debug Result: ", debugResult)
+
 		doneMsg := make(map[string]bool)
 		valid := func() bool {
-			log.Infoln(MsgIt.Item())
+			log.Infoln("Item: ", MsgIt.Item())
 			valid := MsgIt.ValidForPrefix(MsgPrefix)
 			log.Println("Valid: ", valid)
 			return valid
