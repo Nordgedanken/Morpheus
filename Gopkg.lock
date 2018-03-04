@@ -80,12 +80,6 @@
   version = "v0.8.0"
 
 [[projects]]
-  name = "github.com/pkg/profile"
-  packages = ["."]
-  revision = "5b67d428864e92711fcbd2f8629456121a56d91f"
-  version = "v1.2.1"
-
-[[projects]]
   name = "github.com/rhinoman/go-commonmark"
   packages = ["."]
   revision = "baf45d40250496d71f6431a5361c52b6d1f63c5c"
@@ -107,7 +101,7 @@
   branch = "master"
   name = "golang.org/x/crypto"
   packages = ["ssh/terminal"]
-  revision = "49796115aa4b964c318aad4f3084fdb41e9aa067"
+  revision = "91a49db82a88618983a78a06c1cbd4e00ab749ab"
 
 [[projects]]
   branch = "master"
@@ -119,13 +113,13 @@
   branch = "master"
   name = "golang.org/x/net"
   packages = ["context","html","html/atom","html/charset","internal/timeseries","trace"]
-  revision = "cbe0f9307d0156177f9dd5dc85da1a31abc5f2fb"
+  revision = "22ae77b79946ea320088417e4d50825671d82d57"
 
 [[projects]]
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix","windows"]
-  revision = "88d2dcc510266da9f7f8c7f34e1940716cab5f5c"
+  revision = "dd2ff4accc098aceecb86b36eaa7829b2a17b1c9"
 
 [[projects]]
   name = "golang.org/x/text"
@@ -142,6 +136,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "6c0bff24092a9bc006e3a526965e7d1809976e117b74c9451e1945fedaab8e31"
+  inputs-digest = "a016907d83fb904aa08bd7cd6ad0eefe0d5393de2ea0dfa0d0d365faff3d323b"
   solver-name = "gps-cdcl"
   solver-version = 1

@@ -443,7 +443,7 @@ func (m *MainUI) loadCache() (err error) {
 		valid := func() bool {
 			log.Infoln(MsgIt.Item())
 			valid := MsgIt.ValidForPrefix(MsgPrefix)
-			log.Println(valid)
+			log.Println("Valid: ", valid)
 			return valid
 		}()
 
