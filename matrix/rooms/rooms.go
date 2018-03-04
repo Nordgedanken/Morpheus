@@ -11,6 +11,7 @@ import (
 	"github.com/matrix-org/gomatrix"
 	"github.com/rhinoman/go-commonmark"
 	log "github.com/sirupsen/logrus"
+	"github.com/therecipe/qt/core"
 )
 
 const mRoomNameEv = "m.room.name"
@@ -18,6 +19,7 @@ const mRoomCanonicalAliasEv = "m.room.canonical_alias"
 
 // Room saves the information of a Room
 type Room struct {
+	core.QObject
 	setAvatarFuncs    []func(IMGdata []byte)
 	Cli               *gomatrix.Client
 	RoomID            string
@@ -69,11 +71,6 @@ func GetRooms(cli *gomatrix.Client) (rooms []string, err error) {
 		rooms = strings.Split(roomsString, ",")
 	}
 	return
-}
-
-// NewRoom creates a new Room struct
-func NewRoom() *Room {
-	return &Room{}
 }
 
 // AddMessage adds a message struct to a map to keep them in the memory to later have a faster room switching
