@@ -366,15 +366,6 @@ func (m *MainUI) startSync() (err error) {
 		go m.Rooms[room].UpdateRoomNameByEvent(roomName, evType)
 	})
 
-	Syncer.OnEventType("m.room.name", func(ev *gomatrix.Event) {
-		roomNameRaw, _ := ev.Content["name"]
-		var roomName string
-		roomName, _ = roomNameRaw.(string)
-		evType := ev.Type
-		room := ev.RoomID
-		go m.Rooms[room].UpdateRoomNameByEvent(roomName, evType)
-	})
-
 	// Start Non-blocking sync
 	go func() {
 		log.Infoln("Start sync")
