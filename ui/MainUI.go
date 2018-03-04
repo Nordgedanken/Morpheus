@@ -79,9 +79,10 @@ func (m *MainUI) NewUI() (err error) {
 
 	m.initScrolls()
 
-	m.MessageList.ConnectTriggerMessage(func(message *messages.Message) {
+	m.MessageList.ConnectTriggerMessage(func(messageID string) {
 		log.Infoln("Trigger Message")
 		var own bool
+		var message = m.Rooms[m.CurrentRoom].Messages[messageID]
 		if message.Author == m.Cli.UserID {
 			own = true
 		} else {
@@ -338,7 +339,7 @@ func (m *MainUI) startSync() (err error) {
 		timestamp := ev.Timestamp
 		go db.CacheMessageEvents(id, sender, room, msg, timestamp)
 		if room == m.CurrentRoom {
-			message := messages.NewMessage(nil)
+			message := messages.NewMessage()
 			message.EventID = id
 			message.Author = sender
 			message.Message = msg
@@ -346,7 +347,7 @@ func (m *MainUI) startSync() (err error) {
 			message.Cli = m.Cli
 			m.Rooms[room].AddMessage(message)
 
-			go m.MessageList.TriggerMessage(message)
+			go m.MessageList.TriggerMessage(id)
 			m.MessageList.MessageCount++
 
 			if (m.MessageList.MessageCount % 10) == 0 {
@@ -399,7 +400,7 @@ func (m *MainUI) initRoomList() (err error) {
 
 	first := true
 	for _, roomID := range roomsStruct {
-		m.Rooms[roomID] = rooms.NewRoom(nil)
+		m.Rooms[roomID] = rooms.NewRoom()
 		m.Rooms[roomID].Cli = m.Cli
 		m.Rooms[roomID].RoomID = roomID
 		go m.RoomList.TriggerRoom(roomID)
@@ -494,7 +495,7 @@ func (m *MainUI) loadCache() (err error) {
 				//TODO Use for better/faster cache loading
 				currentRoomMem := m.Rooms[m.CurrentRoom]
 
-				message := messages.NewMessage(nil)
+				message := messages.NewMessage()
 				message.EventID = idValue
 				message.Author = sender
 				message.Message = msg
@@ -502,7 +503,7 @@ func (m *MainUI) loadCache() (err error) {
 				message.Cli = m.Cli
 				currentRoomMem.AddMessage(message)
 
-				go m.MessageList.TriggerMessage(message)
+				go m.MessageList.TriggerMessage(idValue)
 				m.MessageList.MessageCount++
 
 				log.Println(m.MessageList.MessageCount)

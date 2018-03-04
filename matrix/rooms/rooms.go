@@ -11,7 +11,6 @@ import (
 	"github.com/matrix-org/gomatrix"
 	"github.com/rhinoman/go-commonmark"
 	log "github.com/sirupsen/logrus"
-	"github.com/therecipe/qt/core"
 )
 
 const mRoomNameEv = "m.room.name"
@@ -19,7 +18,6 @@ const mRoomCanonicalAliasEv = "m.room.canonical_alias"
 
 // Room saves the information of a Room
 type Room struct {
-	core.QObject
 	setAvatarFuncs    []func(IMGdata []byte)
 	Cli               *gomatrix.Client
 	RoomID            string
@@ -28,6 +26,10 @@ type Room struct {
 	RoomAvatarURL     string
 	RoomTopic         string
 	Messages          map[string]*messages.Message
+}
+
+func NewRoom() *Room {
+	return &Room{}
 }
 
 // GetRooms either returns the joinedRoomsList from the Server or the cachedList

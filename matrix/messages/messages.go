@@ -9,12 +9,10 @@ import (
 	"github.com/matrix-org/gomatrix"
 	"github.com/opennota/linkify"
 	log "github.com/sirupsen/logrus"
-	"github.com/therecipe/qt/core"
 )
 
 // Message saves the information of a Message
 type Message struct {
-	core.QObject
 	setAvatarFuncs []func(IMGdata []byte)
 	Cli            *gomatrix.Client
 	EventID        string
@@ -23,6 +21,10 @@ type Message struct {
 	AvatarURL      string
 	Message        string
 	Timestamp      int64
+}
+
+func NewMessage() *Message {
+	return &Message{}
 }
 
 func (m *Message) crawlAvatarURL() (err error) {

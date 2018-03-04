@@ -26,7 +26,7 @@ import (
 // MessageList defines the TriggerMessage method to add messages to the View
 type MessageList struct {
 	widgets.QVBoxLayout
-	_            func(message *messages.Message) `slot:"triggerMessage"`
+	_            func(messageID string) `slot:"triggerMessage"`
 	MessageCount int64
 }
 
