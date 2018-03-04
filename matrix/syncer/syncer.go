@@ -9,6 +9,7 @@ import (
 	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
 	"github.com/Nordgedanken/Morpheus/matrix/rooms"
 	"github.com/matrix-org/gomatrix"
+	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
 )
 
@@ -160,10 +161,12 @@ func (s *MorpheusSyncer) notifyListeners(event *gomatrix.Event) {
 
 // OnFailedSync always returns a 10 second wait period between failed /syncs, never a fatal error.
 func (s *MorpheusSyncer) OnFailedSync(res *gomatrix.RespSync, err error) (time.Duration, error) {
+	log.Errorln(err)
 	return 10 * time.Second, nil
 }
 
 // GetFilterJSON returns a filter with a timeline limit of 50.
 func (s *MorpheusSyncer) GetFilterJSON(userID string) json.RawMessage {
-	return json.RawMessage(`{"room":{"state":{"types":["m.room.*"]},"timeline":{"limit":20,"types":["m.room.message"]}}}`)
+	return json.RawMessage(`{"room":{"timeline":{"limit":50}}}`)
+	//return json.RawMessage(`{"room":{"state":{"types":["m.room.*"]},"timeline":{"limit":20,"types":["m.room.message"]}}}`)
 }
