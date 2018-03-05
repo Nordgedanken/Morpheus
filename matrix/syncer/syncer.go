@@ -9,7 +9,6 @@ import (
 	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
 	"github.com/Nordgedanken/Morpheus/matrix/rooms"
 	"github.com/matrix-org/gomatrix"
-	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
 )
 
@@ -37,10 +36,7 @@ func NewMorpheusSyncer(userID string, store gomatrix.Storer, config *globalTypes
 // ProcessResponse processes the /sync response in a way suitable for bots. "Suitable for bots" means a stream of
 // unrepeating events. Returns a fatal error if a listener panics.
 func (s *MorpheusSyncer) ProcessResponse(res *gomatrix.RespSync, since string) (err error) {
-	log.Infoln("Since: ", since)
-	log.Infof("Res: %+v\n", res)
 	if !s.shouldProcessResponse(res, since) {
-		log.Infoln("bug")
 		return
 	}
 
@@ -51,13 +47,8 @@ func (s *MorpheusSyncer) ProcessResponse(res *gomatrix.RespSync, since string) (
 	}()
 
 	for roomID, roomData := range res.Rooms.Join {
-		log.Infoln("Join Loop")
-		log.Infof("roomID: %+v\n", roomID)
-		log.Infof("roomData: %+v\n", roomData)
 		room := s.getOrCreateRoom(roomID)
-		log.Infof("Room: %+v\n", room)
 		for _, event := range roomData.State.Events {
-			log.Infoln("Join Event")
 			event.RoomID = roomID
 			room.UpdateState(&event)
 			s.notifyListeners(&event)
@@ -68,21 +59,17 @@ func (s *MorpheusSyncer) ProcessResponse(res *gomatrix.RespSync, since string) (
 		}
 	}
 	for roomID, roomData := range res.Rooms.Invite {
-		log.Infoln("Invite Loop")
 		room := s.getOrCreateRoom(roomID)
 		for _, event := range roomData.State.Events {
-			log.Infoln("Invite Event")
 			event.RoomID = roomID
 			room.UpdateState(&event)
 			s.notifyListeners(&event)
 		}
 	}
 	for roomID, roomData := range res.Rooms.Leave {
-		log.Infoln("Leave Loop")
 		room := s.getOrCreateRoom(roomID)
 		for _, event := range roomData.Timeline.Events {
 			if event.StateKey != nil {
-				log.Infoln("Leave Event")
 				event.RoomID = roomID
 				room.UpdateState(&event)
 				s.notifyListeners(&event)
@@ -142,17 +129,12 @@ func (s *MorpheusSyncer) shouldProcessResponse(resp *gomatrix.RespSync, since st
 // getOrCreateRoom must only be called by the Sync() goroutine which calls ProcessResponse()
 func (s *MorpheusSyncer) getOrCreateRoom(roomID string) *gomatrix.Room {
 	// Add new Room to the List if new
-	log.Infoln("roomIDCall: ", roomID)
-	log.Infof("Config: %+v\n", s.config)
-	log.Infof("Rooms: %+v\n", s.config.Rooms)
 	if s.config.Rooms == nil {
 		s.config.Rooms = make(map[string]*rooms.Room)
 	}
-	log.Infoln("after nil if")
 
 	room := s.config.Rooms[roomID]
 
-	log.Infoln("roomIDRoom: ", room.RoomID)
 	if room == nil { // create a new Room
 		room = rooms.NewRoom()
 		room.RoomID = roomID
@@ -164,7 +146,6 @@ func (s *MorpheusSyncer) getOrCreateRoom(roomID string) *gomatrix.Room {
 		s.config.Rooms[roomID] = room
 		go s.config.RoomList.TriggerRoom(roomID)
 	}
-	log.Infoln("After if")
 	gomatrixRoom := gomatrix.NewRoom(roomID)
 	return gomatrixRoom
 }
@@ -181,12 +162,10 @@ func (s *MorpheusSyncer) notifyListeners(event *gomatrix.Event) {
 
 // OnFailedSync always returns a 10 second wait period between failed /syncs, never a fatal error.
 func (s *MorpheusSyncer) OnFailedSync(res *gomatrix.RespSync, err error) (time.Duration, error) {
-	log.Errorln(err)
 	return 10 * time.Second, nil
 }
 
 // GetFilterJSON returns a filter with a timeline limit of 50.
 func (s *MorpheusSyncer) GetFilterJSON(userID string) json.RawMessage {
-	//return json.RawMessage(`{"room":{"timeline":{"limit":50}}}`)
 	return json.RawMessage(`{"room":{"state":{"types":["m.room.*"]},"timeline":{"limit":20,"types":["m.room.message"]}}}`)
 }
