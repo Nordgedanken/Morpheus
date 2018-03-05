@@ -49,6 +49,7 @@ func (s *MorpheusSyncer) ProcessResponse(res *gomatrix.RespSync, since string) (
 	}()
 
 	for roomID, roomData := range res.Rooms.Join {
+		log.Infoln("Join Loop")
 		room := s.getOrCreateRoom(roomID, "join")
 		for _, event := range roomData.State.Events {
 			log.Infoln("Join Event")
@@ -62,6 +63,7 @@ func (s *MorpheusSyncer) ProcessResponse(res *gomatrix.RespSync, since string) (
 		}
 	}
 	for roomID, roomData := range res.Rooms.Invite {
+		log.Infoln("Invite Loop")
 		room := s.getOrCreateRoom(roomID, "invite")
 		for _, event := range roomData.State.Events {
 			log.Infoln("Invite Event")
@@ -71,6 +73,7 @@ func (s *MorpheusSyncer) ProcessResponse(res *gomatrix.RespSync, since string) (
 		}
 	}
 	for roomID, roomData := range res.Rooms.Leave {
+		log.Infoln("Leave Loop")
 		room := s.getOrCreateRoom(roomID, "leave")
 		for _, event := range roomData.Timeline.Events {
 			if event.StateKey != nil {
