@@ -141,14 +141,16 @@ func (s *MorpheusSyncer) shouldProcessResponse(resp *gomatrix.RespSync, since st
 // getOrCreateRoom must only be called by the Sync() goroutine which calls ProcessResponse()
 func (s *MorpheusSyncer) getOrCreateRoom(roomID string) *gomatrix.Room {
 	// Add new Room to the List if new
-	log.Infoln(roomID)
+	log.Infoln("roomIDCall: ", roomID)
 	if s.config.Rooms == nil {
 		s.config.Rooms = make(map[string]*rooms.Room)
 	}
 
 	room := s.config.Rooms[roomID]
-	gomatrixRoom := gomatrix.NewRoom(roomID)
+	log.Infoln("roomIDRoom: ", room.RoomID)
 	if room == nil { // create a new Room
+		room = rooms.NewRoom()
+		room.RoomID = roomID
 		s.config.RoomList.RoomCount++
 		if (s.config.RoomList.RoomCount % 10) == 0 {
 			s.config.App.ProcessEvents(core.QEventLoop__AllEvents)
@@ -156,6 +158,7 @@ func (s *MorpheusSyncer) getOrCreateRoom(roomID string) *gomatrix.Room {
 		s.config.Rooms[roomID] = room
 		go s.config.RoomList.TriggerRoom(roomID)
 	}
+	gomatrixRoom := gomatrix.NewRoom(roomID)
 	return gomatrixRoom
 }
 
