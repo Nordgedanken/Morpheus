@@ -41,10 +41,9 @@ func (m *MessageList) Init(scrollArea *widgets.QScrollArea) {
 
 // NewMessage adds a new message object to the view
 func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.QScrollArea, own bool, height, width int) (err error) {
-	log.Println(message)
 	barAtBottom := false
 	bar := scrollArea.VerticalScrollBar()
-	if bar.Value() == bar.Maximum() {
+	if bar.Value() == bar.Minimum() {
 		barAtBottom = true
 	}
 
@@ -130,7 +129,8 @@ func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.
 	go message.GetUserAvatar()
 
 	if barAtBottom {
-		bar.SetValue(bar.Maximum())
+		bar.Update()
+		bar.SetValue(bar.Minimum())
 	}
 
 	return

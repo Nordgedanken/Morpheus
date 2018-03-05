@@ -80,7 +80,6 @@ func (m *MainUI) NewUI() (err error) {
 	m.initScrolls()
 
 	m.MessageList.ConnectTriggerMessage(func(messageID string) {
-		log.Infoln("Trigger Message")
 		var own bool
 		var message = m.Rooms[m.CurrentRoom].Messages[messageID]
 		if message.Author == m.Cli.UserID {
@@ -243,7 +242,6 @@ func (m *MainUI) sendMessage(message string) (err error) {
 			return
 		}
 	}
-	log.Infoln("SendErr: ", err)
 	return
 }
 
@@ -403,7 +401,7 @@ func (m *MainUI) loadCache() (err error) {
 	log.Println("Loading cache!")
 	barAtBottom := false
 	bar := m.messageScrollArea.VerticalScrollBar()
-	if bar.Value() == bar.Maximum() {
+	if bar.Value() == bar.Minimum() {
 		barAtBottom = true
 	}
 
@@ -497,7 +495,7 @@ func (m *MainUI) loadCache() (err error) {
 
 	if barAtBottom {
 		bar.Update()
-		bar.SetValue(bar.Maximum())
+		bar.SetValue(bar.Minimum())
 	}
 
 	return
