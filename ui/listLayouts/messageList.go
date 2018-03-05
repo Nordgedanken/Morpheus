@@ -40,7 +40,7 @@ func (m *MessageList) Init(scrollArea *widgets.QScrollArea) {
 }
 
 // NewMessage adds a new message object to the view
-func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.QScrollArea, own bool) (err error) {
+func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.QScrollArea, own bool, height, width int) (err error) {
 	log.Println(message)
 	barAtBottom := false
 	bar := scrollArea.VerticalScrollBar()
@@ -122,16 +122,10 @@ func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.
 		return
 	})
 
-	var lineLength int
-	lineLength = messageContent.FontMetrics().Width(messageContent.Text(), -1) - 87
-	if lineLength >= scrollArea.Widget().Size().Width() {
-		lineLength = scrollArea.Widget().Size().Width() - 20 - 87
-	}
+	messageContent.SetMinimumWidth(width + 10)
 
-	messageContent.SetMinimumWidth(lineLength + 10)
-
-	messageWidget.SetMinimumWidth(lineLength)
-	messageWidget.Resize2(lineLength, wrapperWidget.Size().Height())
+	messageWidget.SetMinimumWidth(width)
+	messageWidget.Resize2(width, height+10)
 
 	go message.GetUserAvatar()
 

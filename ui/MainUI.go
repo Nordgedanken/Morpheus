@@ -88,8 +88,10 @@ func (m *MainUI) NewUI() (err error) {
 		} else {
 			own = false
 		}
+		height := m.App.FontMetrics().Height()
+		width := m.App.FontMetrics().Width(message.Message, len(message.Message))
 
-		m.MessageList.NewMessage(message, m.messageScrollArea, own)
+		m.MessageList.NewMessage(message, m.messageScrollArea, own, height, width)
 	})
 
 	go m.startSync()
