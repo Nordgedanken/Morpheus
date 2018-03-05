@@ -35,7 +35,10 @@ func NewMorpheusSyncer(userID string, store gomatrix.Storer) *MorpheusSyncer {
 // ProcessResponse processes the /sync response in a way suitable for bots. "Suitable for bots" means a stream of
 // unrepeating events. Returns a fatal error if a listener panics.
 func (s *MorpheusSyncer) ProcessResponse(res *gomatrix.RespSync, since string) (err error) {
+	log.Infoln("Since: ", since)
+	log.Infoln("Res: ", res)
 	if !s.shouldProcessResponse(res, since) {
+		log.Infoln("bug")
 		return
 	}
 
@@ -48,6 +51,7 @@ func (s *MorpheusSyncer) ProcessResponse(res *gomatrix.RespSync, since string) (
 	for roomID, roomData := range res.Rooms.Join {
 		room := s.getOrCreateRoom(roomID, "join")
 		for _, event := range roomData.State.Events {
+			log.Infoln("Join Event")
 			event.RoomID = roomID
 			room.UpdateState(&event)
 			s.notifyListeners(&event)
@@ -60,6 +64,7 @@ func (s *MorpheusSyncer) ProcessResponse(res *gomatrix.RespSync, since string) (
 	for roomID, roomData := range res.Rooms.Invite {
 		room := s.getOrCreateRoom(roomID, "invite")
 		for _, event := range roomData.State.Events {
+			log.Infoln("Invite Event")
 			event.RoomID = roomID
 			room.UpdateState(&event)
 			s.notifyListeners(&event)
@@ -69,6 +74,7 @@ func (s *MorpheusSyncer) ProcessResponse(res *gomatrix.RespSync, since string) (
 		room := s.getOrCreateRoom(roomID, "leave")
 		for _, event := range roomData.Timeline.Events {
 			if event.StateKey != nil {
+				log.Infoln("Leave Event")
 				event.RoomID = roomID
 				room.UpdateState(&event)
 				s.notifyListeners(&event)
