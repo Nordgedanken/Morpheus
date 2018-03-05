@@ -51,6 +51,7 @@ func (s *MorpheusSyncer) ProcessResponse(res *gomatrix.RespSync, since string) (
 	for roomID, roomData := range res.Rooms.Join {
 		log.Infoln("Join Loop")
 		room := s.getOrCreateRoom(roomID, "join")
+		log.Infof("Room: %+v\n", room)
 		for _, event := range roomData.State.Events {
 			log.Infoln("Join Event")
 			event.RoomID = roomID
