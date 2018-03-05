@@ -2,7 +2,8 @@ package ui
 
 import (
 	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
-	"github.com/Nordgedanken/Morpheus/matrix/syncer"
+	//"github.com/Nordgedanken/Morpheus/matrix/syncer"
+	"github.com/matrix-org/gomatrix"
 	"github.com/therecipe/qt/widgets"
 )
 
@@ -18,8 +19,9 @@ type MainUI struct {
 	messageScrollArea *widgets.QScrollArea
 	roomScrollArea    *widgets.QScrollArea
 
-	window  *widgets.QMainWindow
-	storage *syncer.MorpheusStore
+	window *widgets.QMainWindow
+	//storage *syncer.MorpheusStore
+	storage *gomatrix.InMemoryStore
 }
 
 // SetCurrentRoom sets the new room ID of the MainUI

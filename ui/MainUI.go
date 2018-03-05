@@ -13,7 +13,6 @@ import (
 	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
 	"github.com/Nordgedanken/Morpheus/matrix/messages"
 	"github.com/Nordgedanken/Morpheus/matrix/rooms"
-	"github.com/Nordgedanken/Morpheus/matrix/syncer"
 	"github.com/Nordgedanken/Morpheus/ui/listLayouts"
 	"github.com/dgraph-io/badger"
 	"github.com/matrix-org/gomatrix"
@@ -306,7 +305,7 @@ func (m *MainUI) logout() (err error) {
 
 func (m *MainUI) startSync() (err error) {
 	//Start Syncer!
-	CacheDB, DBOpenErr := db.OpenCacheDB()
+	/*CacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
 		log.Errorln(DBOpenErr)
 	}
@@ -317,9 +316,12 @@ func (m *MainUI) startSync() (err error) {
 	m.storage = &syncer.MorpheusStore{
 		InMemoryStore: *gomatrix.NewInMemoryStore(),
 		CacheDatabase: m.CacheDB,
-	}
+	}*/
 
-	Syncer := syncer.NewMorpheusSyncer(m.Cli.UserID, m.storage)
+	m.storage = gomatrix.NewInMemoryStore()
+
+	//Syncer := syncer.NewMorpheusSyncer(m.Cli.UserID, m.storage)
+	Syncer := gomatrix.NewDefaultSyncer(m.Cli.UserID, m.storage)
 
 	m.Cli.Store = m.storage
 	m.Cli.Syncer = Syncer
