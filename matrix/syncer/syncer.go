@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
+	"github.com/Nordgedanken/Morpheus/matrix/rooms"
 	"github.com/matrix-org/gomatrix"
 	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
@@ -141,7 +142,9 @@ func (s *MorpheusSyncer) shouldProcessResponse(resp *gomatrix.RespSync, since st
 func (s *MorpheusSyncer) getOrCreateRoom(roomID string) *gomatrix.Room {
 	// Add new Room to the List if new
 	log.Infoln(roomID)
-	log.Infoln(s.config.Rooms)
+	if s.config.Rooms == nil {
+		s.config.Rooms = make(map[string]*rooms.Room)
+	}
 
 	room := s.config.Rooms[roomID]
 	gomatrixRoom := gomatrix.NewRoom(roomID)
