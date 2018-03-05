@@ -145,8 +145,10 @@ func (s *MorpheusSyncer) getOrCreateRoom(roomID string) *gomatrix.Room {
 	if s.config.Rooms == nil {
 		s.config.Rooms = make(map[string]*rooms.Room)
 	}
+	log.Infoln("after nil if")
 
 	room := s.config.Rooms[roomID]
+
 	log.Infoln("roomIDRoom: ", room.RoomID)
 	if room == nil { // create a new Room
 		room = rooms.NewRoom()
@@ -158,6 +160,7 @@ func (s *MorpheusSyncer) getOrCreateRoom(roomID string) *gomatrix.Room {
 		s.config.Rooms[roomID] = room
 		go s.config.RoomList.TriggerRoom(roomID)
 	}
+	log.Infoln("After if")
 	gomatrixRoom := gomatrix.NewRoom(roomID)
 	return gomatrixRoom
 }
