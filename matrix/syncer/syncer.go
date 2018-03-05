@@ -36,7 +36,7 @@ func NewMorpheusSyncer(userID string, store gomatrix.Storer) *MorpheusSyncer {
 // unrepeating events. Returns a fatal error if a listener panics.
 func (s *MorpheusSyncer) ProcessResponse(res *gomatrix.RespSync, since string) (err error) {
 	log.Infoln("Since: ", since)
-	log.Infoln("Res: ", res)
+	log.Infof("Res: %+v\n", res)
 	if !s.shouldProcessResponse(res, since) {
 		log.Infoln("bug")
 		return
