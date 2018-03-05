@@ -126,11 +126,6 @@ func OpenUserDB() (db *badger.DB, err error) {
 
 // CacheMessageEvents writes message infos into the cache into the defined room
 func CacheMessageEvents(id, sender, roomID, message string, timestamp int64) (err error) {
-	log.Infoln("ID: ", id)
-	log.Infoln("Sender: ", sender)
-	log.Infoln("RoomID: ", roomID)
-	log.Infoln("Message: ", message)
-	log.Infoln("TS: ", timestamp)
 
 	db, DBOpenErr := OpenCacheDB()
 	if DBOpenErr != nil {
@@ -162,6 +157,7 @@ func CacheMessageEvents(id, sender, roomID, message string, timestamp int64) (er
 	})
 
 	if DBerr != nil {
+		log.Errorln(DBerr)
 		err = DBerr
 		return
 	}

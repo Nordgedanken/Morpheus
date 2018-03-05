@@ -317,7 +317,6 @@ func (m *MainUI) startSync() (err error) {
 	Syncer.Store = m.storage
 
 	Syncer.OnEventType("m.room.message", func(ev *gomatrix.Event) {
-		log.Infoln("NewEVENT")
 		formattedBody, _ := ev.Content["formatted_body"]
 		var msg string
 		msg, _ = formattedBody.(string)
@@ -413,8 +412,8 @@ func (m *MainUI) loadCache() (err error) {
 	if DBOpenErr != nil {
 		err = DBOpenErr
 	}
-	log.Infoln("room|" + m.CurrentRoom + "|messages|")
-	MsgPrefix := []byte("room|" + m.CurrentRoom + "|messages|")
+	log.Infoln("room|" + m.CurrentRoom + "|messages")
+	MsgPrefix := []byte("room|" + m.CurrentRoom + "|messages")
 	DBerr := cacheDB.View(func(txn *badger.Txn) error {
 		log.Println("CacheDB")
 		opts := badger.DefaultIteratorOptions
@@ -422,9 +421,9 @@ func (m *MainUI) loadCache() (err error) {
 		MsgIt := txn.NewIterator(opts)
 
 		//DEBUG
-		debugResult, QueryErr := db.Get(txn, []byte("room|"+m.CurrentRoom+"|messages|"))
+		debugResult, QueryErr := db.Get(txn, []byte("room|"+m.CurrentRoom+"|messages"))
 		if QueryErr != nil {
-			return errors.WithMessage(QueryErr, "Key: "+"room|"+m.CurrentRoom+"|messages|")
+			return errors.WithMessage(QueryErr, "Key: "+"room|"+m.CurrentRoom+"|messages")
 		}
 		log.Infoln("Debug Result: ", debugResult)
 
