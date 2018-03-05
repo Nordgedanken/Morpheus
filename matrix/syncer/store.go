@@ -22,7 +22,7 @@ func NewMorpheusStore() *MorpheusStore {
 
 // SaveFilterID to memory.
 func (m *MorpheusStore) SaveFilterID(userID, filterID string) {
-	log.Infoln("SaveFilterID")
+	log.Infoln("SaveFilterID: ", filterID)
 	CacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
 		log.Errorln(DBOpenErr)
@@ -66,7 +66,7 @@ func (m *MorpheusStore) LoadFilterID(userID string) string {
 
 // SaveNextBatch saves to the database.
 func (m *MorpheusStore) SaveNextBatch(userID, nextBatch string) {
-	log.Infoln("SaveNextBatch")
+	log.Infoln("SaveNextBatch: ", nextBatch)
 	CacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
 		log.Errorln(DBOpenErr)
