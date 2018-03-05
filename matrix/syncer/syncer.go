@@ -129,8 +129,9 @@ func (s *MorpheusSyncer) shouldProcessResponse(resp *gomatrix.RespSync, since st
 // getOrCreateRoom must only be called by the Sync() goroutine which calls ProcessResponse()
 func (s *MorpheusSyncer) getOrCreateRoom(roomID, state string) *gomatrix.Room {
 	// Add new Room to the List if new
+	log.Infoln(s.config.Rooms)
 	_, present := s.config.Rooms[roomID]
-	if present && state == "join" {
+	if !present && state == "join" {
 		s.config.Rooms[roomID] = rooms.NewRoom()
 		s.config.Rooms[roomID].RoomID = roomID
 		s.config.Rooms[roomID].Cli = s.config.GetCli()
@@ -167,6 +168,6 @@ func (s *MorpheusSyncer) OnFailedSync(res *gomatrix.RespSync, err error) (time.D
 
 // GetFilterJSON returns a filter with a timeline limit of 50.
 func (s *MorpheusSyncer) GetFilterJSON(userID string) json.RawMessage {
-	return json.RawMessage(`{"room":{"timeline":{"limit":50}}}`)
-	//return json.RawMessage(`{"room":{"state":{"types":["m.room.*"]},"timeline":{"limit":20,"types":["m.room.message"]}}}`)
+	//return json.RawMessage(`{"room":{"timeline":{"limit":50}}}`)
+	return json.RawMessage(`{"room":{"state":{"types":["m.room.*"]},"timeline":{"limit":20,"types":["m.room.message"]}}}`)
 }
