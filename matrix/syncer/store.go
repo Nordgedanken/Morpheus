@@ -15,7 +15,7 @@ import (
 type MorpheusStore struct {
 }
 
-// NewInMemoryStore constructs a new MorpheusStorage.
+// NewMorpheusStore constructs a new MorpheusStorage.
 func NewMorpheusStore() *MorpheusStore {
 	return &MorpheusStore{}
 }

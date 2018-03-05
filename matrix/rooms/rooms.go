@@ -28,6 +28,7 @@ type Room struct {
 	Messages          map[string]*messages.Message
 }
 
+// NewRoom returns a new Room struct
 func NewRoom() *Room {
 	return &Room{}
 }
