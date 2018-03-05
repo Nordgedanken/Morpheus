@@ -142,6 +142,8 @@ func (s *MorpheusSyncer) shouldProcessResponse(resp *gomatrix.RespSync, since st
 func (s *MorpheusSyncer) getOrCreateRoom(roomID string) *gomatrix.Room {
 	// Add new Room to the List if new
 	log.Infoln("roomIDCall: ", roomID)
+	log.Infof("Config: %+v\n", s.config)
+	log.Infof("Rooms: %+v\n", s.config.Rooms)
 	if s.config.Rooms == nil {
 		s.config.Rooms = make(map[string]*rooms.Room)
 	}
