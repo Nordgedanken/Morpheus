@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/Nordgedanken/Morpheus/matrix/db"
-	"github.com/Nordgedanken/Morpheus/matrix/rooms"
 	"github.com/dgraph-io/badger"
 	"github.com/matrix-org/gomatrix"
 	log "github.com/sirupsen/logrus"
@@ -117,17 +116,17 @@ func (m *MorpheusStore) LoadNextBatch(userID string) string {
 }
 
 // SaveRoom to memory.
-func (m *MorpheusStore) SaveRoom(room *rooms.Room) {
+func (m *MorpheusStore) SaveRoom(room *gomatrix.Room) {
 	CacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
 		log.Errorln(DBOpenErr)
 		return
 	}
-	roomID := room.RoomID
+	roomID := room.ID
 
 	DBerr := CacheDB.Update(func(txn *badger.Txn) error {
 
-		DBSetRoomNameErr := txn.Set([]byte("room|"+roomID+"|name"), []byte(room.RoomName))
+		DBSetRoomNameErr := txn.Set([]byte("room|"+roomID+"|id"), []byte(roomID))
 		return DBSetRoomNameErr
 	})
 	if DBerr != nil {
