@@ -9,15 +9,6 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type Storer interface {
-	SaveFilterID(userID, filterID string)
-	LoadFilterID(userID string) string
-	SaveNextBatch(userID, nextBatchToken string)
-	LoadNextBatch(userID string) string
-	SaveRoom(room *gomatrix.Room)
-	LoadRoom(roomID string) *gomatrix.Room
-}
-
 // MorpheusStore implements the gomatrix.Storer interface.
 //
 // It persists the next batch token in the database, and includes a ClientConfig for the client.

@@ -15,7 +15,7 @@ import (
 //MorpheusSyncer holds the UserID, the used Storer and the listener
 type MorpheusSyncer struct {
 	UserID    string
-	Store     Storer
+	Store     gomatrix.Storer
 	listeners map[string][]OnEventListener // event type to listeners array
 	config    *globalTypes.Config
 }
@@ -24,7 +24,7 @@ type MorpheusSyncer struct {
 type OnEventListener func(*gomatrix.Event)
 
 // NewMorpheusSyncer returns an instantiated MorpheusSyncer
-func NewMorpheusSyncer(userID string, store Storer) *MorpheusSyncer {
+func NewMorpheusSyncer(userID string, store gomatrix.Storer) *MorpheusSyncer {
 	return &MorpheusSyncer{
 		UserID:    userID,
 		Store:     store,
