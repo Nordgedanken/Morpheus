@@ -133,7 +133,7 @@ func (m *MainUI) NewUI() (err error) {
 
 		if m.CurrentRoom != room.RoomID {
 			m.SetCurrentRoom(room.RoomID)
-			m.RoomAvatar.SetPixmap(nil)
+			m.RoomAvatar.SetPixmap(gui.NewQPixmap())
 			m.MainWidget.SetWindowTitle("Morpheus - " + room.GetRoomTopic())
 
 			room.ConnectSetAvatar(func(IMGdata []byte) {
