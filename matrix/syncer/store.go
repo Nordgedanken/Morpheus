@@ -13,7 +13,6 @@ import (
 //
 // It persists the next batch token in the database, and includes a ClientConfig for the client.
 type MorpheusStore struct {
-	gomatrix.Storer
 	cli *gomatrix.Client
 }
 
