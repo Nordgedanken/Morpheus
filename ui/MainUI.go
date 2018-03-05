@@ -310,7 +310,7 @@ func (m *MainUI) startSync() (err error) {
 	//Start Syncer!
 	m.storage = syncer.NewMorpheusStore()
 
-	Syncer := syncer.NewMorpheusSyncer(m.Cli.UserID, m.storage)
+	Syncer := syncer.NewMorpheusSyncer(m.Cli.UserID, m.storage, &m.Config)
 
 	m.Cli.Store = m.storage
 	m.Cli.Syncer = Syncer

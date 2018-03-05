@@ -25,11 +25,12 @@ type MorpheusSyncer struct {
 type OnEventListener func(*gomatrix.Event)
 
 // NewMorpheusSyncer returns an instantiated MorpheusSyncer
-func NewMorpheusSyncer(userID string, store gomatrix.Storer) *MorpheusSyncer {
+func NewMorpheusSyncer(userID string, store gomatrix.Storer, config *globalTypes.Config) *MorpheusSyncer {
 	return &MorpheusSyncer{
 		UserID:    userID,
 		Store:     store,
 		listeners: make(map[string][]OnEventListener),
+		config:    config,
 	}
 }
 
