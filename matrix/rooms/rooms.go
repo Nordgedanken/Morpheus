@@ -81,7 +81,6 @@ func (r *Room) AddMessage(message *messages.Message) {
 	if r.Messages == nil {
 		r.Messages = make(map[string]*messages.Message)
 	}
-	log.Println(message.EventID)
 	r.Messages[message.EventID] = message
 }
 
@@ -224,12 +223,12 @@ func (r *Room) crawlRoomName() {
 	}{}
 
 	if roomNameStateEventErr := r.Cli.StateEvent(r.RoomID, mRoomNameEv, "", &roomName); roomNameStateEventErr != nil {
-		log.Println(roomNameStateEventErr)
+		log.Errorln(roomNameStateEventErr)
 		// Not returning as a Error NotFound is allowed
 	}
 	if roomName.Name == "" {
 		if roomCanonicalAliasStateEventErr := r.Cli.StateEvent(r.RoomID, mRoomCanonicalAliasEv, "", &roomCanonicalAlias); roomCanonicalAliasStateEventErr != nil {
-			log.Println(roomCanonicalAliasStateEventErr)
+			log.Errorln(roomCanonicalAliasStateEventErr)
 			// Not returning as a Error NotFound is allowed
 		}
 		if roomCanonicalAlias.Alias == "" {
