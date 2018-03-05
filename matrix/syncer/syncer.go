@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
-	"github.com/Nordgedanken/Morpheus/matrix/rooms"
 	"github.com/matrix-org/gomatrix"
 	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
@@ -16,7 +15,7 @@ import (
 //MorpheusSyncer holds the UserID, the used Storer and the listener
 type MorpheusSyncer struct {
 	UserID    string
-	Store     gomatrix.Storer
+	Store     Storer
 	listeners map[string][]OnEventListener // event type to listeners array
 	config    *globalTypes.Config
 }
@@ -25,7 +24,7 @@ type MorpheusSyncer struct {
 type OnEventListener func(*gomatrix.Event)
 
 // NewMorpheusSyncer returns an instantiated MorpheusSyncer
-func NewMorpheusSyncer(userID string, store gomatrix.Storer) *MorpheusSyncer {
+func NewMorpheusSyncer(userID string, store Storer) *MorpheusSyncer {
 	return &MorpheusSyncer{
 		UserID:    userID,
 		Store:     store,
@@ -130,24 +129,22 @@ func (s *MorpheusSyncer) shouldProcessResponse(resp *gomatrix.RespSync, since st
 func (s *MorpheusSyncer) getOrCreateRoom(roomID, state string) *gomatrix.Room {
 	// Add new Room to the List if new
 	log.Infoln(s.config.Rooms)
+
+	room := s.config.Rooms[roomID]
+	gomatrixRoom := gomatrix.NewRoom(roomID)
+	if room == nil { // create a new Room
+		s.Store.SaveRoom(gomatrixRoom)
+	}
 	_, present := s.config.Rooms[roomID]
-	if !present && state == "join" {
-		s.config.Rooms[roomID] = rooms.NewRoom()
-		s.config.Rooms[roomID].RoomID = roomID
-		s.config.Rooms[roomID].Cli = s.config.GetCli()
+	if !present {
 		s.config.RoomList.RoomCount++
 		if (s.config.RoomList.RoomCount % 10) == 0 {
 			s.config.App.ProcessEvents(core.QEventLoop__AllEvents)
 		}
 		s.config.RoomList.TriggerRoom(roomID)
+		s.config.Rooms[roomID] = room
 	}
-
-	room := s.Store.LoadRoom(roomID)
-	if room == nil { // create a new Room
-		room = gomatrix.NewRoom(roomID)
-		s.Store.SaveRoom(room)
-	}
-	return room
+	return gomatrixRoom
 }
 
 func (s *MorpheusSyncer) notifyListeners(event *gomatrix.Event) {

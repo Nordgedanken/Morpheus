@@ -306,11 +306,7 @@ func (m *MainUI) logout() (err error) {
 
 func (m *MainUI) startSync() (err error) {
 	//Start Syncer!
-	m.SetCacheDB(&db.MorpheusStorage{})
-	m.storage = &syncer.MorpheusStore{
-		InMemoryStore: *gomatrix.NewInMemoryStore(),
-		CacheDatabase: m.CacheDB,
-	}
+	m.storage = syncer.NewMorpheusStore(m.Cli)
 
 	Syncer := syncer.NewMorpheusSyncer(m.Cli.UserID, m.storage)
 
