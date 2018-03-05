@@ -410,15 +410,17 @@ func (m *MainUI) loadCache() (err error) {
 
 	cacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
+		log.Errorln(DBOpenErr)
 		err = DBOpenErr
 	}
-	log.Infoln("room|" + m.CurrentRoom + "|messages")
-	MsgPrefix := []byte("room|" + m.CurrentRoom + "|messages")
 	DBerr := cacheDB.View(func(txn *badger.Txn) error {
 		log.Println("CacheDB")
-		opts := badger.DefaultIteratorOptions
-		opts.PrefetchValues = false
-		MsgIt := txn.NewIterator(opts)
+		MsgOpts := badger.DefaultIteratorOptions
+		MsgOpts.PrefetchSize = 10
+		MsgIt := txn.NewIterator(MsgOpts)
+
+		log.Infoln("room|" + m.CurrentRoom + "|messages")
+		MsgPrefix := []byte("room|" + m.CurrentRoom + "|messages")
 
 		//DEBUG
 		debugResult, QueryErr := db.Get(txn, []byte("room|"+m.CurrentRoom+"|messages"))
@@ -428,14 +430,8 @@ func (m *MainUI) loadCache() (err error) {
 		log.Infoln("Debug Result: ", debugResult)
 
 		doneMsg := make(map[string]bool)
-		valid := func() bool {
-			log.Infoln("Item: ", MsgIt.Item())
-			valid := MsgIt.ValidForPrefix(MsgPrefix)
-			log.Println("Valid: ", valid)
-			return valid
-		}()
 
-		for MsgIt.Seek(MsgPrefix); valid; MsgIt.Next() {
+		for MsgIt.Seek(MsgPrefix); MsgIt.ValidForPrefix(MsgPrefix); MsgIt.Next() {
 			log.Println("MSG LOOP")
 			item := MsgIt.Item()
 			key := item.Key()
