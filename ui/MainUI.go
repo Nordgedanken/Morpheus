@@ -180,7 +180,7 @@ func (m *MainUI) initScrolls() {
 	m.messageScrollArea.SetContentsMargins(0, 0, 0, 0)
 }
 
-func (m *MainUI) loadChatUIDefaults() (err error) {
+func (m *MainUI) loadChatUIDefaults() {
 	m.widget = widgets.NewQWidget(nil, 0)
 
 	var loader = uitools.NewQUiLoader(nil)
@@ -215,13 +215,10 @@ func (m *MainUI) loadChatUIDefaults() (err error) {
 
 	//Set Avatar
 	avatarLogo := widgets.NewQLabelFromPointer(m.widget.FindChild("UserAvatar", core.Qt__FindChildrenRecursively).Pointer())
-	avatar, AvatarErr := matrix.GetOwnUserAvatar(m.Cli)
-	if AvatarErr != nil {
-		err = AvatarErr
-		return
-	}
-	avatarLogo.SetPixmap(avatar)
-	return
+	go func() {
+		avatar, _ := matrix.GetOwnUserAvatar(m.Cli)
+		avatarLogo.SetPixmap(avatar)
+	}()
 }
 
 func (m *MainUI) sendMessage(message string) (err error) {
