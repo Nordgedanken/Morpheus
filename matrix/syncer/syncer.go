@@ -133,16 +133,12 @@ func (s *MorpheusSyncer) getOrCreateRoom(roomID, state string) *gomatrix.Room {
 	room := s.config.Rooms[roomID]
 	gomatrixRoom := gomatrix.NewRoom(roomID)
 	if room == nil { // create a new Room
-		s.Store.SaveRoom(gomatrixRoom)
-	}
-	_, present := s.config.Rooms[roomID]
-	if !present {
 		s.config.RoomList.RoomCount++
 		if (s.config.RoomList.RoomCount % 10) == 0 {
 			s.config.App.ProcessEvents(core.QEventLoop__AllEvents)
 		}
-		s.config.RoomList.TriggerRoom(roomID)
 		s.config.Rooms[roomID] = room
+		go s.config.RoomList.TriggerRoom(roomID)
 	}
 	return gomatrixRoom
 }
