@@ -13,18 +13,16 @@ import (
 //
 // It persists the next batch token in the database, and includes a ClientConfig for the client.
 type MorpheusStore struct {
-	cli *gomatrix.Client
 }
 
 // NewInMemoryStore constructs a new MorpheusStorage.
-func NewMorpheusStore(cli *gomatrix.Client) *MorpheusStore {
-	return &MorpheusStore{
-		cli: cli,
-	}
+func NewMorpheusStore() *MorpheusStore {
+	return &MorpheusStore{}
 }
 
 // SaveFilterID to memory.
 func (m *MorpheusStore) SaveFilterID(userID, filterID string) {
+	log.Infoln("SaveFilterID")
 	CacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
 		log.Errorln(DBOpenErr)
@@ -43,6 +41,7 @@ func (m *MorpheusStore) SaveFilterID(userID, filterID string) {
 
 // LoadFilterID from memory.
 func (m *MorpheusStore) LoadFilterID(userID string) string {
+	log.Infoln("LoadFilterID")
 	CacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
 		log.Errorln(DBOpenErr)
@@ -61,11 +60,13 @@ func (m *MorpheusStore) LoadFilterID(userID string) string {
 		log.Errorln(DBerr)
 		return ""
 	}
+	log.Infoln("FilterID: ", filterID)
 	return filterID
 }
 
 // SaveNextBatch saves to the database.
 func (m *MorpheusStore) SaveNextBatch(userID, nextBatch string) {
+	log.Infoln("SaveNextBatch")
 	CacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
 		log.Errorln(DBOpenErr)
@@ -84,6 +85,7 @@ func (m *MorpheusStore) SaveNextBatch(userID, nextBatch string) {
 
 // LoadNextBatch loads from the database.
 func (m *MorpheusStore) LoadNextBatch(userID string) string {
+	log.Infoln("LoadNextBatch")
 	CacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
 		log.Errorln(DBOpenErr)
@@ -102,11 +104,13 @@ func (m *MorpheusStore) LoadNextBatch(userID string) string {
 		log.Errorln(DBerr)
 		return ""
 	}
+	log.Infoln("NextBatch: ", nextBatch)
 	return nextBatch
 }
 
 // SaveRoom to memory.
 func (m *MorpheusStore) SaveRoom(room *gomatrix.Room) {
+	log.Infoln("SaveRoom")
 	CacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
 		log.Errorln(DBOpenErr)
@@ -128,6 +132,7 @@ func (m *MorpheusStore) SaveRoom(room *gomatrix.Room) {
 
 // LoadRoom from memory.
 func (m *MorpheusStore) LoadRoom(roomID string) *gomatrix.Room {
+	log.Infoln("LoadRoom")
 	room := gomatrix.NewRoom(roomID)
 	return room
 }
