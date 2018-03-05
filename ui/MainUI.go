@@ -134,6 +134,7 @@ func (m *MainUI) NewUI() (err error) {
 
 		if m.CurrentRoom != room.RoomID {
 			m.SetCurrentRoom(room.RoomID)
+			m.RoomAvatar.SetPixmap(nil)
 			m.MainWidget.SetWindowTitle("Morpheus - " + room.GetRoomTopic())
 
 			room.ConnectSetAvatar(func(IMGdata []byte) {
@@ -179,7 +180,7 @@ func (m *MainUI) initScrolls() {
 	m.messageScrollArea.SetContentsMargins(0, 0, 0, 0)
 }
 
-func (m *MainUI) loadChatUIDefaults() {
+func (m *MainUI) loadChatUIDefaults() (err error) {
 	m.widget = widgets.NewQWidget(nil, 0)
 
 	var loader = uitools.NewQUiLoader(nil)
@@ -213,13 +214,14 @@ func (m *MainUI) loadChatUIDefaults() {
 	})
 
 	//Set Avatar
-	/*avatarLogo := widgets.NewQLabelFromPointer(m.widget.FindChild("UserAvatar", core.Qt__FindChildrenRecursively).Pointer())
+	avatarLogo := widgets.NewQLabelFromPointer(m.widget.FindChild("UserAvatar", core.Qt__FindChildrenRecursively).Pointer())
 	avatar, AvatarErr := matrix.GetOwnUserAvatar(m.Cli)
 	if AvatarErr != nil {
 		err = AvatarErr
 		return
 	}
-	avatarLogo.SetPixmap(avatar)*/
+	avatarLogo.SetPixmap(avatar)
+	return
 }
 
 func (m *MainUI) sendMessage(message string) (err error) {
@@ -414,25 +416,15 @@ func (m *MainUI) loadCache() (err error) {
 		err = DBOpenErr
 	}
 	DBerr := cacheDB.View(func(txn *badger.Txn) error {
-		log.Println("CacheDB")
 		MsgOpts := badger.DefaultIteratorOptions
 		MsgOpts.PrefetchSize = 10
 		MsgIt := txn.NewIterator(MsgOpts)
 
-		log.Infoln("room|" + m.CurrentRoom + "|messages")
 		MsgPrefix := []byte("room|" + m.CurrentRoom + "|messages")
-
-		//DEBUG
-		debugResult, QueryErr := db.Get(txn, []byte("room|"+m.CurrentRoom+"|messages"))
-		if QueryErr != nil {
-			return errors.WithMessage(QueryErr, "Key: "+"room|"+m.CurrentRoom+"|messages")
-		}
-		log.Infoln("Debug Result: ", debugResult)
 
 		doneMsg := make(map[string]bool)
 
 		for MsgIt.Seek(MsgPrefix); MsgIt.ValidForPrefix(MsgPrefix); MsgIt.Next() {
-			log.Println("MSG LOOP")
 			item := MsgIt.Item()
 			key := item.Key()
 			stringKey := fmt.Sprintf("%s", key)
