@@ -140,6 +140,7 @@ func (s *MorpheusSyncer) shouldProcessResponse(resp *gomatrix.RespSync, since st
 // getOrCreateRoom must only be called by the Sync() goroutine which calls ProcessResponse()
 func (s *MorpheusSyncer) getOrCreateRoom(roomID string) *gomatrix.Room {
 	// Add new Room to the List if new
+	log.Infoln(roomID)
 	log.Infoln(s.config.Rooms)
 
 	room := s.config.Rooms[roomID]
