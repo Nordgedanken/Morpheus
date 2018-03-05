@@ -29,7 +29,7 @@ func (m *MorpheusStore) SaveFilterID(userID, filterID string) {
 		return
 	}
 	DBerr := CacheDB.Update(func(txn *badger.Txn) error {
-		DBSetFilterIDErr := txn.Set([]byte("matrix|"+userID+"|filterID|"), []byte(filterID))
+		DBSetFilterIDErr := txn.Set([]byte("matrix|"+userID+"|filterID"), []byte(filterID))
 		return DBSetFilterIDErr
 	})
 	if DBerr != nil {
@@ -49,7 +49,7 @@ func (m *MorpheusStore) LoadFilterID(userID string) string {
 	}
 	var filterID string
 	DBerr := CacheDB.View(func(txn *badger.Txn) error {
-		filterIDResult, QueryErr := db.Get(txn, []byte("user|filterID"))
+		filterIDResult, QueryErr := db.Get(txn, []byte("matrix|"+userID+"|filterID"))
 		if QueryErr != nil {
 			return QueryErr
 		}
@@ -73,7 +73,7 @@ func (m *MorpheusStore) SaveNextBatch(userID, nextBatch string) {
 		return
 	}
 	DBerr := CacheDB.Update(func(txn *badger.Txn) error {
-		DBSetNextBatchErr := txn.Set([]byte("matrix|"+userID+"|nextBatch|"), []byte(nextBatch))
+		DBSetNextBatchErr := txn.Set([]byte("matrix|"+userID+"|nextBatch"), []byte(nextBatch))
 		return DBSetNextBatchErr
 	})
 	if DBerr != nil {
@@ -93,7 +93,7 @@ func (m *MorpheusStore) LoadNextBatch(userID string) string {
 	}
 	var nextBatch string
 	DBerr := CacheDB.View(func(txn *badger.Txn) error {
-		nextBatchResult, QueryErr := db.Get(txn, []byte("user|accessToken"))
+		nextBatchResult, QueryErr := db.Get(txn, []byte("matrix|"+userID+"|nextBatch"))
 		if QueryErr != nil {
 			return QueryErr
 		}
