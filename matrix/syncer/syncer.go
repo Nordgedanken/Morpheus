@@ -50,7 +50,9 @@ func (s *MorpheusSyncer) ProcessResponse(res *gomatrix.RespSync, since string) (
 
 	for roomID, roomData := range res.Rooms.Join {
 		log.Infoln("Join Loop")
-		room := s.getOrCreateRoom(roomID, "join")
+		log.Infof("roomID: %+v\n", roomID)
+		log.Infof("roomData: %+v\n", roomData)
+		room := s.getOrCreateRoom(roomID)
 		log.Infof("Room: %+v\n", room)
 		for _, event := range roomData.State.Events {
 			log.Infoln("Join Event")
@@ -65,7 +67,7 @@ func (s *MorpheusSyncer) ProcessResponse(res *gomatrix.RespSync, since string) (
 	}
 	for roomID, roomData := range res.Rooms.Invite {
 		log.Infoln("Invite Loop")
-		room := s.getOrCreateRoom(roomID, "invite")
+		room := s.getOrCreateRoom(roomID)
 		for _, event := range roomData.State.Events {
 			log.Infoln("Invite Event")
 			event.RoomID = roomID
@@ -75,7 +77,7 @@ func (s *MorpheusSyncer) ProcessResponse(res *gomatrix.RespSync, since string) (
 	}
 	for roomID, roomData := range res.Rooms.Leave {
 		log.Infoln("Leave Loop")
-		room := s.getOrCreateRoom(roomID, "leave")
+		room := s.getOrCreateRoom(roomID)
 		for _, event := range roomData.Timeline.Events {
 			if event.StateKey != nil {
 				log.Infoln("Leave Event")
@@ -136,7 +138,7 @@ func (s *MorpheusSyncer) shouldProcessResponse(resp *gomatrix.RespSync, since st
 }
 
 // getOrCreateRoom must only be called by the Sync() goroutine which calls ProcessResponse()
-func (s *MorpheusSyncer) getOrCreateRoom(roomID, state string) *gomatrix.Room {
+func (s *MorpheusSyncer) getOrCreateRoom(roomID string) *gomatrix.Room {
 	// Add new Room to the List if new
 	log.Infoln(s.config.Rooms)
 
