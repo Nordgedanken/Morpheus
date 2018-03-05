@@ -126,6 +126,8 @@ func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.
 
 	messageWidget.SetMinimumWidth(width)
 	messageWidget.Resize2(width, height+10)
+	wrapperWidget.Resize2(width, height+30)
+	widget.Resize2(width, height+30)
 
 	go message.GetUserAvatar()
 
