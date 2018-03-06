@@ -42,8 +42,11 @@ func (m *MessageList) Init(scrollArea *widgets.QScrollArea) {
 // NewMessage adds a new message object to the view
 func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.QScrollArea, own bool, height, width int) (err error) {
 	bar := scrollArea.VerticalScrollBar()
+	barAtBottom := bar.Value() == bar.Maximum()
 	bar.ConnectRangeChanged(func(min int, max int) {
-		scrollArea.VerticalScrollBar().SetValue(max)
+		if barAtBottom {
+			scrollArea.VerticalScrollBar().SetValue(max)
+		}
 	})
 
 	var widget = widgets.NewQWidget(nil, 0)
