@@ -161,6 +161,8 @@ func (m *MainUI) NewUI() (err error) {
 			}
 
 			log.Println("Before loadCache")
+			//Ensure we count again on every Room Change
+			m.MessageList.MessageCount = 0
 			go m.loadCache()
 		}
 	})
