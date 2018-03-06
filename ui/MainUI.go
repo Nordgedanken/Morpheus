@@ -142,6 +142,7 @@ func (m *MainUI) NewUI() (err error) {
 				widgetScroll := m.MessageList.ItemAt(i).Widget()
 				widgetScroll.DeleteLater()
 			}
+			m.App.ProcessEvents(core.QEventLoop__AllEvents)
 
 			m.RoomAvatar.SetPixmap(gui.NewQPixmap())
 			m.MainWidget.SetWindowTitle("Morpheus - " + room.GetRoomTopic())
@@ -419,6 +420,7 @@ func (m *MainUI) loadCache() (err error) {
 
 		doneMsg := make(map[string]bool)
 
+		var intIt int
 		for MsgIt.Seek(MsgPrefix); MsgIt.ValidForPrefix(MsgPrefix); MsgIt.Next() {
 			item := MsgIt.Item()
 			key := item.Key()
@@ -483,6 +485,10 @@ func (m *MainUI) loadCache() (err error) {
 					m.App.ProcessEvents(core.QEventLoop__AllEvents)
 				}
 			}
+			if (intIt % 10) == 0 {
+				m.App.ProcessEvents(core.QEventLoop__AllEvents)
+			}
+			intIt++
 		}
 		m.App.ProcessEvents(core.QEventLoop__AllEvents)
 		return nil
