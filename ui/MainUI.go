@@ -90,12 +90,11 @@ func (m *MainUI) NewUI() (err error) {
 		height := m.App.FontMetrics().Height()
 		width := m.App.FontMetrics().Width(message.Message, len(message.Message))
 
-		messageFunc := func() {
+		thread := listLayouts.NewMessageThread(m.MainWidget)
+		thread.ConnectStart(func() {
 			log.Debugln("Adding New Message In Thread")
 			m.MessageList.NewMessage(message, m.messageScrollArea, own, height, width)
-		}
-		thread := listLayouts.NewMessageThread(m.MainWidget)
-		thread.MessageFunc = messageFunc
+		})
 
 		thread.Start()
 	})
@@ -107,16 +106,15 @@ func (m *MainUI) NewUI() (err error) {
 	m.RoomList.ConnectTriggerRoom(func(roomID string) {
 		room := m.Rooms[roomID]
 
-		messageFunc := func() {
+		thread := listLayouts.NewRoomThread(m.MainWidget)
+		thread.ConnectStart(func() {
 			log.Debugln("Adding New Room In Thread")
 			NewRoomErr := m.RoomList.NewRoom(room, m.roomScrollArea)
 			if NewRoomErr != nil {
 				err = NewRoomErr
 				return
 			}
-		}
-		thread := listLayouts.NewRoomThread(m.MainWidget)
-		thread.RoomFunc = messageFunc
+		})
 
 		thread.Start()
 

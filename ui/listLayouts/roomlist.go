@@ -30,13 +30,6 @@ type RoomList struct {
 
 type RoomThread struct {
 	core.QThread
-	RoomFunc func()
-}
-
-func (rt *RoomThread) Exec() int {
-	log.Infoln("Run!")
-	rt.RoomFunc()
-	return 1
 }
 
 // Init generates a new RoomList and adds it to the room scrollArea

@@ -32,13 +32,6 @@ type MessageList struct {
 
 type MessageThread struct {
 	core.QThread
-	MessageFunc func()
-}
-
-func (mt *MessageThread) Exec() int {
-	log.Infoln("Run!")
-	mt.MessageFunc()
-	return 1
 }
 
 // Init generates a new widgets.QVBoxLayout and adds it to the message scrollArea
