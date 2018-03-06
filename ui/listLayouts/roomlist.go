@@ -28,6 +28,15 @@ type RoomList struct {
 	RoomCount int64
 }
 
+type RoomThread struct {
+	core.QThread
+	RoomFunc func()
+}
+
+func (rt *RoomThread) Run() {
+	rt.RoomFunc()
+}
+
 // Init generates a new RoomList and adds it to the room scrollArea
 func (r *RoomList) Init(scrollArea *widgets.QScrollArea) {
 	r.SetSpacing(0)
