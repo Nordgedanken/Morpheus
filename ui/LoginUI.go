@@ -61,11 +61,29 @@ func (l *LoginUI) NewUI() (err error) {
 	// loginButton
 	loginButton := widgets.NewQPushButtonFromPointer(l.widget.FindChild("LoginButton", core.Qt__FindChildrenRecursively).Pointer())
 
+	//Set Button Effect
+	leffect := widgets.NewQGraphicsDropShadowEffect(nil)
+	leffect.SetBlurRadius(5)
+	leffect.SetXOffset(2)
+	leffect.SetYOffset(2)
+	leffect.SetColor(gui.NewQColor2(core.Qt__black))
+
+	loginButton.SetGraphicsEffect(leffect)
+
 	// ServerDropdown
 	serverDropdown := widgets.NewQComboBoxFromPointer(l.widget.FindChild("ServerChooserDropdown", core.Qt__FindChildrenRecursively).Pointer())
 
 	// registerButton
 	registerButton := widgets.NewQPushButtonFromPointer(l.widget.FindChild("RegisterButton", core.Qt__FindChildrenRecursively).Pointer())
+
+	//Set Button Effect
+	reffect := widgets.NewQGraphicsDropShadowEffect(nil)
+	reffect.SetBlurRadius(5)
+	reffect.SetXOffset(2)
+	reffect.SetYOffset(2)
+	reffect.SetColor(gui.NewQColor2(core.Qt__black))
+
+	registerButton.SetGraphicsEffect(reffect)
 
 	var layout = widgets.NewQHBoxLayout()
 	l.window.SetLayout(layout)
