@@ -92,6 +92,7 @@ func (m *MainUI) NewUI() (err error) {
 
 		thread := core.NewQThread(nil)
 		thread.ConnectRun(func() {
+			log.Debugln("Adding New Message In Thread")
 			m.MessageList.NewMessage(message, m.messageScrollArea, own, height, width)
 		})
 		thread.Exec()
@@ -106,6 +107,7 @@ func (m *MainUI) NewUI() (err error) {
 
 		thread := core.NewQThread(nil)
 		thread.ConnectRun(func() {
+			log.Debugln("Adding New Room In Thread")
 			NewRoomErr := m.RoomList.NewRoom(room, m.roomScrollArea)
 			if NewRoomErr != nil {
 				err = NewRoomErr
