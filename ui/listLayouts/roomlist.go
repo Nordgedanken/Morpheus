@@ -33,9 +33,10 @@ type RoomThread struct {
 	RoomFunc func()
 }
 
-func (rt *RoomThread) Run() {
+func (rt *RoomThread) Exec() int {
 	log.Infoln("Run!")
 	rt.RoomFunc()
+	return 1
 }
 
 // Init generates a new RoomList and adds it to the room scrollArea
