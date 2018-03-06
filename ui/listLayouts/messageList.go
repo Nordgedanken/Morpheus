@@ -126,11 +126,18 @@ func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.
 	//TODO: Debug width and height
 	log.Println("Width: ", width)
 	log.Println("Height: ", height)
+	var aWidth int
+	if (width + 10) > scrollArea.Widget().Width() {
+		aWidth = scrollArea.Widget().Width()
+	} else {
+		aWidth = width
+	}
+	log.Println("aWidth: ", aWidth)
 
-	messageContent.SetMinimumWidth(width + 10)
+	messageContent.SetMinimumWidth(aWidth + 10)
 
-	messageWidget.SetMinimumWidth(width)
-	messageWidget.Resize2(width, height+10)
+	messageWidget.SetMinimumWidth(aWidth)
+	messageWidget.Resize2(aWidth, height+10)
 
 	go message.GetUserAvatar()
 
