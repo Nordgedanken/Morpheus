@@ -399,11 +399,6 @@ func (m *MainUI) initRoomList() (err error) {
 
 func (m *MainUI) loadCache() (err error) {
 	log.Println("Loading cache!")
-	barAtBottom := false
-	bar := m.messageScrollArea.VerticalScrollBar()
-	if bar.Value() == bar.Minimum() {
-		barAtBottom = true
-	}
 
 	cacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
@@ -491,11 +486,6 @@ func (m *MainUI) loadCache() (err error) {
 		log.Errorln("DBERR: ", DBerr)
 		err = DBerr
 		return
-	}
-
-	if barAtBottom {
-		bar.Update()
-		bar.SetValue(bar.Minimum())
 	}
 
 	return
