@@ -122,8 +122,15 @@ func (m *Message) GetUserAvatar() {
 		} else {
 			DisplayNameResp, _ := m.Cli.GetDisplayName(m.Author)
 			DisplayName := DisplayNameResp.DisplayName
+			var name string
+			if DisplayName == "" {
+				name = m.Author
+			} else {
+				name = DisplayName
+			}
+
 			var GenerateImgErr error
-			IMGdata, GenerateImgErr = matrix.GenerateGenericImages(DisplayName, 61)
+			IMGdata, GenerateImgErr = matrix.GenerateGenericImages(name, 61)
 			if GenerateImgErr != nil {
 				log.Errorf("%s", GenerateImgErr)
 				return
