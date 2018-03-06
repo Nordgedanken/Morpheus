@@ -133,6 +133,16 @@ func (m *MainUI) NewUI() (err error) {
 
 		if m.CurrentRoom != room.RoomID {
 			m.SetCurrentRoom(room.RoomID)
+
+			count := m.MessageList.Count()
+			for i := 0; i < count; i++ {
+				if (i % 10) == 0 {
+					m.App.ProcessEvents(core.QEventLoop__AllEvents)
+				}
+				widgetScroll := m.MessageList.ItemAt(i).Widget()
+				widgetScroll.DeleteLater()
+			}
+
 			m.RoomAvatar.SetPixmap(gui.NewQPixmap())
 			m.MainWidget.SetWindowTitle("Morpheus - " + room.GetRoomTopic())
 
@@ -149,20 +159,13 @@ func (m *MainUI) NewUI() (err error) {
 			go room.GetRoomAvatar()
 
 			m.RoomTitle.SetText(room.GetRoomName())
-
 			m.RoomTopic.SetText(room.GetRoomTopic())
-			count := m.MessageList.Count()
-			for i := 0; i < count; i++ {
-				if (i % 10) == 0 {
-					m.App.ProcessEvents(core.QEventLoop__AllEvents)
-				}
-				widgetScroll := m.MessageList.ItemAt(i).Widget()
-				widgetScroll.DeleteLater()
-			}
 
 			log.Println("Before loadCache")
 			//Ensure we count again on every Room Change
 			m.MessageList.MessageCount = 0
+
+			m.App.ProcessEvents(core.QEventLoop__AllEvents)
 			go m.loadCache()
 		}
 	})
