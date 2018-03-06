@@ -41,14 +41,10 @@ func (m *MessageList) Init(scrollArea *widgets.QScrollArea) {
 
 // NewMessage adds a new message object to the view
 func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.QScrollArea, own bool, height, width int) (err error) {
-	barAtBottom := false
 	bar := scrollArea.VerticalScrollBar()
-	log.Println("BarVal: ", bar.Value())
-	log.Println("BarMin: ", bar.Minimum())
-	log.Println("BarMax: ", bar.Maximum())
-	if bar.Value() == bar.Minimum() {
-		barAtBottom = true
-	}
+	bar.ConnectRangeChanged(func(min int, max int) {
+		scrollArea.VerticalScrollBar().SetValue(max)
+	})
 
 	var widget = widgets.NewQWidget(nil, 0)
 
@@ -140,14 +136,5 @@ func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.
 	messageWidget.Resize2(aWidth, height+10)
 
 	go message.GetUserAvatar()
-
-	log.Println("BarVal: ", bar.Value())
-	log.Println("BarMin: ", bar.Minimum())
-	log.Println("BarMax: ", bar.Maximum())
-	if barAtBottom {
-		bar.Update()
-		bar.SetValue(bar.Minimum())
-	}
-
 	return
 }
