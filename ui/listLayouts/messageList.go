@@ -30,10 +30,6 @@ type MessageList struct {
 	MessageCount int64
 }
 
-type MessageThread struct {
-	core.QThread
-}
-
 // Init generates a new widgets.QVBoxLayout and adds it to the message scrollArea
 func (m *MessageList) Init(scrollArea *widgets.QScrollArea) {
 	m.SetSpacing(0)
