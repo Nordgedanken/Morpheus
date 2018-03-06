@@ -36,6 +36,7 @@ type MessageThread struct {
 }
 
 func (mt *MessageThread) Run() {
+	log.Infoln("Run!")
 	mt.MessageFunc()
 }
 

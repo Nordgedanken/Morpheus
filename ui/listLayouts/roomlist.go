@@ -34,6 +34,7 @@ type RoomThread struct {
 }
 
 func (rt *RoomThread) Run() {
+	log.Infoln("Run!")
 	rt.RoomFunc()
 }
 
