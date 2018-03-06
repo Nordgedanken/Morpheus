@@ -90,7 +90,11 @@ func (m *MainUI) NewUI() (err error) {
 		height := m.App.FontMetrics().Height()
 		width := m.App.FontMetrics().Width(message.Message, len(message.Message))
 
-		m.MessageList.NewMessage(message, m.messageScrollArea, own, height, width)
+		thread := core.NewQThread(nil)
+		thread.ConnectRun(func() {
+			m.MessageList.NewMessage(message, m.messageScrollArea, own, height, width)
+		})
+		thread.Exec()
 	})
 
 	go m.startSync()
@@ -100,11 +104,16 @@ func (m *MainUI) NewUI() (err error) {
 	m.RoomList.ConnectTriggerRoom(func(roomID string) {
 		room := m.Rooms[roomID]
 
-		NewRoomErr := m.RoomList.NewRoom(room, m.roomScrollArea)
-		if NewRoomErr != nil {
-			err = NewRoomErr
-			return
-		}
+		thread := core.NewQThread(nil)
+		thread.ConnectRun(func() {
+			NewRoomErr := m.RoomList.NewRoom(room, m.roomScrollArea)
+			if NewRoomErr != nil {
+				err = NewRoomErr
+				return
+			}
+		})
+		thread.Exec()
+
 	})
 
 	go m.initRoomList()
