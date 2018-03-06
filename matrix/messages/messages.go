@@ -124,14 +124,13 @@ func (m *Message) GetUserAvatar() {
 			if NameErr != nil {
 				log.Errorln(NameErr)
 			}
-			DisplayName := DisplayNameResp.DisplayName
 			var name string
 			if DisplayNameResp == nil {
 				name = m.Author
-			} else if DisplayName == "" {
+			} else if DisplayNameResp.DisplayName == "" {
 				name = m.Author
 			} else {
-				name = DisplayName
+				name = DisplayNameResp.DisplayName
 			}
 
 			var GenerateImgErr error
