@@ -94,7 +94,7 @@ func (m *MainUI) NewUI() (err error) {
 			log.Debugln("Adding New Message In Thread")
 			m.MessageList.NewMessage(message, m.messageScrollArea, own, height, width)
 		}
-		thread := listLayouts.NewMessageThread(nil)
+		thread := listLayouts.NewMessageThread(m.MainWidget)
 		thread.MessageFunc = messageFunc
 
 		thread.Start()
@@ -115,7 +115,7 @@ func (m *MainUI) NewUI() (err error) {
 				return
 			}
 		}
-		thread := listLayouts.NewRoomThread(nil)
+		thread := listLayouts.NewRoomThread(m.MainWidget)
 		thread.RoomFunc = messageFunc
 
 		thread.Start()
