@@ -95,7 +95,7 @@ func (m *MainUI) NewUI() (err error) {
 			log.Debugln("Adding New Message In Thread")
 			m.MessageList.NewMessage(message, m.messageScrollArea, own, height, width)
 		})
-		thread.Exec()
+		thread.Start()
 	})
 
 	go m.startSync()
@@ -114,7 +114,7 @@ func (m *MainUI) NewUI() (err error) {
 				return
 			}
 		})
-		thread.Exec()
+		thread.Start()
 
 	})
 
