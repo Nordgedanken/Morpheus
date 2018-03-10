@@ -20,20 +20,32 @@ parts:
       - libgl1-mesa-dev
       - libpulse-dev
       - curl
+      - libfontconfig
+      - xvfb
+      - software-properties-common
     build: |
       add-apt-repository -y ppa:gophers/archive
       apt-get -qq update
-      apt-get -y -qq install golang-1.9-go curl
-      export PATH=$PATH:/usr/lib/go-1.9/bin/
+      apt-get -y -qq install golang-1.9-go
+      export PATH="$PATH:/usr/lib/go-1.9/bin/"
       export GOPATH="$HOME/go/"
       mkdir $GOPATH
-      go get -u -v github.com/therecipe/qt/cmd/...
-      curl -sL --retry 10 --retry-delay 10 -o /tmp/$QT https://download.qt.io/official_releases/online_installers/qt-unified-linux-x64-online.run
+      go get -u -d -v github.com/therecipe/qt/cmd/...
+      export DISPLAY=:0
+      curl -L --retry 10 --retry-delay 10 -o /tmp/qt-unified-linux-x64-online.run https://download.qt.io/official_releases/online_installers/qt-unified-linux-x64-online.run
       chmod +x /tmp/qt-unified-linux-x64-online.run
-      /tmp/qt-unified-linux-x64-online.run --script $GOPATH/src/github.com/therecipe/qt/internal/ci/iscript.qs LINUX=true
+      xvfb-run /tmp/qt-unified-linux-x64-online.run --script $GOPATH/src/github.com/therecipe/qt/internal/ci/iscript.qs LINUX=true
       rm -f /tmp/qt-unified-linux-x64-online.run
+      export PKG_CONFIG_PATH=/opt/qt58/lib/pkgconfig
+      export QT_DOC_DIR=/opt/qt58/doc
+      export QT_MISC_DIR=/opt/qt58
+      export QT_DIR=/opt/Qt
+      go install github.com/therecipe/qt/cmd/...
       $GOPATH/bin/qtsetup
-      curl -L -s https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64 -o $GOPATH/bin/dep && chmod +x $GOPATH/bin/dep
+      mkdir -p $GOPATH/src/github.com/Nordgedanken/Morpheus/
+      mv ./* $GOPATH/src/github.com/Nordgedanken/Morpheus/
+      cd $GOPATH/src/github.com/Nordgedanken/Morpheus/
+      curl -L https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64 -o $GOPATH/bin/dep && chmod +x $GOPATH/bin/dep
       dep ensure
       $GOPATH/bin/qtdeploy build linux
     install: |
