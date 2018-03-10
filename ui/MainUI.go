@@ -419,6 +419,13 @@ func (m *MainUI) initRoomList() (err error) {
 func (m *MainUI) loadCache() (err error) {
 	log.Println("Loading cache!")
 
+	currentRoomMem := m.Rooms[m.CurrentRoom]
+
+	for _, v := range currentRoomMem.Messages {
+		go m.MessageList.TriggerMessage(v.EventID)
+		m.MessageList.MessageCount++
+	}
+
 	cacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
 		log.Errorln(DBOpenErr)
@@ -450,7 +457,7 @@ func (m *MainUI) loadCache() (err error) {
 			}
 			idValue := fmt.Sprintf("%s", value)
 
-			if !doneMsg[idValue] {
+			if !doneMsg[idValue] && (currentRoomMem.Messages[idValue] != nil) {
 				// Remember we already added this message to the view
 				doneMsg[idValue] = true
 
@@ -478,9 +485,6 @@ func (m *MainUI) loadCache() (err error) {
 					return errors.WithMessage(ConvErr, "Timestamp String: "+timestamp)
 				}
 
-				//TODO Use for better/faster cache loading
-				currentRoomMem := m.Rooms[m.CurrentRoom]
-
 				message := messages.NewMessage()
 				message.EventID = idValue
 				message.Author = sender
@@ -494,11 +498,8 @@ func (m *MainUI) loadCache() (err error) {
 
 				log.Println(m.MessageList.MessageCount)
 
-				if (m.MessageList.MessageCount % 10) == 0 {
-					m.App.ProcessEvents(core.QEventLoop__AllEvents)
-				}
 			}
-			if (intIt % 10) == 0 {
+			if ((m.MessageList.MessageCount % 10) == 0) || ((intIt % 10) == 0) {
 				m.App.ProcessEvents(core.QEventLoop__AllEvents)
 			}
 			intIt++
