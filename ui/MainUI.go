@@ -284,6 +284,16 @@ func (m *MainUI) logout() (err error) {
 			results <- false
 		}
 		db.ResetOnceUser()
+
+		//Reset RoomList
+		cacheDB, DBOpenCacheErr := db.OpenCacheDB()
+		if DBOpenCacheErr != nil {
+			log.Errorln(DBOpenCacheErr)
+		}
+		cacheDB.Update(func(txn *badger.Txn) error {
+			return txn.Delete([]byte("rooms"))
+		})
+
 		results <- true
 	}(m.Cli, results)
 
