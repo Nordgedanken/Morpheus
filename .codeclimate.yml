@@ -6,6 +6,10 @@ checks:
   method-lines:
     config:
       threshold: 40
+  return-statements:
+    config:
+      threshold: 400
+
 plugins:
   govet:
     enabled: true
