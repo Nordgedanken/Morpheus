@@ -32,7 +32,7 @@ parts:
       mkdir $GOPATH
       go get -u -d -v github.com/therecipe/qt/cmd/...
       export DISPLAY=:0
-      curl -sL --retry 10 --retry-delay 10 -o /tmp/qt-unified-linux-x64-online.run https://download.qt.io/official_releases/online_installers/qt-unified-linux-x64-online.run
+      curl -L --retry 10 --retry-delay 10 -o /tmp/qt-unified-linux-x64-online.run https://download.qt.io/official_releases/online_installers/qt-unified-linux-x64-online.run
       chmod +x /tmp/qt-unified-linux-x64-online.run
       xvfb-run /tmp/qt-unified-linux-x64-online.run --script $GOPATH/src/github.com/therecipe/qt/internal/ci/iscript.qs LINUX=true
       rm -f /tmp/qt-unified-linux-x64-online.run
@@ -45,7 +45,8 @@ parts:
       mkdir -p $GOPATH/src/github.com/Nordgedanken/Morpheus/
       mv ./* $GOPATH/src/github.com/Nordgedanken/Morpheus/
       cd $GOPATH/src/github.com/Nordgedanken/Morpheus/
-      go get ./...
+      curl -L https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64 -o $GOPATH/bin/dep && chmod +x $GOPATH/bin/dep
+      dep ensure
       $GOPATH/bin/qtdeploy build linux
     install: |
       mv .circleci/Morpheus.sh $SNAPCRAFT_PART_INSTALL/usr/bin/Morpheus.sh
