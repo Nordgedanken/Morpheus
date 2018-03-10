@@ -25,6 +25,7 @@ parts:
       - software-properties-common
     build: |
       test $SNAP_ARCH = 'armhf' && exit 0
+      test $SNAP_ARCH = 'arm64' && exit 0
       add-apt-repository -y ppa:gophers/archive
       apt-get -qq update
       apt-get -y -qq install golang-1.9-go
@@ -33,16 +34,16 @@ parts:
       mkdir $GOPATH
       go get -u -d -v github.com/therecipe/qt/cmd/...
       export DISPLAY=:0
-      test $SNAP_ARCH = 'x86_64' && curl -L --retry 10 --retry-delay 10 -o ./qt-unified-linux-x64-online.run https://download.qt.io/official_releases/online_installers/qt-unified-linux-x64-online.run
+      test $SNAP_ARCH = 'amd64' && curl -L --retry 10 --retry-delay 10 -o ./qt-unified-linux-x64-online.run https://download.qt.io/official_releases/online_installers/qt-unified-linux-x64-online.run
       test $SNAP_ARCH = 'i386' && curl -L --retry 10 --retry-delay 10 -o ./qt-unified-linux-x86-online.run https://download.qt.io/official_releases/online_installers/qt-unified-linux-x86-online.run
       ls -la ./
-      test $SNAP_ARCH = 'x86_64' && ls -la ./qt-unified-linux-x64-online.run
+      test $SNAP_ARCH = 'amd64' && ls -la ./qt-unified-linux-x64-online.run
       test $SNAP_ARCH = 'i386' && ls -la ./qt-unified-linux-x86-online.run
-      test $SNAP_ARCH = 'x86_64' && chmod +x ./qt-unified-linux-x64-online.run
+      test $SNAP_ARCH = 'amd64' && chmod +x ./qt-unified-linux-x64-online.run
       test $SNAP_ARCH = 'i386' && chmod +x qt-unified-linux-x86-online.run
-      test $SNAP_ARCH = 'x86_64' && xvfb-run sh ./qt-unified-linux-x64-online.run --script $GOPATH/src/github.com/therecipe/qt/internal/ci/iscript.qs LINUX=true
+      test $SNAP_ARCH = 'amd64' && xvfb-run sh ./qt-unified-linux-x64-online.run --script $GOPATH/src/github.com/therecipe/qt/internal/ci/iscript.qs LINUX=true
       test $SNAP_ARCH = 'i386' && xvfb-run sh ./qt-unified-linux-x86-online.run --script $GOPATH/src/github.com/therecipe/qt/internal/ci/iscript.qs LINUX=true
-      test $SNAP_ARCH = 'x86_64' && rm -f ./qt-unified-linux-x64-online.run
+      test $SNAP_ARCH = 'amd64' && rm -f ./qt-unified-linux-x64-online.run
       test $SNAP_ARCH = 'i386' && rm -f ./qt-unified-linux-x86-online.run
       export PKG_CONFIG_PATH=/opt/qt58/lib/pkgconfig
       export QT_DOC_DIR=/opt/qt58/doc
@@ -58,6 +59,7 @@ parts:
       $GOPATH/bin/qtdeploy build linux
     install: |
       test $SNAP_ARCH = 'armhf' && exit 0
+      test $SNAP_ARCH = 'arm64' && exit 0
       mv .circleci/Morpheus.sh $SNAPCRAFT_PART_INSTALL/usr/bin/Morpheus.sh
       sed -i -e 's/$appname/Morpheus_bin/g' $SNAPCRAFT_PART_INSTALL/usr/bin/Morpheus.sh
       ln -s $SNAPCRAFT_PART_INSTALL/usr/bin/Morpheus.sh $SNAPCRAFT_PART_INSTALL/usr/bin/Morpheus
