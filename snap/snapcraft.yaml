@@ -32,10 +32,12 @@ parts:
       mkdir $GOPATH
       go get -u -d -v github.com/therecipe/qt/cmd/...
       export DISPLAY=:0
-      curl -L --retry 10 --retry-delay 10 -o /tmp/qt-unified-linux-x64-online.run https://download.qt.io/official_releases/online_installers/qt-unified-linux-x64-online.run
-      chmod +x /tmp/qt-unified-linux-x64-online.run
-      xvfb-run /tmp/qt-unified-linux-x64-online.run --script $GOPATH/src/github.com/therecipe/qt/internal/ci/iscript.qs LINUX=true
-      rm -f /tmp/qt-unified-linux-x64-online.run
+      curl -L --retry 10 --retry-delay 10 -o ./qt-unified-linux-x64-online.run https://download.qt.io/official_releases/online_installers/qt-unified-linux-x64-online.run
+      ls -la ./
+      ls -la ./qt-unified-linux-x64-online.run
+      chmod +x ./qt-unified-linux-x64-online.run
+      xvfb-run ./qt-unified-linux-x64-online.run --script $GOPATH/src/github.com/therecipe/qt/internal/ci/iscript.qs LINUX=true
+      rm -f ./qt-unified-linux-x64-online.run
       export PKG_CONFIG_PATH=/opt/qt58/lib/pkgconfig
       export QT_DOC_DIR=/opt/qt58/doc
       export QT_MISC_DIR=/opt/qt58
