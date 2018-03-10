@@ -1,4 +1,9 @@
-engines:
+version: "2"         # required to adjust maintainability checks
+checks:
+  method-complexity:
+    config:
+      threshold: 15
+plugins:
   govet:
     enabled: true
   golint:
@@ -11,7 +16,7 @@ engines:
       strings:
       - FIXME
       - BUG
-      - CUSTOM
+      - TODO
 
 ratings:
   paths:
