@@ -33,16 +33,16 @@ parts:
       go get -u -d -v github.com/therecipe/qt/cmd/...
       export DISPLAY=:0
       test $(uname -m) = 'x86_64' && curl -L --retry 10 --retry-delay 10 -o ./qt-unified-linux-x64-online.run https://download.qt.io/official_releases/online_installers/qt-unified-linux-x64-online.run
-      test $(uname -m) = 'i368' && curl -L --retry 10 --retry-delay 10 -o ./qt-unified-linux-x86-online.run https://download.qt.io/official_releases/online_installers/qt-unified-linux-x86-online.run
+      test $(uname -m) = 'i386' && curl -L --retry 10 --retry-delay 10 -o ./qt-unified-linux-x86-online.run https://download.qt.io/official_releases/online_installers/qt-unified-linux-x86-online.run
       ls -la ./
       ls -la ./qt-unified-linux-x64-online.run
       ls -la ./qt-unified-linux-x86-online.run
       test $(uname -m) = 'x86_64' && chmod +x ./qt-unified-linux-x64-online.run
-      test $(uname -m) = 'i368' && chmod +x qt-unified-linux-x86-online.run
+      test $(uname -m) = 'i386' && chmod +x qt-unified-linux-x86-online.run
       test $(uname -m) = 'x86_64' && xvfb-run sh ./qt-unified-linux-x64-online.run --script $GOPATH/src/github.com/therecipe/qt/internal/ci/iscript.qs LINUX=true
-      test $(uname -m) = 'i368' && xvfb-run sh ./qt-unified-linux-x86-online.run --script $GOPATH/src/github.com/therecipe/qt/internal/ci/iscript.qs LINUX=true
+      test $(uname -m) = 'i386' && xvfb-run sh ./qt-unified-linux-x86-online.run --script $GOPATH/src/github.com/therecipe/qt/internal/ci/iscript.qs LINUX=true
       test $(uname -m) = 'x86_64' && rm -f ./qt-unified-linux-x64-online.run
-      test $(uname -m) = 'i368' && rm -f ./qt-unified-linux-x86-online.run
+      test $(uname -m) = 'i386' && rm -f ./qt-unified-linux-x86-online.run
       export PKG_CONFIG_PATH=/opt/qt58/lib/pkgconfig
       export QT_DOC_DIR=/opt/qt58/doc
       export QT_MISC_DIR=/opt/qt58
