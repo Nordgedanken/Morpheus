@@ -43,7 +43,8 @@ parts:
       if [ "$(arch)" = "x86_64" ]; then chmod +x /root/qt-unified-linux-x64-online.run; else chmod +x /root/qt-unified-linux-x86-online.run; fi
       echo ${GOPATH}/src/github.com/therecipe/qt/internal/ci/iscript.qs
       cat ${GOPATH}/src/github.com/therecipe/qt/internal/ci/iscript.qs
-      if [ "$(arch)" = "x86_64" ]; then xvfb-run "sh /root/qt-unified-linux-x64-online.run --script \"${GOPATH}src/github.com/therecipe/qt/internal/ci/iscript.qs\"" LINUX=true; else xvfb-run "sh /root/qt-unified-linux-x86-online.run --script \"${GOPATH}src/github.com/therecipe/qt/internal/ci/iscript.qs\"" LINUX=true; fi
+      xvfb-run --help
+      if [ "$(arch)" = "x86_64" ]; then xvfb-run sh "/root/qt-unified-linux-x64-online.run --script \"${GOPATH}src/github.com/therecipe/qt/internal/ci/iscript.qs\"" LINUX=true; else xvfb-run sh "/root/qt-unified-linux-x86-online.run --script \"${GOPATH}src/github.com/therecipe/qt/internal/ci/iscript.qs\"" LINUX=true; fi
       if [ "$(arch)" = "x86_64" ]; then rm -f /root/qt-unified-linux-x64-online.run; else rm -f /root/qt-unified-linux-x86-online.run; fi
       export PKG_CONFIG_PATH=/opt/qt58/lib/pkgconfig
       export QT_DOC_DIR=/opt/qt58/doc
