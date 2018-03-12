@@ -136,7 +136,6 @@ func (m *MainUI) NewUI() (err error) {
 
 		if m.CurrentRoom != room.RoomID {
 			m.SetCurrentRoom(room.RoomID)
-			m.messageScrollArea.Widget().Hide()
 
 			count := m.MessageList.Count()
 			for i := 0; i < count; i++ {
@@ -172,7 +171,6 @@ func (m *MainUI) NewUI() (err error) {
 
 			m.App.ProcessEvents(core.QEventLoop__AllEvents)
 			go m.loadCache()
-			m.messageScrollArea.Widget().Show()
 		}
 	})
 
