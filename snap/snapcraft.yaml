@@ -50,11 +50,13 @@ parts:
       $GOPATH/bin/qtsetup install
       mkdir -p $GOPATH/src/github.com/Nordgedanken/Morpheus/
       mv ./* $GOPATH/src/github.com/Nordgedanken/Morpheus/
-      cd $GOPATH/src/github.com/Nordgedanken/Morpheus/
       curl -L https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64 -o $GOPATH/bin/dep && chmod +x $GOPATH/bin/dep
-      $GOPATH/bin/dep ensure
-      $GOPATH/bin/qtdeploy build linux
+      cd $GOPATH/src/github.com/Nordgedanken/Morpheus/ && $GOPATH/bin/dep ensure
+      ls -la
+      cd $GOPATH/src/github.com/Nordgedanken/Morpheus/ && ls -la
+      cd $GOPATH/src/github.com/Nordgedanken/Morpheus/ && $GOPATH/bin/qtdeploy build linux
     install: |
+      cd $GOPATH/src/github.com/Nordgedanken/Morpheus/
       mv .circleci/Morpheus.sh $SNAPCRAFT_PART_INSTALL/usr/bin/Morpheus.sh
       sed -i -e 's/$appname/Morpheus_bin/g' $SNAPCRAFT_PART_INSTALL/usr/bin/Morpheus.sh
       ln -s $SNAPCRAFT_PART_INSTALL/usr/bin/Morpheus.sh $SNAPCRAFT_PART_INSTALL/usr/bin/Morpheus
