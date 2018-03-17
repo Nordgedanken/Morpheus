@@ -50,7 +50,7 @@ parts:
       $GOPATH/bin/qtsetup generate
       $GOPATH/bin/qtsetup install
       mkdir -p $GOPATH/src/github.com/Nordgedanken/Morpheus/
-      mv ./ $GOPATH/src/github.com/Nordgedanken/Morpheus/
+      mv ./* $GOPATH/src/github.com/Nordgedanken/Morpheus/
       curl -L https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64 -o $GOPATH/bin/dep && chmod +x $GOPATH/bin/dep
       ls -la
       cd $GOPATH/src/github.com/Nordgedanken/Morpheus/ && $GOPATH/bin/dep ensure
