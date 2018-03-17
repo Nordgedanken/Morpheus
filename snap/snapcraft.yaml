@@ -1,11 +1,11 @@
 # After registering a name on build.snapcraft.io, commit an uncommented line:
 name: morpheus
-version: '0.1.0' # just for humans, typically '1.2+git' or '1.3.2'
+version: '0.1.0+git' # just for humans, typically '1.2+git' or '1.3.2'
 summary: A Matrix client written in Go-QT
 description: |
   A Matrix client written in Go-QT.
 grade: devel # must be 'stable' to release into candidate/stable channels
-confinement: devmode # use 'strict' once you have the right plugs and slots
+confinement: strict # use 'strict' once you have the right plugs and slots
 
 apps:
   morpheus:
@@ -14,6 +14,8 @@ apps:
 parts:
   morpheus:
     source: https://github.com/Nordgedanken/Morpheus.git
+    source-type: git
+    source-branch: develop
     plugin: nil
     build-packages:
       - build-essential
@@ -49,13 +51,14 @@ parts:
       $GOPATH/bin/qtsetup check
       $GOPATH/bin/qtsetup generate
       $GOPATH/bin/qtsetup install
+      ls -la
       mkdir -p $GOPATH/src/github.com/Nordgedanken/Morpheus/
       mv ./* $GOPATH/src/github.com/Nordgedanken/Morpheus/
+      cd $GOPATH/src/github.com/Nordgedanken/Morpheus/
       curl -L https://github.com/golang/dep/releases/download/v0.4.1/dep-linux-amd64 -o $GOPATH/bin/dep && chmod +x $GOPATH/bin/dep
       ls -la
-      cd $GOPATH/src/github.com/Nordgedanken/Morpheus/ && $GOPATH/bin/dep ensure
-      cd $GOPATH/src/github.com/Nordgedanken/Morpheus/ && ls -la
-      cd $GOPATH/src/github.com/Nordgedanken/Morpheus/ && $GOPATH/bin/qtdeploy build linux
+      $GOPATH/bin/dep ensure
+      $GOPATH/bin/qtdeploy build linux
     install: |
       cd $GOPATH/src/github.com/Nordgedanken/Morpheus/
       mv .circleci/Morpheus.sh $SNAPCRAFT_PART_INSTALL/usr/bin/Morpheus.sh
