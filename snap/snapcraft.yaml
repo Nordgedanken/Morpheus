@@ -41,7 +41,10 @@ parts:
       export QT_MISC_DIR=/opt/qt58
       export QT_DIR=/opt/Qt
       go install github.com/therecipe/qt/cmd/...
-      $GOPATH/bin/qtsetup
+      $GOPATH/bin/qtsetup check
+      $GOPATH/bin/qtsetup prep
+      $GOPATH/bin/qtsetup generate
+      $GOPATH/bin/qtsetup install
       mkdir -p $GOPATH/src/github.com/Nordgedanken/Morpheus/
       mv ./* $GOPATH/src/github.com/Nordgedanken/Morpheus/
       cd $GOPATH/src/github.com/Nordgedanken/Morpheus/
