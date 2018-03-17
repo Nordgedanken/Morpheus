@@ -26,6 +26,11 @@ parts:
       - xvfb
       - software-properties-common
     build: |
+      ls -la /src
+      ls -la
+      ls -la /Morpheus/src
+      ls -la /
+      ls -la parts/Morpheus/src
       add-apt-repository -y ppa:gophers/archive
       apt-get -qq update
       apt-get -y -qq install golang-1.9-go
