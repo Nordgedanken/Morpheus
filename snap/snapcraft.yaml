@@ -44,8 +44,9 @@ parts:
       export CGO_CXXFLAGS_ALLOW=".*"
       export CGO_LDFLAGS_ALLOW=".*"
       export CGO_CFLAGS_ALLOW=".*"
-      $GOPATH/bin/qtsetup check
+      ls -la /opt/Qt
       $GOPATH/bin/qtsetup prep
+      $GOPATH/bin/qtsetup check
       $GOPATH/bin/qtsetup generate
       $GOPATH/bin/qtsetup install
       mkdir -p $GOPATH/src/github.com/Nordgedanken/Morpheus/
