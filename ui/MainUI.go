@@ -173,13 +173,8 @@ func (m *MainUI) NewUI() (err error) {
 			// Ensure we count again on every Room Change
 			m.MessageList.MessageCount = 0
 
-			cacheThread := core.NewQThread(nil)
-			cacheThread.ConnectRun(func() {
-				m.App.ProcessEvents(core.QEventLoop__AllEvents)
-				m.loadCache()
-				println("cacheThread:", core.QThread_CurrentThread().Pointer())
-			})
-			cacheThread.Start()
+			m.App.ProcessEvents(core.QEventLoop__AllEvents)
+			m.loadCache()
 		}
 	})
 
