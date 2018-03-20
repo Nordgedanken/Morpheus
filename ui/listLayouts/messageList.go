@@ -26,7 +26,6 @@ import (
 // MessageList defines the TriggerMessage method to add messages to the View
 type MessageList struct {
 	widgets.QVBoxLayout
-	_            func(messageID string) `slot:"triggerMessage"`
 	MessageCount int64
 }
 
@@ -41,7 +40,7 @@ func (m *MessageList) Init(scrollArea *widgets.QScrollArea) {
 
 // NewMessage adds a new message object to the view
 func (m *MessageList) NewMessage(message *messages.Message, scrollArea *widgets.QScrollArea, own bool, height, width int) (err error) {
-	//Todo: properly fix the scrollbar position or use readmarkers!
+	// Todo: properly fix the scrollbar position or use readmarkers!
 	bar := scrollArea.VerticalScrollBar()
 	barAtBottom := bar.Value() == bar.Maximum()
 	bar.ConnectRangeChanged(func(min int, max int) {

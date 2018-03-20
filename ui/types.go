@@ -2,6 +2,7 @@ package ui
 
 import (
 	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
+	"github.com/Nordgedanken/Morpheus/utils"
 
 	"github.com/Nordgedanken/Morpheus/matrix/syncer"
 	"github.com/therecipe/qt/widgets"
@@ -18,6 +19,8 @@ type MainUI struct {
 	MainWidget        *widgets.QWidget
 	messageScrollArea *widgets.QScrollArea
 	roomScrollArea    *widgets.QScrollArea
+
+	Dispatcher *utils.Dispatcher
 
 	window  *widgets.QMainWindow
 	storage *syncer.MorpheusStore

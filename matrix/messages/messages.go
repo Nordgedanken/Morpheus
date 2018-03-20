@@ -5,10 +5,12 @@ import (
 
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
+	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
 	"github.com/dgraph-io/badger"
 	"github.com/matrix-org/gomatrix"
 	"github.com/opennota/linkify"
 	log "github.com/sirupsen/logrus"
+	"github.com/therecipe/qt/widgets"
 )
 
 // Message saves the information of a Message
@@ -21,10 +23,28 @@ type Message struct {
 	AvatarURL      string
 	Message        string
 	Timestamp      int64
+	Height         int64
+	Width          int64
+	Config         *globalTypes.Config
+	ScrollArea     *widgets.QScrollArea
 }
 
 func NewMessage() *Message {
 	return &Message{}
+}
+
+func (m *Message) Show() error {
+	var own bool
+	if m.Author == m.Cli.UserID {
+		own = true
+	} else {
+		own = false
+	}
+	height := m.Config.App.FontMetrics().Height()
+	width := m.Config.App.FontMetrics().Width(m.Message, len(m.Message))
+
+	log.Debugln("Adding New Message In Thread")
+	return m.Config.MessageList.NewMessage(m, m.ScrollArea, own, height, width)
 }
 
 func (m *Message) crawlAvatarURL() (err error) {

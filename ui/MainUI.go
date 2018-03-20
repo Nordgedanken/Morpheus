@@ -15,6 +15,7 @@ import (
 	"github.com/Nordgedanken/Morpheus/matrix/rooms"
 	"github.com/Nordgedanken/Morpheus/matrix/syncer"
 	"github.com/Nordgedanken/Morpheus/ui/listLayouts"
+	"github.com/Nordgedanken/Morpheus/utils"
 	"github.com/dgraph-io/badger"
 	"github.com/matrix-org/gomatrix"
 	"github.com/opennota/linkify"
@@ -26,6 +27,11 @@ import (
 	"github.com/therecipe/qt/gui"
 	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
+)
+
+var (
+	MaxWorker = 3
+	MaxQueue  = 20
 )
 
 // NewMainUIStruct gives you a MainUI struct with prefilled data
@@ -65,6 +71,10 @@ func (m *MainUI) GetWidget() (widget *widgets.QWidget) {
 
 // NewUI initializes a new Main Screen
 func (m *MainUI) NewUI() (err error) {
+
+	m.Dispatcher = utils.NewDispatcher(MaxQueue, MaxWorker)
+	m.Dispatcher.Run()
+
 	m.loadChatUIDefaults()
 
 	// Handle LogoutButton
@@ -78,22 +88,6 @@ func (m *MainUI) NewUI() (err error) {
 	})
 
 	m.initScrolls()
-
-	m.MessageList.ConnectTriggerMessage(func(messageID string) {
-		var own bool
-		var message = m.Rooms[m.CurrentRoom].Messages[messageID]
-		if message.Author == m.Cli.UserID {
-			own = true
-		} else {
-			own = false
-		}
-		height := m.App.FontMetrics().Height()
-		width := m.App.FontMetrics().Width(message.Message, len(message.Message))
-
-		log.Debugln("Adding New Message In Thread")
-		m.MessageList.NewMessage(message, m.messageScrollArea, own, height, width)
-
-	})
 
 	go m.startSync()
 	m.widget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
@@ -338,7 +332,7 @@ func (m *MainUI) logout() (err error) {
 }
 
 func (m *MainUI) startSync() (err error) {
-	//Start Syncer!
+	// Start Syncer!
 	m.storage = syncer.NewMorpheusStore()
 
 	Syncer := syncer.NewMorpheusSyncer(m.Cli.UserID, m.storage, &m.Config)
@@ -368,7 +362,11 @@ func (m *MainUI) startSync() (err error) {
 			message.Cli = m.Cli
 			m.Rooms[room].AddMessage(message)
 
-			go m.MessageList.TriggerMessage(id)
+			work := utils.Job{Message: message}
+
+			log.Infoln("sending payload  to workque")
+			utils.JobQueue <- work
+			log.Infoln("sent payload  to workque")
 			m.MessageList.MessageCount++
 
 			if (m.MessageList.MessageCount % 10) == 0 {
@@ -437,7 +435,12 @@ func (m *MainUI) loadCache() (err error) {
 	currentRoomMem := m.Rooms[m.CurrentRoom]
 
 	for _, v := range currentRoomMem.Messages {
-		go m.MessageList.TriggerMessage(v.EventID)
+		work := utils.Job{Message: v}
+
+		log.Infoln("sending payload  to workque")
+		utils.JobQueue <- work
+		log.Infoln("sent payload  to workque")
+
 		m.MessageList.MessageCount++
 	}
 
@@ -506,14 +509,16 @@ func (m *MainUI) loadCache() (err error) {
 				message.Message = msg
 				message.Timestamp = timestampInt
 				message.Cli = m.Cli
+				message.ScrollArea = m.messageScrollArea
+				message.Config = &m.Config
 				currentRoomMem.AddMessage(message)
 
-				triggerMessageThread := core.NewQThread(nil)
-				triggerMessageThread.ConnectRun(func() {
-					m.MessageList.TriggerMessage(idValue)
-					println("triggerMessageThread:", core.QThread_CurrentThread().Pointer())
-				})
-				triggerMessageThread.Start()
+				work := utils.Job{Message: message}
+
+				log.Infoln("sending payload  to workque")
+				utils.JobQueue <- work
+				log.Infoln("sent payload  to workque")
+
 				m.MessageList.MessageCount++
 
 				log.Println(m.MessageList.MessageCount)
