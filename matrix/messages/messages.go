@@ -5,7 +5,7 @@ import (
 
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
-	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
+	"github.com/Nordgedanken/Morpheus/ui/listLayouts"
 	"github.com/dgraph-io/badger"
 	"github.com/matrix-org/gomatrix"
 	"github.com/opennota/linkify"
@@ -25,8 +25,9 @@ type Message struct {
 	Timestamp      int64
 	Height         int64
 	Width          int64
-	Config         *globalTypes.Config
 	ScrollArea     *widgets.QScrollArea
+	MessageList    *listLayouts.MessageList
+	App            *widgets.QApplication
 }
 
 func NewMessage() *Message {
@@ -40,11 +41,11 @@ func (m *Message) Show() error {
 	} else {
 		own = false
 	}
-	height := m.Config.App.FontMetrics().Height()
-	width := m.Config.App.FontMetrics().Width(m.Message, len(m.Message))
+	height := m.App.FontMetrics().Height()
+	width := m.App.FontMetrics().Width(m.Message, len(m.Message))
 
 	log.Debugln("Adding New Message In Thread")
-	return m.Config.MessageList.NewMessage(m, m.ScrollArea, own, height, width)
+	return m.MessageList.NewMessage(m, m.ScrollArea, own, height, width)
 }
 
 func (m *Message) crawlAvatarURL() (err error) {
