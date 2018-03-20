@@ -508,7 +508,12 @@ func (m *MainUI) loadCache() (err error) {
 				message.Cli = m.Cli
 				currentRoomMem.AddMessage(message)
 
-				go m.MessageList.TriggerMessage(idValue)
+				triggerMessageThread := core.NewQThread(nil)
+				triggerMessageThread.ConnectRun(func() {
+					m.MessageList.TriggerMessage(idValue)
+					println("triggerMessageThread:", core.QThread_CurrentThread().Pointer())
+				})
+				triggerMessageThread.Start()
 				m.MessageList.MessageCount++
 
 				log.Println(m.MessageList.MessageCount)
