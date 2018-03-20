@@ -5,7 +5,6 @@ import (
 
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
-	"github.com/Nordgedanken/Morpheus/ui/listLayouts"
 	"github.com/dgraph-io/badger"
 	"github.com/matrix-org/gomatrix"
 	"github.com/opennota/linkify"
@@ -15,26 +14,39 @@ import (
 
 // Message saves the information of a Message
 type Message struct {
-	setAvatarFuncs []func(IMGdata []byte)
-	Cli            *gomatrix.Client
-	EventID        string
-	Author         string
-	EventType      string
-	AvatarURL      string
-	Message        string
-	Timestamp      int64
-	Height         int64
-	Width          int64
-	ScrollArea     *widgets.QScrollArea
-	MessageList    *listLayouts.MessageList
-	App            *widgets.QApplication
+	setAvatarFuncs    []func(IMGdata []byte)
+	showCallbackFuncs []func(message *Message, own bool, height, width int)
+	Cli               *gomatrix.Client
+	EventID           string
+	Author            string
+	EventType         string
+	AvatarURL         string
+	Message           string
+	Timestamp         int64
+	Height            int64
+	Width             int64
+	App               *widgets.QApplication
 }
 
 func NewMessage() *Message {
 	return &Message{}
 }
 
-func (m *Message) Show() error {
+// ConnectSetAvatar registers a callback function
+func (m *Message) ConnectShowCallback(f func(message *Message, own bool, height, width int)) {
+	m.showCallbackFuncs = append(m.showCallbackFuncs, f)
+	return
+}
+
+// SetAvatar triggers all callback functions
+func (m *Message) ShowCallback(message *Message, own bool, height, width int) {
+	for _, f := range m.showCallbackFuncs {
+		f(message, own, height, width)
+	}
+	return
+}
+
+func (m *Message) Show() {
 	var own bool
 	if m.Author == m.Cli.UserID {
 		own = true
@@ -44,8 +56,8 @@ func (m *Message) Show() error {
 	height := m.App.FontMetrics().Height()
 	width := m.App.FontMetrics().Width(m.Message, len(m.Message))
 
-	log.Debugln("Adding New Message In Thread")
-	return m.MessageList.NewMessage(m, m.ScrollArea, own, height, width)
+	log.Debugln("Adding New Message")
+	m.ShowCallback(m, own, height, width)
 }
 
 func (m *Message) crawlAvatarURL() (err error) {

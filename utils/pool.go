@@ -2,7 +2,6 @@ package utils
 
 import (
 	"github.com/Nordgedanken/Morpheus/matrix/messages"
-	log "github.com/sirupsen/logrus"
 )
 
 // Job represents the job to be run
@@ -38,9 +37,7 @@ func (w Worker) Start() {
 			select {
 			case job := <-w.JobChannel:
 				// we have received a work request.
-				if err := job.Message.Show(); err != nil {
-					log.Errorf("Error Showing Message: %s", err.Error())
-				}
+				job.Message.Show()
 
 			case <-w.quit:
 				// we have received a signal to stop

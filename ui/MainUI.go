@@ -360,6 +360,9 @@ func (m *MainUI) startSync() (err error) {
 			message.Message = msg
 			message.Timestamp = timestamp
 			message.Cli = m.Cli
+			message.ConnectShowCallback(func(message *messages.Message, own bool, height, width int) {
+				m.MessageList.NewMessage(message, m.messageScrollArea, own, height, width)
+			})
 			m.Rooms[room].AddMessage(message)
 
 			work := utils.Job{Message: message}
@@ -509,8 +512,9 @@ func (m *MainUI) loadCache() (err error) {
 				message.Message = msg
 				message.Timestamp = timestampInt
 				message.Cli = m.Cli
-				message.ScrollArea = m.messageScrollArea
-				message.Config = &m.Config
+				message.ConnectShowCallback(func(message *messages.Message, own bool, height, width int) {
+					m.MessageList.NewMessage(message, m.messageScrollArea, own, height, width)
+				})
 				currentRoomMem.AddMessage(message)
 
 				work := utils.Job{Message: message}
