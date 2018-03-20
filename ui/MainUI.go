@@ -67,7 +67,7 @@ func (m *MainUI) GetWidget() (widget *widgets.QWidget) {
 func (m *MainUI) NewUI() (err error) {
 	m.loadChatUIDefaults()
 
-	//Handle LogoutButton
+	// Handle LogoutButton
 	logoutButton := widgets.NewQPushButtonFromPointer(m.widget.FindChild("LogoutButton", core.Qt__FindChildrenRecursively).Pointer())
 	logoutButton.ConnectClicked(func(_ bool) {
 		LogoutErr := m.logout()
@@ -110,7 +110,12 @@ func (m *MainUI) NewUI() (err error) {
 		}
 	})
 
-	go m.initRoomList()
+	initRoomThread := core.NewQThread(nil)
+	initRoomThread.ConnectRun(func() {
+		m.initRoomList()
+		println("initRoomList thread:", core.QThread_CurrentThread().Pointer())
+	})
+	initRoomThread.Start()
 
 	var message string
 	messageInput := widgets.NewQLineEditFromPointer(m.widget.FindChild("MessageInput", core.Qt__FindChildrenRecursively).Pointer())
@@ -137,15 +142,20 @@ func (m *MainUI) NewUI() (err error) {
 		if m.CurrentRoom != room.RoomID {
 			m.SetCurrentRoom(room.RoomID)
 
-			count := m.MessageList.Count()
-			for i := 0; i < count; i++ {
-				if (i % 10) == 0 {
-					m.App.ProcessEvents(core.QEventLoop__AllEvents)
+			changeRoomThread := core.NewQThread(nil)
+			changeRoomThread.ConnectRun(func() {
+				println("changeRoomThread thread:", core.QThread_CurrentThread().Pointer())
+				count := m.MessageList.Count()
+				for i := 0; i < count; i++ {
+					if (i % 10) == 0 {
+						m.App.ProcessEvents(core.QEventLoop__AllEvents)
+					}
+					widgetScroll := m.MessageList.ItemAt(i).Widget()
+					widgetScroll.DeleteLater()
 				}
-				widgetScroll := m.MessageList.ItemAt(i).Widget()
-				widgetScroll.DeleteLater()
-			}
-			m.App.ProcessEvents(core.QEventLoop__AllEvents)
+				m.App.ProcessEvents(core.QEventLoop__AllEvents)
+			})
+			changeRoomThread.Start()
 
 			m.RoomAvatar.SetPixmap(gui.NewQPixmap())
 			m.MainWidget.SetWindowTitle("Morpheus - " + room.GetRoomTopic())
@@ -166,11 +176,16 @@ func (m *MainUI) NewUI() (err error) {
 			m.RoomTopic.SetText(room.GetRoomTopic())
 
 			log.Println("Before loadCache")
-			//Ensure we count again on every Room Change
+			// Ensure we count again on every Room Change
 			m.MessageList.MessageCount = 0
 
-			m.App.ProcessEvents(core.QEventLoop__AllEvents)
-			go m.loadCache()
+			cacheThread := core.NewQThread(nil)
+			cacheThread.ConnectRun(func() {
+				m.App.ProcessEvents(core.QEventLoop__AllEvents)
+				m.loadCache()
+				println("cacheThread:", core.QThread_CurrentThread().Pointer())
+			})
+			cacheThread.Start()
 		}
 	})
 
