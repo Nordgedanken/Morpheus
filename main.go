@@ -18,6 +18,11 @@ import (
 	"github.com/therecipe/qt/widgets"
 )
 
+// Arrange that main.main runs on main thread.
+func init() {
+	runtime.LockOSThread()
+}
+
 var window *widgets.QMainWindow
 var mainUIStruct *ui.MainUI
 var loginUIStruct *ui.LoginUI
