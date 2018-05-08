@@ -4,29 +4,32 @@ import (
 	"sync"
 
 	"github.com/Nordgedanken/Morpheus/matrix"
+	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
 	"github.com/matrix-org/gomatrix"
 	log "github.com/sirupsen/logrus"
 	"github.com/therecipe/qt/core"
+	"github.com/therecipe/qt/gui"
+	"github.com/therecipe/qt/uitools"
 	"github.com/therecipe/qt/widgets"
 )
 
 // NewLoginUIStruct gives you a LoginUI struct with prefilled data
-func NewLoginUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow) (loginUIStruct LoginUI) {
-	configStruct := config{
-		windowWidth:  windowWidth,
-		windowHeight: windowHeight,
+func NewLoginUIStruct(windowWidth, windowHeight int, window *widgets.QMainWindow) (loginUIStruct *LoginUI) {
+	configStruct := globalTypes.Config{
+		WindowWidth:  windowWidth,
+		WindowHeight: windowHeight,
 	}
-	loginUIStruct = LoginUI{
-		config: configStruct,
+	loginUIStruct = &LoginUI{
+		Config: configStruct,
 		window: window,
 	}
 	return
 }
 
 // NewLoginUIStructWithExistingConfig gives you a LoginUI struct with prefilled data and data from a previous Config
-func NewLoginUIStructWithExistingConfig(configStruct config, window *widgets.QMainWindow) (loginUIStruct LoginUI) {
-	loginUIStruct = LoginUI{
-		config: configStruct,
+func NewLoginUIStructWithExistingConfig(configStruct globalTypes.Config, window *widgets.QMainWindow) (loginUIStruct *LoginUI) {
+	loginUIStruct = &LoginUI{
+		Config: configStruct,
 		window: window,
 	}
 	return
@@ -40,80 +43,160 @@ func (l *LoginUI) GetWidget() (widget *widgets.QWidget) {
 
 // NewUI initializes a new login Screen
 func (l *LoginUI) NewUI() (err error) {
-	widget := widgets.NewQWidget(nil, 0)
-	widget.SetObjectName("LoginWrapper")
-	widget.SetStyleSheet("QWidget#LoginWrapper { border: 0px; };")
-	topLayout := widgets.NewQVBoxLayout()
+	l.widget = widgets.NewQWidget(nil, 0)
 
-	formWidget := widgets.NewQWidget(nil, 0)
-	formWrapper := widgets.NewQHBoxLayout()
+	var loader = uitools.NewQUiLoader(nil)
+	var file = core.NewQFile2(":/qml/ui/login.ui")
 
-	formLayout := widgets.NewQVBoxLayout()
-	formLayout.SetSpacing(20)
-	formLayout.SetContentsMargins(0, 0, 0, 30)
-	formWidget.SetLayout(formLayout)
+	file.Open(core.QIODevice__ReadOnly)
+	l.LoginWidget = loader.Load(file, l.widget)
+	file.Close()
 
-	formWrapper.AddStretch(1)
-	formWrapper.AddWidget(formWidget, 0, 0)
-	formWrapper.AddStretch(1)
-
-	// UsernameInput
-	usernameInput := widgets.NewQLineEdit(nil)
-	usernameInput.SetPlaceholderText("Insert MXID")
-
-	usernameLayout := widgets.NewQHBoxLayout()
-	usernameLayout.AddWidget(usernameInput, 0, core.Qt__AlignVCenter)
+	// LocalpartInput
+	localpartInput := widgets.NewQLineEditFromPointer(l.widget.FindChild("LocalpartInput", core.Qt__FindChildrenRecursively).Pointer())
 
 	// PasswordInput
-	passwordInput := widgets.NewQLineEdit(nil)
-	passwordInput.SetPlaceholderText("Insert password")
-	passwordInput.SetEchoMode(widgets.QLineEdit__Password)
-
-	passwordLayout := widgets.NewQHBoxLayout()
-	passwordLayout.AddWidget(passwordInput, 0, core.Qt__AlignVCenter)
-
-	formLayout.AddLayout(usernameLayout, 0)
-	formLayout.AddLayout(passwordLayout, 0)
+	passwordInput := widgets.NewQLineEditFromPointer(l.widget.FindChild("PasswordInput", core.Qt__FindChildrenRecursively).Pointer())
 
 	// loginButton
-	buttonLayout := widgets.NewQHBoxLayout()
-	buttonLayout.SetSpacing(0)
-	buttonLayout.SetContentsMargins(0, 0, 0, 30)
+	loginButton := widgets.NewQPushButtonFromPointer(l.widget.FindChild("LoginButton", core.Qt__FindChildrenRecursively).Pointer())
 
-	loginButton := widgets.NewQPushButton2("LOGIN", nil)
-	loginButton.SetMinimumSize2(350, 65)
+	//Set Button Effect
+	leffect := widgets.NewQGraphicsDropShadowEffect(nil)
+	leffect.SetBlurRadius(5)
+	leffect.SetXOffset(2)
+	leffect.SetYOffset(2)
+	leffect.SetColor(gui.NewQColor2(core.Qt__black))
 
-	buttonLayout.AddStretch(1)
-	buttonLayout.AddWidget(loginButton, 0, 0)
-	buttonLayout.AddStretch(1)
+	loginButton.SetGraphicsEffect(leffect)
 
-	topLayout.AddStretch(1)
-	topLayout.AddLayout(formWrapper, 0)
-	topLayout.AddStretch(1)
-	topLayout.AddLayout(buttonLayout, 0)
-	topLayout.AddStretch(1)
+	// ServerDropdown
+	serverDropdown := widgets.NewQComboBoxFromPointer(l.widget.FindChild("ServerChooserDropdown", core.Qt__FindChildrenRecursively).Pointer())
 
-	widget.SetLayout(topLayout)
+	// registerButton
+	registerButton := widgets.NewQPushButtonFromPointer(l.widget.FindChild("RegisterButton", core.Qt__FindChildrenRecursively).Pointer())
 
-	usernameInput.ConnectTextChanged(func(value string) {
-		l.username = value
+	//Set Button Effect
+	reffect := widgets.NewQGraphicsDropShadowEffect(nil)
+	reffect.SetBlurRadius(5)
+	reffect.SetXOffset(2)
+	reffect.SetYOffset(2)
+	reffect.SetColor(gui.NewQColor2(core.Qt__black))
+
+	registerButton.SetGraphicsEffect(reffect)
+
+	var layout = widgets.NewQHBoxLayout()
+	l.window.SetLayout(layout)
+	layout.InsertWidget(0, l.LoginWidget, 0, core.Qt__AlignTop|core.Qt__AlignLeft)
+	layout.SetSpacing(0)
+	layout.SetContentsMargins(0, 0, 0, 0)
+	l.widget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
+	l.LoginWidget.SetSizePolicy2(widgets.QSizePolicy__Expanding, widgets.QSizePolicy__Expanding)
+
+	l.widget.ConnectResizeEvent(func(event *gui.QResizeEvent) {
+		l.LoginWidget.Resize(event.Size())
+		event.Accept()
+	})
+
+	var helloMatrixRespErr error
+	l.helloMatrixResp, helloMatrixRespErr = getHelloMatrixList()
+	if helloMatrixRespErr != nil {
+		log.Println(helloMatrixRespErr)
+		err = helloMatrixRespErr
+		return
+	}
+
+	hostnames := convertHelloMatrixRespToNameSlice(l.helloMatrixResp)
+	serverDropdown.AddItems(hostnames)
+
+	localpartInput.ConnectTextChanged(func(value string) {
+		if localpartInput.StyleSheet() == redBorder {
+			localpartInput.SetStyleSheet("")
+		}
+		l.Localpart = value
 	})
 
 	passwordInput.ConnectTextChanged(func(value string) {
-		l.password = value
+		if passwordInput.StyleSheet() == redBorder {
+			passwordInput.SetStyleSheet("")
+		}
+		l.Password = value
 	})
 
 	loginButton.ConnectClicked(func(_ bool) {
-		LoginErr := l.login()
-		if err != nil {
-			err = LoginErr
-			return
+		if l.Localpart != "" && l.Password != "" {
+			l.Server = serverDropdown.CurrentText()
+			LoginErr := l.login()
+			if LoginErr != nil {
+				err = LoginErr
+				return
+			}
+		} else {
+			if l.Localpart == "" {
+				localpartInput.SetStyleSheet(redBorder)
+			} else {
+				passwordInput.SetStyleSheet(redBorder)
+			}
 		}
 	})
 
-	widget.SetWindowTitle("Morpheus - Login")
+	registerButton.ConnectClicked(func(_ bool) {
+		registerUIStruct := NewRegUIStructWithExistingConfig(l.Config, l.window)
+		regUIErr := registerUIStruct.NewUI()
+		if regUIErr != nil {
+			err = regUIErr
+			return
+		}
+		l.window.SetCentralWidget(registerUIStruct.GetWidget())
+		l.window.Resize(l.widget.Size())
+	})
 
-	l.widget = widget
+	localpartInput.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
+		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
+			if l.Password != "" {
+				l.Server = serverDropdown.CurrentText()
+				LoginErr := l.login()
+				if LoginErr != nil {
+					err = LoginErr
+					return
+				}
+
+				localpartInput.Clear()
+				ev.Accept()
+			} else {
+				passwordInput.SetStyleSheet(redBorder)
+				ev.Ignore()
+			}
+		} else {
+			localpartInput.KeyPressEventDefault(ev)
+			ev.Ignore()
+		}
+	})
+
+	passwordInput.ConnectKeyPressEvent(func(ev *gui.QKeyEvent) {
+		if int(ev.Key()) == int(core.Qt__Key_Enter) || int(ev.Key()) == int(core.Qt__Key_Return) {
+			if l.Localpart != "" {
+				l.Server = serverDropdown.CurrentText()
+				LoginErr := l.login()
+				if LoginErr != nil {
+					err = LoginErr
+					return
+				}
+
+				passwordInput.Clear()
+				ev.Accept()
+			} else {
+				localpartInput.SetStyleSheet(redBorder)
+				ev.Ignore()
+			}
+		} else {
+			passwordInput.KeyPressEventDefault(ev)
+			ev.Ignore()
+		}
+	})
+
+	l.LoginWidget.SetWindowTitle("Morpheus - Login")
+
 	return
 }
 
@@ -122,12 +205,12 @@ func (l *LoginUI) login() (err error) {
 
 	var wg sync.WaitGroup
 
-	if l.username != "" && l.password != "" {
-		log.Infoln("Starting Login Sequenze in background")
+	if l.Localpart != "" && l.Password != "" {
+		log.Infoln("Starting Login Sequence in background")
 		results := make(chan *gomatrix.Client)
 
 		wg.Add(1)
-		go matrix.DoLogin(l.username, l.password, "", "", "", results, &wg)
+		go matrix.DoLogin(l.Localpart, l.Password, l.Server, "", "", results, &wg)
 
 		go func() {
 			wg.Wait()      // wait for each execTask to return
@@ -135,10 +218,11 @@ func (l *LoginUI) login() (err error) {
 		}()
 
 		//Show MainUI
-		for result := range results {
-			//TODO Don't switch screen on wrong login data.
-			l.cli = result
-			MainUIStruct := NewMainUIStructWithExistingConfig(l.config, l.window)
+		select {
+		case result := <-results:
+			l.Cli = result
+			MainUIStruct := NewMainUIStructWithExistingConfig(l.Config, l.window)
+			MainUIStruct.App = l.App
 			mainUIErr := MainUIStruct.NewUI()
 			if mainUIErr != nil {
 				err = mainUIErr
@@ -148,7 +232,7 @@ func (l *LoginUI) login() (err error) {
 			l.window.Resize(l.widget.Size())
 		}
 	} else {
-		log.Warningln("Username and/or password is empty. Do Nothing.")
+		log.Warningln("Localpart and/or password is empty. Do Nothing.")
 	}
 	return
 }

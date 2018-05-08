@@ -2,6 +2,8 @@
 [![CircleCI branch](https://img.shields.io/circleci/project/github/Nordgedanken/Morpheus/master.svg)](https://circleci.com/gh/Nordgedanken/Morpheus)
 
 [![Github All Releases](https://img.shields.io/github/downloads/Nordgedanken/Morpheus/total.svg)]()
+
+[![Go Report Card](https://goreportcard.com/badge/github.com/Nordgedanken/Morpheus)](https://goreportcard.com/report/github.com/Nordgedanken/Morpheus)
 ---
 
 A Matrix client written in Go-QT
@@ -20,6 +22,11 @@ Read the [Contribution Guideline](CONTRIBUTING.md)
 1. Run `qtdeploy build desktop` inside  `$GOPATH/src/github.com/Nordgedanken/Morpheus`
 2. Run the Application from within `deploy/**`
 
+## How to Build the Windows Installer
+1. Get a Windows PC
+2. Follow setup on https://github.com/mh-cbon/go-msi
+3. Download the Morpheus.exe from the latest CI Build for your tag into the Source Folder or the build result (it needs to be static linked)
+4. Run `go-msi make --msi Morpheus.msi --version 0.0.1 --src scripts/templates`
 
 ## Versioning
 We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/Nordgedanken/Morpheus/tags).

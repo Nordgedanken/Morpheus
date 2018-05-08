@@ -47,6 +47,12 @@
       </sizepolicy>
      </property>
      <layout class="QGridLayout" name="gridLayout">
+      <property name="leftMargin">
+       <number>9</number>
+      </property>
+      <property name="topMargin">
+       <number>9</number>
+      </property>
       <item row="0" column="0">
        <widget class="QWidget" name="widget_3" native="true">
         <property name="sizePolicy">
@@ -129,7 +135,7 @@
          <string notr="true">border: 0;</string>
         </property>
         <property name="text">
-         <string>Test</string>
+         <string/>
         </property>
         <property name="scaledContents">
          <bool>false</bool>
@@ -165,10 +171,10 @@
             <string notr="true">color:grey;</string>
            </property>
            <property name="text">
-            <string>MTRNord</string>
+            <string>This is a placeholder :)</string>
            </property>
            <property name="openExternalLinks">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <property name="textInteractionFlags">
             <set>Qt::LinksAccessibleByMouse</set>
@@ -186,13 +192,13 @@
             <string notr="true">color:grey;</string>
            </property>
            <property name="text">
-            <string>Way to early to say a time^^</string>
+            <string>This is a placeholder :)</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
            <property name="openExternalLinks">
-            <bool>true</bool>
+            <bool>false</bool>
            </property>
            <property name="textInteractionFlags">
             <set>Qt::LinksAccessibleByMouse</set>

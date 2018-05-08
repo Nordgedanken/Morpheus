@@ -17,5 +17,7 @@ rcc*
 debug*
 log/
 data/
-ui/moc*
+moc*
 .idea/
+Morpheus.exe
+Morpheus.msi

@@ -1,18 +1,14 @@
 package main
 
 import (
-	"fmt"
 	"os"
-	"os/signal"
 	"path/filepath"
 	"runtime"
 	"sync"
-	"syscall"
 
 	"github.com/Nordgedanken/Morpheus/matrix"
 	"github.com/Nordgedanken/Morpheus/matrix/db"
 	"github.com/Nordgedanken/Morpheus/ui"
-	"github.com/dgraph-io/badger"
 	"github.com/Nordgedanken/dugong"
 	"github.com/matrix-org/gomatrix"
 	"github.com/shibukawa/configdir"
@@ -22,13 +18,29 @@ import (
 	"github.com/therecipe/qt/widgets"
 )
 
+// Arrange that main.main runs on main thread.
+func init() {
+	runtime.LockOSThread()
+}
+
 var window *widgets.QMainWindow
+var mainUIStruct *ui.MainUI
+var loginUIStruct *ui.LoginUI
 
 func main() {
 	runtime.GOMAXPROCS(128)
 
-	// Init Logs
+	//defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
+
+	// Init Logs and folders
 	configDirs := configdir.New("Nordgedanken", "Morpheus")
+	if _, StatErr := os.Stat(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path) + "/log/"); os.IsNotExist(StatErr) {
+		MkdirErr := os.MkdirAll(filepath.ToSlash(configDirs.QueryFolders(configdir.Global)[0].Path)+"/log/", 0700)
+		if MkdirErr != nil {
+			log.Println(MkdirErr)
+			return
+		}
+	}
 
 	log.SetFormatter(&log.TextFormatter{
 		TimestampFormat:  "2006-01-02 15:04:05.000000",
@@ -49,25 +61,6 @@ func main() {
 			DisableSorting:   false,
 		}, &dugong.DailyRotationSchedule{GZip: false},
 	))
-
-	c := make(chan os.Signal, 2)
-	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
-	go func() {
-		<-c
-		cleanup()
-		close(c)
-		os.Exit(1)
-	}()
-
-	UserDB, DBOpenErr := db.OpenUserDB()
-	if DBOpenErr != nil {
-		log.Fatalln(DBOpenErr)
-	}
-
-	CacheDB, DBOpenErr := db.OpenCacheDB()
-	if DBOpenErr != nil {
-		log.Fatalln(DBOpenErr)
-	}
 
 	log.Infoln("Starting Morpheus")
 
@@ -107,51 +100,14 @@ func main() {
 	windowX := (screen.Width() - windowHeight) / 2
 	windowY := (screen.Height() - windowWidth) / 2
 
+	window.Resize2(windowWidth, windowHeight)
+	window.Show()
+
 	window.Move2(windowX, windowY)
 
-	var accessToken string
-	var homeserverURL string
-	var userID string
-
-	// Get cache
-	DBErr := UserDB.View(func(txn *badger.Txn) error {
-		accessTokenItem, QueryErr := txn.Get([]byte("user|accessToken"))
-		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
-			return QueryErr
-		}
-		if QueryErr != badger.ErrKeyNotFound {
-			accessTokenByte, accessTokenErr := accessTokenItem.Value()
-			accessToken = fmt.Sprintf("%s", accessTokenByte)
-			if accessTokenErr != nil {
-				return accessTokenErr
-			}
-		}
-
-		homeserverURLItem, QueryErr := txn.Get([]byte("user|homeserverURL"))
-		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
-			return QueryErr
-		}
-		if QueryErr != badger.ErrKeyNotFound {
-			homeserverURLByte, homeserverURLErr := homeserverURLItem.Value()
-			homeserverURL = fmt.Sprintf("%s", homeserverURLByte)
-			if homeserverURLErr != nil {
-				return homeserverURLErr
-			}
-		}
-
-		userIDItem, QueryErr := txn.Get([]byte("user|userID"))
-		if QueryErr != nil && QueryErr != badger.ErrKeyNotFound {
-			return QueryErr
-		}
-		if QueryErr != badger.ErrKeyNotFound {
-			userIDByte, userIDErr := userIDItem.Value()
-			userID = fmt.Sprintf("%s", userIDByte)
-			return userIDErr
-		}
-		return nil
-	})
-	if DBErr != nil {
-		log.Errorln("Login: ", DBErr)
+	accessToken, homeserverURL, userID, UserCacheErr := matrix.GetUserDataFromCache()
+	if UserCacheErr != nil {
+		log.Debug(UserCacheErr)
 	}
 
 	if accessToken != "" && homeserverURL != "" && userID != "" {
@@ -168,52 +124,81 @@ func main() {
 		}()
 
 		//Show MainUI
-		for result := range results {
-			//TODO Don't switch screen on wrong login data.
-			MainUIStruct := ui.NewMainUIStruct(windowWidth, windowHeight, window)
-			MainUIStruct.SetCli(result)
-			mainUIErr := MainUIStruct.NewUI()
+		select {
+		case result := <-results:
+			mainUIStruct = ui.NewMainUIStruct(windowWidth, windowHeight, window)
+			mainUIStruct.SetCli(result)
+			mainUIStruct.App = app
+			mainUIErr := mainUIStruct.NewUI()
 			if mainUIErr != nil {
 				log.Errorln("mainUI: ", mainUIErr)
 				return
 			}
-			MainUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
-			window.SetCentralWidget(MainUIStruct.GetWidget())
+
+			mainUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
+			window.SetCentralWidget(mainUIStruct.GetWidget())
 		}
 	} else {
 		//Show loginUI
-		LoginUIStruct := ui.NewLoginUIStruct(windowWidth, windowHeight, window)
-		loginUIErr := LoginUIStruct.NewUI()
+		loginUIStruct = ui.NewLoginUIStruct(windowWidth, windowHeight, window)
+		loginUIStruct.App = app
+		loginUIErr := loginUIStruct.NewUI()
 		if loginUIErr != nil {
 			log.Errorln("Login Err: ", loginUIErr)
 			return
 		}
-		LoginUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
-		window.SetCentralWidget(LoginUIStruct.GetWidget())
+
+		loginUIStruct.GetWidget().Resize2(windowWidth, windowHeight)
+		window.SetCentralWidget(loginUIStruct.GetWidget())
 	}
 
 	window.Resize2(windowWidth, windowHeight)
-	window.Show()
+
+	window.ConnectCloseEvent(func(event *gui.QCloseEvent) {
+		log.Infoln("Stopping Morpheus")
+		if cleanup() {
+			event.Accept()
+		} else {
+			event.Ignore()
+		}
+	})
 
 	//enter the main event loop
 	_ = widgets.QApplication_Exec()
-	defer UserDB.Close()
-	defer CacheDB.Close()
-	log.Infoln("Stopping Morpheus")
 }
 
-func cleanup() {
+func cleanup() bool {
 	log.Infoln("cleanup")
+
+	if mainUIStruct != nil {
+		if mainUIStruct.GetCli() != nil {
+			log.Infoln("Stop Sync")
+			mainUIStruct.GetCli().StopSync()
+		}
+		mainUIStruct.RoomList.DestroyRoomList()
+	}
+
+	if loginUIStruct != nil {
+		if loginUIStruct.GetCli() != nil {
+			log.Infoln("Stop Sync")
+			loginUIStruct.GetCli().StopSync()
+		}
+	}
+
 	UserDB, DBOpenErr := db.OpenUserDB()
 	if DBOpenErr != nil {
 		log.Errorln(DBOpenErr)
+		return false
 	}
 
 	CacheDB, DBOpenErr := db.OpenCacheDB()
 	if DBOpenErr != nil {
 		log.Errorln(DBOpenErr)
+		return false
 	}
 
 	UserDB.Close()
 	CacheDB.Close()
+
+	return true
 }

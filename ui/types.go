@@ -1,68 +1,78 @@
 package ui
 
 import (
-	"github.com/Nordgedanken/Morpheus/matrix"
-	"github.com/Nordgedanken/Morpheus/matrix/db"
+	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
+	"github.com/Nordgedanken/Morpheus/utils"
+
 	"github.com/Nordgedanken/Morpheus/matrix/syncer"
-	"github.com/matrix-org/gomatrix"
-	"github.com/therecipe/qt/core"
 	"github.com/therecipe/qt/widgets"
 )
 
-// Config holds important reused information in the UI
-type config struct {
-	username string
-	password string
-
-	windowWidth  int
-	windowHeight int
-
-	matrixClient
-}
-
-type matrixClient struct {
-	databases
-	cli    *gomatrix.Client
-	syncer *syncer.MorpheusSyncer
-}
-
-type databases struct {
-	cacheDB db.Storer
-}
-
-// SetCurrentRoom sets the new room ID of the MainUI
-func (d *databases) SetCacheDB(db db.Storer) {
-	d.cacheDB = db
-}
-
 // MainUI holds information about the MainUI
 type MainUI struct {
-	config
+	globalTypes.Config
 
-	widget                  *widgets.QWidget
-	widgetThread            *core.QThread
-	RoomAvatar              *widgets.QLabel
-	RoomTitle               *widgets.QLabel
-	RoomTopic               *widgets.QLabel
-	MainWidget              *widgets.QWidget
-	MessageListLayout       *QVBoxLayoutWithTriggerSlot
-	messageScrollArea       *widgets.QScrollArea
-	messageScrollAreaThread *core.QThread
+	widget            *widgets.QWidget
+	RoomAvatar        *widgets.QLabel
+	RoomTitle         *widgets.QLabel
+	RoomTopic         *widgets.QLabel
+	MainWidget        *widgets.QWidget
+	messageScrollArea *widgets.QScrollArea
+	roomScrollArea    *widgets.QScrollArea
 
-	window      *widgets.QMainWindow
-	storage     *syncer.MorpheusStore
-	rooms       map[string]*matrix.Room
-	currentRoom string
+	Dispatcher *utils.Dispatcher
+
+	window  *widgets.QMainWindow
+	storage *syncer.MorpheusStore
 }
 
 // SetCurrentRoom sets the new room ID of the MainUI
 func (m *MainUI) SetCurrentRoom(RoomID string) {
-	m.currentRoom = RoomID
+	m.CurrentRoom = RoomID
 }
 
 // LoginUI holds information about the LoginUI
 type LoginUI struct {
-	config
-	widget *widgets.QWidget
-	window *widgets.QMainWindow
+	globalTypes.Config
+
+	LoginWidget     *widgets.QWidget
+	widget          *widgets.QWidget
+	window          *widgets.QMainWindow
+	helloMatrixResp helloMatrixResp
+}
+
+// RegUI holds information about the LoginUI
+type RegUI struct {
+	globalTypes.Config
+
+	RegWidget       *widgets.QWidget
+	widget          *widgets.QWidget
+	window          *widgets.QMainWindow
+	helloMatrixResp helloMatrixResp
+}
+
+type helloMatrixResp []struct {
+	Hostname             string `json:"hostname"`
+	Description          string `json:"description"`
+	URL                  string `json:"url"`
+	Category             string `json:"category"`
+	Location             string `json:"location"`
+	OnlineSince          int64  `json:"online_since"`
+	LastResponse         int64  `json:"last_response"`
+	LastResponseTime     int64  `json:"last_response_time"`
+	StatusSince          string `json:"status_since"`
+	LastVersions         string `json:"last_versions"`
+	Measurements         int64  `json:"measurements"`
+	Successful           int64  `json:"successful"`
+	SumResponseTime      int64  `json:"sum_response_time"`
+	MeasurementsShort    int64  `json:"measurements_short"`
+	SuccessfulShort      int64  `json:"successful_short"`
+	SumResponseTimeShort int64  `json:"sum_response_time_short"`
+	UsersActive          int64  `json:"users_active,omitempty"`
+	ServerName           string `json:"server_name"`
+	ServerVersion        string `json:"server_version"`
+	Grade                string `json:"grade"`
+	GradeTrustIgnored    string `json:"gradeTrustIgnored"`
+	HasWarnings          int64  `json:"hasWarnings"`
+	PublicRoomCount      int64  `json:"public_room_count"`
 }

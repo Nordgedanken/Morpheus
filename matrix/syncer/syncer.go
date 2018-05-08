@@ -6,24 +6,30 @@ import (
 	"runtime/debug"
 	"time"
 
+	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
+	"github.com/Nordgedanken/Morpheus/matrix/rooms"
 	"github.com/matrix-org/gomatrix"
+	"github.com/therecipe/qt/core"
 )
 
+//MorpheusSyncer holds the UserID, the used Storer and the listener
 type MorpheusSyncer struct {
 	UserID    string
 	Store     gomatrix.Storer
 	listeners map[string][]OnEventListener // event type to listeners array
+	config    *globalTypes.Config
 }
 
 // OnEventListener can be used with DefaultSyncer.OnEventType to be informed of incoming events.
 type OnEventListener func(*gomatrix.Event)
 
 // NewMorpheusSyncer returns an instantiated MorpheusSyncer
-func NewMorpheusSyncer(userID string, store gomatrix.Storer) *MorpheusSyncer {
+func NewMorpheusSyncer(userID string, store gomatrix.Storer, config *globalTypes.Config) *MorpheusSyncer {
 	return &MorpheusSyncer{
 		UserID:    userID,
 		Store:     store,
 		listeners: make(map[string][]OnEventListener),
+		config:    config,
 	}
 }
 
@@ -122,12 +128,26 @@ func (s *MorpheusSyncer) shouldProcessResponse(resp *gomatrix.RespSync, since st
 
 // getOrCreateRoom must only be called by the Sync() goroutine which calls ProcessResponse()
 func (s *MorpheusSyncer) getOrCreateRoom(roomID string) *gomatrix.Room {
-	room := s.Store.LoadRoom(roomID)
-	if room == nil { // create a new Room
-		room = gomatrix.NewRoom(roomID)
-		s.Store.SaveRoom(room)
+	// Add new Room to the List if new
+	if s.config.Rooms == nil {
+		s.config.Rooms = make(map[string]*rooms.Room)
 	}
-	return room
+
+	room := s.config.Rooms[roomID]
+
+	if room == nil { // create a new Room
+		room = rooms.NewRoom()
+		room.RoomID = roomID
+		room.Cli = s.config.Cli
+		s.config.RoomList.RoomCount++
+		if (s.config.RoomList.RoomCount % 10) == 0 {
+			s.config.App.ProcessEvents(core.QEventLoop__AllEvents)
+		}
+		s.config.Rooms[roomID] = room
+		go s.config.RoomList.TriggerRoom(roomID)
+	}
+	gomatrixRoom := gomatrix.NewRoom(roomID)
+	return gomatrixRoom
 }
 
 func (s *MorpheusSyncer) notifyListeners(event *gomatrix.Event) {
