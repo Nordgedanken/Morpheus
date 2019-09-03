@@ -4,6 +4,7 @@ import (
 	"sync"
 
 	"github.com/Nordgedanken/Morpheus/matrix"
+	"github.com/Nordgedanken/Morpheus/matrix/scalar"
 	"github.com/Nordgedanken/Morpheus/matrix/globalTypes"
 	"github.com/matrix-org/gomatrix"
 	log "github.com/sirupsen/logrus"
@@ -228,6 +229,9 @@ func (l *LoginUI) login() (err error) {
 				err = mainUIErr
 				return
 			}
+
+			scalar.ReqAndSaveScalarToken(MainUIStruct.GetCli())
+
 			l.window.SetCentralWidget(MainUIStruct.GetWidget())
 			l.window.Resize(l.widget.Size())
 		}
